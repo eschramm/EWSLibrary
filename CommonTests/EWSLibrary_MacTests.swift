@@ -1,15 +1,15 @@
 //
-//  EWSLibrary_iOSTests.swift
-//  EWSLibrary_iOSTests
+//  EWSLibrary_MacTests.swift
+//  EWSLibrary_iOS
 //
 //  Created by Eric Schramm on 7/23/18.
 //  Copyright © 2018 eware. All rights reserved.
 //
 
 import XCTest
-@testable import EWSLibrary_iOS
+@testable import EWSLibrary
 
-class EWSLibrary_iOSTests: XCTestCase {
+class EWSLibrary_MacTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -24,6 +24,11 @@ class EWSLibrary_iOSTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+    
+    func testShell() {
+        let shell = Shell()
+        XCTAssert(shell.outputOf(commandName: "echo", arguments: ["testing the shell"]) == "testing the shell\n")
     }
     
     func testPerformanceExample() {

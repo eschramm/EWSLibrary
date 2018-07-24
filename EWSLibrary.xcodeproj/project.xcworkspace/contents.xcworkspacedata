@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:EWSLibrary_iOS.xcodeproj">
+      location = "self:/Users/ericschramm/Dropbox/XCode/~Resources/EWSLibrary_iOS/EWSLibrary.xcodeproj">
    </FileRef>
 </Workspace>

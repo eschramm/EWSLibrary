@@ -6,13 +6,13 @@
 //  Copyright © 2018 eware. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for EWSLibrary_iOS.
-FOUNDATION_EXPORT double EWSLibrary_iOSVersionNumber;
+FOUNDATION_EXPORT double EWSLibrary_VersionNumber;
 
 //! Project version string for EWSLibrary_iOS.
-FOUNDATION_EXPORT const unsigned char EWSLibrary_iOSVersionString[];
+FOUNDATION_EXPORT const unsigned char EWSLibrary_VersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <EWSLibrary_iOS/PublicHeader.h>
 
