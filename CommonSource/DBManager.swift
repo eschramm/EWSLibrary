@@ -432,12 +432,12 @@ public class DBManager {
     
     public let filePath: String
     public let models: [DBModel.Type]
-    var database: FMDatabase!
+    public private(set) var database: FMDatabase!
     var caches = [String : RecordCache]()
     var cacheSaves = 0
     let numberFormatter = NumberFormatter()
     
-    let sqlDateFormatter = DateFormatter()
+    public let sqlDateFormatter = DateFormatter()
     
     public init(filePath: String, models: [DBModel.Type]) {
         self.filePath = filePath
