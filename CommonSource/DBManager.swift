@@ -13,9 +13,9 @@ import Foundation
 import Foundation
 import FMDB
 
-typealias RecordID = Int32
+public typealias RecordID = Int32
 
-protocol DBModel {
+public protocol DBModel {
     static var table: DBTable { get }
     static var fields: [DBField] { get }
     var zID: RecordID? { get }
@@ -23,17 +23,17 @@ protocol DBModel {
     init?(dataDictionary: [String : Any])
 }
 
-enum Result<T> {
+public enum Result<T> {
     case success(T)
     case error(String)
 }
 
-enum Success {
+public enum Success {
     case success
     case error(String)
 }
 
-extension DBModel {
+public extension DBModel {
     
     static func allFields() -> [DBField] {
         var output = [DBField(keyName: "zID", dbFieldName: nil, dataType: .recordID, constraints: [.notNull, .primaryKey, .autoIncrement])]
@@ -302,7 +302,7 @@ extension DBModel {
     }
 }
 
-enum SQLDataType {
+public enum SQLDataType {
     //see: https://www.sqlite.org/datatype3.html
     case text
     case numeric
@@ -335,7 +335,7 @@ enum SQLDataType {
     }
 }
 
-enum SQLConstraints: Int {
+public enum SQLConstraints: Int {
     //see: https://www.w3schools.com/sql/sql_constraints.asp
     case unique
     case primaryKey
@@ -365,24 +365,37 @@ enum SQLConstraints: Int {
     }
 }
 
-struct DBTable {
-    let keyName: String
-    let dbTableName: String?
-    let indexes: [DBIndex]
+public struct DBTable {
+    public let keyName: String
+    public let dbTableName: String?
+    public let indexes: [DBIndex]
     
-    func dbTable() -> String {
+    public init(keyName: String, dbTableName: String?, indexes: [DBIndex]) {
+        self.keyName = keyName
+        self.dbTableName = dbTableName
+        self.indexes = indexes
+    }
+    
+    public func dbTable() -> String {
         return dbTableName ?? keyName
     }
 }
 
-struct DBField : Equatable {
+public struct DBField : Equatable {
     
-    let keyName: String
-    let dbFieldName: String?
-    let dataType: SQLDataType
-    let constraints: Set<SQLConstraints>
+    public let keyName: String
+    public let dbFieldName: String?
+    public let dataType: SQLDataType
+    public let constraints: Set<SQLConstraints>
     
-    func dbField() -> String {
+    public init(keyName: String, dbFieldName: String?, dataType: SQLDataType, constraints: Set<SQLConstraints>) {
+        self.keyName = keyName
+        self.dbFieldName = dbFieldName
+        self.dataType = dataType
+        self.constraints = constraints
+    }
+    
+    public func dbField() -> String {
         return dbFieldName ?? keyName
     }
     
@@ -396,23 +409,29 @@ struct DBField : Equatable {
         return constraintsStrings.joined(separator: " ")
     }
     
-    static func == (lhs: DBField, rhs: DBField) -> Bool {
+    public static func == (lhs: DBField, rhs: DBField) -> Bool {
         return lhs.keyName == rhs.keyName
     }
 }
 
-struct DBIndex {
-    let name: String
-    let fields: [DBField]
-    let unique: Bool
+public struct DBIndex {
+    public let name: String
+    public let fields: [DBField]
+    public let unique: Bool
+    
+    public init(name: String, fields: [DBField], unique: Bool) {
+        self.name = name
+        self.fields = fields
+        self.unique = unique
+    }
 }
 
 typealias RecordCache = [RecordID : DBModel]
 
-class DBManager {
+public class DBManager {
     
-    let filePath: String
-    let models: [DBModel.Type]
+    public let filePath: String
+    public let models: [DBModel.Type]
     var database: FMDatabase!
     var caches = [String : RecordCache]()
     var cacheSaves = 0
@@ -420,7 +439,7 @@ class DBManager {
     
     let sqlDateFormatter = DateFormatter()
     
-    init(filePath: String, models: [DBModel.Type]) {
+    public init(filePath: String, models: [DBModel.Type]) {
         self.filePath = filePath
         self.models = models
         sqlDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -508,7 +527,7 @@ class DBManager {
         return created
     }
     
-    func cacheStatus() {
+    public func cacheStatus() {
         print("Cache Saves: \(numberFormatter.string(from: NSNumber(value: cacheSaves))!)")
         for (key, value) in caches {
             print("Cache - '\(key)'")
