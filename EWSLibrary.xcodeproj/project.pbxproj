@@ -19,6 +19,7 @@
 		DACDE82D21065E1D0077A612 /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE82421065E1D0077A612 /* EWSLibrary.framework */; };
 		DADDA08421066DB000827123 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA97B9892106601700135BF1 /* Shell.swift */; };
 		DADDA0882106712100827123 /* EWSLibrary_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */; };
+		DAE756CC21079880002C5DFA /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE756CB21079880002C5DFA /* FMDB.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		DACDE83F21065EB50077A612 /* EWSLibrary_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibrary_iOSTests.swift; sourceTree = "<group>"; };
 		DACDE84021065EB50077A612 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibrary_MacTests.swift; sourceTree = "<group>"; };
+		DAE756CB21079880002C5DFA /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAE756CC21079880002C5DFA /* FMDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +98,7 @@
 		DAB73DC621075D2600F94664 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DAE756CB21079880002C5DFA /* FMDB.framework */,
 				DAB73DCB21075D5A00F94664 /* FMDB.framework */,
 				DAB73DC921075D2C00F94664 /* FMDB.framework */,
 				DAB73DC721075D2600F94664 /* FMDB.framework */,
