@@ -10,7 +10,7 @@ env:
     - SDK_IPHONE=iphonesimulator11.4
     - SDK_MAC=macosx10.13
     - DESTINATION_IOS="platform=iOS Simulator,name=iPhone X,OS=11.4"
-    - DESTINATION_MAC="platform=macOS,name=My Mac,OS=10.13"
+    - DESTINATION_MAC="platform=macOS,arch=x86_64,id=åå42044A08-8570-4C2D-BD4A-BB3EA7766E60
 
 before_install:
   - brew install carthage || true
