@@ -146,8 +146,8 @@
 			isa = PBXGroup;
 			children = (
 				DACDE83F21065EB50077A612 /* EWSLibrary_iOSTests.swift */,
-				DAB73CDE21075A9B00F94664 /* DBManager_iOSTests.swift */,
 				DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */,
+				DAB73CDE21075A9B00F94664 /* DBManager_iOSTests.swift */,
 				DAB73CE021075AAD00F94664 /* DBManager_MacTests.swift */,
 				DA534A942108D7A9004B0CC0 /* DBManager_SharedTests.swift */,
 				DACDE84021065EB50077A612 /* Info.plist */,

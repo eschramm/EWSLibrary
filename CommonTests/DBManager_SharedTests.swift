@@ -78,7 +78,7 @@ struct Person: DBModel {
 }
 
 func createManager() -> DBManager {
-    let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+    let paths = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)
     let documentsDirectory = paths[0] as NSString
     let fileName = "TestDB.sqlite"
     let logFilePath = documentsDirectory.appendingPathComponent(fileName)
