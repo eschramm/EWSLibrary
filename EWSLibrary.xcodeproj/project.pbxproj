@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA534A962108D7CB004B0CC0 /* DBManager_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* DBManager_SharedTests.swift */; };
+		DA534A972108D7CB004B0CC0 /* DBManager_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* DBManager_SharedTests.swift */; };
 		DA97B98521065F5800135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98621065F5900135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98721065F8000135BF1 /* EWSLibrary_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACDE83F21065EB50077A612 /* EWSLibrary_iOSTests.swift */; };
@@ -40,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DA534A942108D7A9004B0CC0 /* DBManager_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager_SharedTests.swift; sourceTree = "<group>"; };
 		DA97B9892106601700135BF1 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		DAB73CDC21075A5A00F94664 /* DBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager.swift; sourceTree = "<group>"; };
 		DAB73CDE21075A9B00F94664 /* DBManager_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager_iOSTests.swift; sourceTree = "<group>"; };
@@ -146,6 +149,7 @@
 				DAB73CDE21075A9B00F94664 /* DBManager_iOSTests.swift */,
 				DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */,
 				DAB73CE021075AAD00F94664 /* DBManager_MacTests.swift */,
+				DA534A942108D7A9004B0CC0 /* DBManager_SharedTests.swift */,
 				DACDE84021065EB50077A612 /* Info.plist */,
 			);
 			path = CommonTests;
@@ -349,6 +353,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA534A962108D7CB004B0CC0 /* DBManager_SharedTests.swift in Sources */,
 				DA97B98721065F8000135BF1 /* EWSLibrary_iOSTests.swift in Sources */,
 				DAB73CE221075AF600F94664 /* DBManager_iOSTests.swift in Sources */,
 			);
@@ -367,6 +372,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA534A972108D7CB004B0CC0 /* DBManager_SharedTests.swift in Sources */,
 				DADDA0882106712100827123 /* EWSLibrary_MacTests.swift in Sources */,
 				DAB73CE321075AFA00F94664 /* DBManager_MacTests.swift in Sources */,
 			);

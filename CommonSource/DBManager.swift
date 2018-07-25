@@ -446,8 +446,8 @@ public class DBManager {
         numberFormatter.numberStyle = .decimal
     }
     
-    public func createDatabaseIfNotExist() {
-        _ = openDatabase()
+    public func createDatabaseIfNotExist() -> Bool {
+        return openDatabase()
     }
     
     public func nukeDatabase() {
