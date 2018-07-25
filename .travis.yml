@@ -1,0 +1,25 @@
+language: swift
+osx_image: xcode9.4
+
+env:
+  #environment variables
+  global:
+    - WORKSPACE_NAME="EWSLibrary.xcworkspace"
+    - SCHEME_MAC="EWSLibrary_Mac"
+    - SCHEME_IPHONE="EWSLibrary_iOS"
+    - SDK_IPHONE=iphonesimulator11.4
+    - SDK_MAC=macosx10.13
+    - DESTINATION_IOS="platform=iOS Simulator,name=iPhone X,OS=11.4"
+    - DESTINATION_MAC="platform=macOS,name=My Mac,OS=10.13"
+
+before_install:
+  - brew install carthage || true
+
+before_script:
+  # bootstrap the dependencies for the project
+  - ./dependencies init
+
+script:
+  - set -o pipefail
+  - xcodebuild clean test -sdk "$SDK_IPHONE" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_IPHONE" -destination "$DESTINATION_IOS" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+  - xcodebuild clean test -sdk "$SDK_MAC" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_MAC" -destination "$DESTINATION_MAC" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO

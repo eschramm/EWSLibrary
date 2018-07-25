@@ -85,13 +85,28 @@ class DBManager_MacTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
+    func testWriteReadTypes() {
         let person = Person(firstName: "Eric", lastName: "Schramm", weight: 123.456, timeStamp: Date())
-        let person2 = Person(firstName: "Jennifer", lastName: "Schramm", weight: 234.567, timeStamp: Date().addingTimeInterval(60 * 60 * 24 * -2))
-        let savedResult : Result<Person> = person.save(dbManager: manager)
-        print(savedResult)
-        let savedResult2 : Result<Person> = person2.save(dbManager: manager)
-        print(savedResult2)
+        let savedResult: Result<Person> = person.save(dbManager: manager)
+        switch savedResult {
+        case .success(let savedPerson):
+            XCTAssert(savedPerson.firstName == "Eric",  ".text - String mismatch")
+            XCTAssert(savedPerson.weight == 123.456,    ".numeric - Double mismatch")
+        case .error(let error):
+            XCTAssert(true, error)
+        }
+        
+        /*
+        case text
+        case numeric
+        case integer
+        case recordID
+        case real
+        case blob
+        case dateTime
+        case bool           // 0 or 1
+        */
+        
     }
     
     func testPerformanceExample() {
