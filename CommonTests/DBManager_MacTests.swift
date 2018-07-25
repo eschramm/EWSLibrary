@@ -14,6 +14,7 @@ struct Person: DBModel {
     static let firstNameField = DBField(keyName: "firstName", dbFieldName: nil, dataType: .text, constraints: [.notNull])
     static let lastNameField = DBField(keyName: "lastName", dbFieldName: nil, dataType: .text, constraints: [.notNull])
     static let weightField = DBField(keyName: "weight", dbFieldName: "WeightMotherFucker", dataType: .real, constraints: [.notNull])
+    static let ageField = DBField(keyName: "age", dbFieldName: nil, dataType: .integer, constraints: [.notNull])
     static let timeStampField = DBField(keyName: "timeStamp", dbFieldName: nil, dataType: .dateTime, constraints: [.notNull])
     
     static var table: DBTable {
@@ -25,6 +26,7 @@ struct Person: DBModel {
             firstNameField,
             lastNameField,
             weightField,
+            ageField,
             timeStampField
         ]
     }
@@ -35,6 +37,7 @@ struct Person: DBModel {
             "firstName" : firstName,
             "lastName" : lastName,
             "weight" : weight,
+            "age" : age,
             "timeStamp" : timeStamp
         ]
     }
@@ -43,29 +46,33 @@ struct Person: DBModel {
     let firstName: String
     let lastName: String
     let weight: Double
+    let age: Int32
     let timeStamp: Date
     
     init?(dataDictionary: [String : Any]) {
         if let firstName = dataDictionary["firstName"] as? String,
             let lastName = dataDictionary["lastName"] as? String,
             let weight = dataDictionary["weight"] as? Double,
+            let age = dataDictionary["age"] as? Int32,
             let timeStamp = dataDictionary["timeStamp"] as? Date
         {
             self.firstName = firstName
             self.lastName = lastName
             self.zID = dataDictionary["zID"] as? RecordID
             self.weight = weight
+            self.age = age
             self.timeStamp = timeStamp
         } else {
             return nil
         }
     }
     
-    init(firstName: String, lastName: String, weight: Double, timeStamp: Date) {
+    init(firstName: String, lastName: String, weight: Double, age: Int32, timeStamp: Date) {
         self.firstName = firstName
         self.lastName = lastName
         self.zID = nil
         self.weight = weight
+        self.age = age
         self.timeStamp = timeStamp
     }
 }
@@ -86,12 +93,13 @@ class DBManager_MacTests: XCTestCase {
     }
     
     func testWriteReadTypes() {
-        let person = Person(firstName: "Eric", lastName: "Schramm", weight: 123.456, timeStamp: Date())
+        let person = Person(firstName: "Eric", lastName: "Schramm", weight: 123.456, age: 41, timeStamp: Date())
         let savedResult: Result<Person> = person.save(dbManager: manager)
         switch savedResult {
         case .success(let savedPerson):
-            XCTAssert(savedPerson.firstName == "Eric",  ".text - String mismatch")
-            XCTAssert(savedPerson.weight == 123.456,    ".numeric - Double mismatch")
+            XCTAssert(savedPerson.firstName == "Eric",  ".text      - String mismatch")
+            XCTAssert(savedPerson.weight == 123.456,    ".numeric   - Double mismatch")
+            XCTAssert(savedPerson.age == 41,            ".integer   - Int32 mismatch")
         case .error(let error):
             XCTAssert(true, error)
         }
