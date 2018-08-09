@@ -19,6 +19,7 @@ public protocol DBModel {
     static var table: DBTable { get }
     static var fields: [DBField] { get }
     var zID: RecordID? { get }
+    static var zIDfieldOverride: String? { get }
     var dataDictionary: [String : Any] { get }
     init?(dataDictionary: [String : Any])
 }
@@ -35,8 +36,15 @@ public enum Success {
 
 public extension DBModel {
     
+    static func zIDfield() -> String {
+        return zIDfieldOverride ?? "zID"
+    }
+    
     static func allFields() -> [DBField] {
-        var output = [DBField(keyName: "zID", dbFieldName: nil, dataType: .recordID, constraints: [.notNull, .primaryKey, .autoIncrement])]
+        if zIDfield() != "zID" {
+            return fields
+        }
+        var output = [DBField(keyName: zIDfield(), dbFieldName: nil, dataType: .recordID, constraints: [.notNull, .primaryKey, .autoIncrement])]
         output.append(contentsOf: fields)
         return output
     }
@@ -65,11 +73,11 @@ public extension DBModel {
     }
     
     func delete(dbManager: DBManager) -> Success {
-        if let primaryKey = dataDictionary["zID"] as? RecordID, dbManager.openDatabase() {
+        if let primaryKey = dataDictionary[Self.zIDfield()] as? RecordID, dbManager.openDatabase() {
             defer {
                 dbManager.database.close()
             }
-            let deleteStatement = "DELETE FROM \(Self.table.dbTable()) WHERE zID=?"
+            let deleteStatement = "DELETE FROM \(Self.table.dbTable()) WHERE \(Self.zIDfield())=?"
             do {
                 try dbManager.database.executeUpdate(deleteStatement, values: [primaryKey])
                 //delete from cache
@@ -82,7 +90,7 @@ public extension DBModel {
                 return .error("Error deleting '\(Self.table.keyName)'\n\(error.localizedDescription)")
             }
         }
-        return .error("Error deleting '\(Self.table.keyName) - no primary key (zID)")
+        return .error("Error deleting '\(Self.table.keyName) - no primary key (\(Self.zIDfield())")
     }
     
     func save<T>(dbManager: DBManager) -> Result<T> {
@@ -97,13 +105,13 @@ public extension DBModel {
             dbManager.database.close()
         }
         
-        if let recordID = dataDictionary["zID"] as? RecordID {
+        if let recordID = dataDictionary[Self.zIDfield()] as? RecordID {
             var updateStatement = "UPDATE \(Self.table.dbTable()) SET "
             let fields = Self.allFields().map { (field) -> String in
                 "\n\(field.dbField())=?"
                 }.joined(separator: ", ")
             updateStatement += fields
-            updateStatement += " \nWHERE zID=?"
+            updateStatement += " \nWHERE \(Self.zIDfield())=?"
             var values = Self.allFields().map { (field) -> Any in
                 let value = dataDictionary[field.keyName]
                 if let date = value as? Date {
@@ -154,7 +162,7 @@ public extension DBModel {
                     for field in Self.allFields() {
                         dataDict[field.keyName] = dataDictionary[field.keyName]
                     }
-                    dataDict["zID"] = id
+                    dataDict[Self.zIDfield()] = id
                     let record = Self.init(dataDictionary: dataDict) as! T
                     updateCache(record: record as! Self, dbManager: dbManager)
                     return Result.success(record)
@@ -178,7 +186,7 @@ public extension DBModel {
         if let zID = record.zID {
             cache[zID] = record as DBModel
         } else {
-            print("Attempting to cache record without a recordID (zID)!")
+            print("Attempting to cache record without a recordID (\(Self.zIDfield())!")
         }
         dbManager.caches[Self.table.dbTable()] = cache
     }
@@ -212,7 +220,7 @@ public extension DBModel {
             let queryQuestionMarks = String(repeating: "?, ", count: faultedIDs.count - 1) + "?"
             
             do {
-                let result = try dbManager.database.executeQuery("SELECT * FROM \(Self.table.dbTable()) WHERE zID IN (\(queryQuestionMarks))", values: faultedIDs)
+                let result = try dbManager.database.executeQuery("SELECT * FROM \(Self.table.dbTable()) WHERE \(zIDfield()) IN (\(queryQuestionMarks))", values: faultedIDs)
                 while result.next() {
                     let recordAndID: (record: T?, id: RecordID?) = record(for: result, dbManager: dbManager)
                     if let record = recordAndID.record, let id = recordAndID.id {
@@ -244,7 +252,7 @@ public extension DBModel {
         do {
             let results = try dbManager.database.executeQuery(query, values: values)
             while(results.next()) {
-                ids.append(RecordID(results.int(forColumn: "zID")))
+                ids.append(RecordID(results.int(forColumn: Self.zIDfield())))
             }
         } catch {
             let errorString = "Error fetching with query '\(query)' - returning empty array of IDs"
@@ -298,7 +306,7 @@ public extension DBModel {
             }
             dataDict[field.keyName] = value
         }
-        return (Self.init(dataDictionary: dataDict) as? T, dataDict["zID"] as? RecordID)
+        return (Self.init(dataDictionary: dataDict) as? T, dataDict[zIDfield()] as? RecordID)
     }
 }
 
