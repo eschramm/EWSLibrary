@@ -20,6 +20,7 @@ public protocol DBModel {
     static var fields: [DBField] { get }
     var zID: RecordID? { get }
     static var zIDfieldOverride: String? { get }
+    static var zIDfieldKeyOverride: String? { get }
     var dataDictionary: [String : Any] { get }
     init?(dataDictionary: [String : Any])
 }
@@ -38,6 +39,10 @@ public extension DBModel {
     
     static func zIDfield() -> String {
         return zIDfieldOverride ?? "zID"
+    }
+    
+    static func zIDfieldKey() -> String {
+        return zIDfieldKeyOverride ?? "zID"
     }
     
     static func allFields() -> [DBField] {
@@ -306,7 +311,7 @@ public extension DBModel {
             }
             dataDict[field.keyName] = value
         }
-        return (Self.init(dataDictionary: dataDict) as? T, dataDict[zIDfield()] as? RecordID)
+        return (Self.init(dataDictionary: dataDict) as? T, dataDict[zIDfieldKey()] as? RecordID)
     }
 }
 
