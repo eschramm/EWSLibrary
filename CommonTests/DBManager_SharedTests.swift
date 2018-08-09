@@ -43,6 +43,7 @@ struct Person: DBModel {
     }
     
     static let zIDfieldOverride: String? = nil
+    static var zIDfieldKeyOverride: String? = nil
     
     let zID: RecordID?
     let firstName: String
