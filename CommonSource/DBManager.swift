@@ -170,7 +170,7 @@ public extension DBModel {
     
     private func updateCache(record: Self, dbManager: DBManager) {
         var cache: RecordCache
-        if let aCache = dbManager.caches[Self.table.dbTable()] {
+        if let aCache = dbManager.caches[Self.table.keyName] {
             cache = aCache
         } else {
             cache = RecordCache()
@@ -180,7 +180,7 @@ public extension DBModel {
         } else {
             print("Attempting to cache record without a recordID (zID)!")
         }
-        dbManager.caches[Self.table.dbTable()] = cache
+        dbManager.caches[Self.table.keyName] = cache
     }
     
     static func fetch<T>(for IDs: [RecordID], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
