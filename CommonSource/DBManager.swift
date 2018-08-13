@@ -441,6 +441,10 @@ public struct DBIndex {
 
 typealias RecordCache = [RecordID : DBModel]
 
+public extension DBManager {
+    public static let didCompleteInitialization = Notification.Name("DBManagerDidCompleteInitialization")
+}
+
 public class DBManager {
     
     public let filePath: String
@@ -457,6 +461,7 @@ public class DBManager {
         self.models = models
         sqlDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         numberFormatter.numberStyle = .decimal
+        NotificationCenter.default.post(name: DBManager.didCompleteInitialization, object: self, userInfo: nil)
     }
     
     public func createDatabaseIfNotExist() -> Bool {
