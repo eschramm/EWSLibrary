@@ -22,4 +22,5 @@ before_script:
 script:
   - set -o pipefail
   - xcodebuild clean test -sdk "$SDK_IPHONE" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_IPHONE" -destination "$DESTINATION_IOS" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
-  - xcodebuild clean test -sdk "$SDK_MAC" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_MAC" -destination "$DESTINATION_MAC" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+  # on hold while I figure out how to do code-signing on TravisCI
+  #- xcodebuild clean test -sdk "$SDK_MAC" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_MAC" -destination "$DESTINATION_MAC" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
