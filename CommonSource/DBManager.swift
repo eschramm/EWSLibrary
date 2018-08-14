@@ -251,7 +251,7 @@ public extension DBModel {
     }
     
     static func fetchIDs(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[RecordID]> {
-        guard dbManager.database.open() else {
+        guard dbManager.openDatabase()  else {
             let errorString = "Error opening database - returning empty array of IDs"
             print(errorString)
             return .error(errorString)
@@ -279,7 +279,7 @@ public extension DBModel {
     }
     
     static func fetch<T>(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
-        guard dbManager.database.open() else {
+        guard dbManager.openDatabase()  else {
             let errorString = "Error opening database - returning empty array of \(Self.table.keyName)"
             print(errorString)
             return Result.error(errorString)
