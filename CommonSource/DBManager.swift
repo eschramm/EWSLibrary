@@ -198,6 +198,7 @@ public extension DBModel {
     
     static func fetch<T>(for IDs: [RecordID], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
         
+        let startTime = mach_absolute_time()
         var faultedIDs = [RecordID]()
         if !skipCache, let cache = dbManager.caches[table.keyName] {
             for id in IDs {
@@ -239,6 +240,11 @@ public extension DBModel {
             }
             dbManager.caches[table.keyName] = cache
         }
+        if dbManager.debugMode {
+            print("Query from IDs: '\(faultedIDs)'")
+            print("Cache Saves: \(IDs.count - faultedIDs.count)")
+            print("Query Time: \(timeStampDiff(start: startTime, end: mach_absolute_time()))")
+        }
         return Result.success(IDs.map({ (recordID) -> T in
             cache[recordID] as! T
         }))
@@ -253,6 +259,7 @@ public extension DBModel {
         defer {
             dbManager.database.close()
         }
+        let startTime = mach_absolute_time()
         var ids = [RecordID]()
         do {
             let results = try dbManager.database.executeQuery(query, values: values)
@@ -264,11 +271,14 @@ public extension DBModel {
             print(errorString)
             return .error(errorString)
         }
+        if dbManager.debugMode {
+            print("Query IDs: '\(query)' with values '\(values)'")
+            print("Query Time: \(timeStampDiff(start: startTime, end: mach_absolute_time()))")
+        }
         return .success(ids)
     }
     
     static func fetch<T>(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
-        
         guard dbManager.database.open() else {
             let errorString = "Error opening database - returning empty array of \(Self.table.keyName)"
             print(errorString)
@@ -450,6 +460,7 @@ public class DBManager {
     public let filePath: String
     public let models: [DBModel.Type]
     public private(set) var database: FMDatabase!
+    public var debugMode = false
     var caches = [String : RecordCache]()
     var cacheSaves = 0
     let numberFormatter = NumberFormatter()
@@ -552,4 +563,10 @@ public class DBManager {
             print(" - \(numberFormatter.string(from: NSNumber(value: value.count))!) records")
         }
     }
+}
+
+func timeStampDiff(start: UInt64, end: UInt64) -> String {
+    let diffInNanoseconds = end - start
+    let diffInSeconds = Double(Double(Int(Double(diffInNanoseconds) / 1_000_000_000 * 10000)) / 10000)  //round to four decimal places
+    return "\(diffInSeconds) seconds"
 }
