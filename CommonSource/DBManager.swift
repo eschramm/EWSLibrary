@@ -196,7 +196,7 @@ public extension DBModel {
         dbManager.caches[Self.table.keyName] = cache
     }
     
-    static func fetch<T>(for IDs: [RecordID], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
+    static func fetch<T>(for IDs: [RecordID], dbManager: DBManager, skipCache: Bool = false) -> Result<[T]> {
         
         let startTime = mach_absolute_time()
         var faultedIDs = [RecordID]()
@@ -250,7 +250,7 @@ public extension DBModel {
         }))
     }
     
-    static func fetchIDs(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[RecordID]> {
+    static func fetchIDs(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool = false) -> Result<[RecordID]> {
         guard dbManager.openDatabase()  else {
             let errorString = "Error opening database - returning empty array of IDs"
             print(errorString)
@@ -278,7 +278,7 @@ public extension DBModel {
         return .success(ids)
     }
     
-    static func fetch<T>(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
+    static func fetch<T>(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool = false) -> Result<[T]> {
         guard dbManager.openDatabase()  else {
             let errorString = "Error opening database - returning empty array of \(Self.table.keyName)"
             print(errorString)
