@@ -296,28 +296,33 @@ public extension DBModel {
     static func record<T>(for result: FMResultSet, dbManager: DBManager) -> (record: T?, id: RecordID?) {
         var dataDict = [String : Any]()
         for field in Self.allFields() {
+            //check for nulls, first
             let value: Any
-            switch field.dataType {
-            case .text:
-                value = result.string(forColumn: field.dbField()) as Any
-            case .numeric:
-                value = result.double(forColumn: field.dbField()) as Any
-            case .integer:
-                value = result.int(forColumn: field.dbField()) as Any   //returns an Int32 by default
-            case .recordID:
-                value = RecordID(result.int(forColumn: field.dbField())) as Any
-            case .real:
-                value = result.double(forColumn: field.dbField()) as Any
-            case .blob:
-                value = result.data(forColumn: field.dbField()) as Any
-            case .dateTime:
-                if let stringDate = result.string(forColumn: field.dbField()) {
-                    value = dbManager.sqlDateFormatter.date(from: stringDate) as Any
-                } else {
-                    value = NSNull()
+            if !field.constraints.contains(.notNull), let _ = result.object(forColumn: field.dbField()) as? NSNull {
+                value = NSNull()
+            } else {
+                switch field.dataType {
+                case .text:
+                    value = result.string(forColumn: field.dbField()) as Any
+                case .numeric:
+                    value = result.double(forColumn: field.dbField()) as Any
+                case .integer:
+                    value = result.int(forColumn: field.dbField()) as Any   //returns an Int32 by default
+                case .recordID:
+                    value = RecordID(result.int(forColumn: field.dbField())) as Any
+                case .real:
+                    value = result.double(forColumn: field.dbField()) as Any
+                case .blob:
+                    value = result.data(forColumn: field.dbField()) as Any
+                case .dateTime:
+                    if let stringDate = result.string(forColumn: field.dbField()) {
+                        value = dbManager.sqlDateFormatter.date(from: stringDate) as Any
+                    } else {
+                        value = NSNull()
+                    }
+                case .bool:
+                    value = (result.int(forColumn: field.dbField()) == 1) as Any
                 }
-            case .bool:
-                value = (result.int(forColumn: field.dbField()) == 1) as Any
             }
             dataDict[field.keyName] = value
         }
