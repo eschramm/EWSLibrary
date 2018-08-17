@@ -82,6 +82,25 @@ public extension DBModel {
             defer {
                 dbManager.database.close()
             }
+            
+            //check if networked
+            if let networkings = dbManager.networkedNoDeletion[Self.table.dbTable()] {
+                for networking in networkings {
+                    let testStatement = "SELECT COUNT(\(networking.field)) FROM \(networking.table) WHERE \(networking.field)=?"
+                    do {
+                        let result = try dbManager.database.executeQuery(testStatement, values: [primaryKey])
+                        if result.next(), result.int(forColumnIndex: 0) > 0 {
+                            let count = result.int(forColumnIndex: 0)
+                            return .error("Cannot delete \(Self.table.keyName) with zID=\(primaryKey) as this record is networked to \(count) records on field '\(networking.field)' in table '\(networking.table)'")
+                        }
+                    } catch {
+                        let errorString = "Error retrieving \(networking.field) on )\(networking.table) for count for deletion permission check"
+                        print(errorString)
+                        return .error(errorString)
+                    }
+                }
+            }
+            
             let deleteStatement = "DELETE FROM \(Self.table.dbTable()) WHERE \(Self.zIDfield())=?"
             do {
                 try dbManager.database.executeUpdate(deleteStatement, values: [primaryKey])
@@ -363,12 +382,13 @@ public enum SQLDataType {
     }
 }
 
-public enum SQLConstraints: Int {
+public enum SQLConstraints : Hashable, Equatable {
     //see: https://www.w3schools.com/sql/sql_constraints.asp
     case unique
     case primaryKey
     case autoIncrement
     case notNull
+    case noDeletionIfNetworked(toTable: TableName)
     //case foreignKey(toTable: DBTable, toField: DBField)
     //case check(evalPredicate: String)
     //case hasDefault(defaultValue: String)
@@ -383,6 +403,8 @@ public enum SQLConstraints: Int {
             return "UNIQUE"
         case .primaryKey:
             return "PRIMARY KEY"
+        case .noDeletionIfNetworked(toTable: _):
+            return ""
             /* case .foreignKey(let toTable, let toField):
              return "FOREIGN KEY(\(forField.DBFieldName ?? forField.keyName) REFERENCES \(toTable.DBTableName ?? toTable.keyName)(\(toField.DBFieldName ?? toField.keyName)"  //FOREIGN KEY(trackartist) REFERENCES artist(artistid)
              case .check(let evalPredicate):
@@ -391,9 +413,24 @@ public enum SQLConstraints: Int {
              */
         }
     }
+    
+    func sortValue() -> Int {
+        switch self {
+        case .primaryKey:
+            return 0
+        case .autoIncrement:
+            return 1
+        case .notNull:
+            return 2
+        case .unique:
+            return 3
+        case .noDeletionIfNetworked(toTable: _):
+            return 4
+        }
+    }
 }
 
-public struct DBTable {
+public struct DBTable: Equatable, Hashable {
     public let keyName: String
     public let dbTableName: String?
     public let indexes: [DBIndex]
@@ -409,7 +446,7 @@ public struct DBTable {
     }
 }
 
-public struct DBField : Equatable {
+public struct DBField : Equatable, Hashable {
     
     public let keyName: String
     public let dbFieldName: String?
@@ -429,7 +466,7 @@ public struct DBField : Equatable {
     
     func constraintsStatement() -> String {
         let sortedConstraints = constraints.sorted { (constraint1, constraint2) -> Bool in
-            constraint1.rawValue < constraint2.rawValue
+            constraint1.sortValue() < constraint2.sortValue()
         }
         let constraintsStrings = sortedConstraints.map { (constraint) -> String in
             constraint.statementText()
@@ -442,7 +479,7 @@ public struct DBField : Equatable {
     }
 }
 
-public struct DBIndex {
+public struct DBIndex: Equatable, Hashable {
     public let name: String
     public let fields: [DBField]
     public let unique: Bool
@@ -455,6 +492,13 @@ public struct DBIndex {
 }
 
 typealias RecordCache = [RecordID : DBModel]
+public typealias TableName = String
+public typealias FieldName = String
+
+struct Networking {
+    let table: TableName
+    let field: FieldName
+}
 
 public extension DBManager {
     public static let didCompleteInitialization = Notification.Name("DBManagerDidCompleteInitialization")
@@ -469,6 +513,7 @@ public class DBManager {
     var caches = [String : RecordCache]()
     var cacheSaves = 0
     let numberFormatter = NumberFormatter()
+    var networkedNoDeletion = [TableName : [Networking]]()
     
     public let sqlDateFormatter = DateFormatter()
     
@@ -477,6 +522,7 @@ public class DBManager {
         self.models = models
         sqlDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         numberFormatter.numberStyle = .decimal
+        populateNetworkedNoDeletion()
         NotificationCenter.default.post(name: DBManager.didCompleteInitialization, object: self, userInfo: nil)
     }
     
@@ -490,6 +536,26 @@ public class DBManager {
             try FileManager.default.removeItem(atPath: filePath)
         } catch {
             print("Error deleting database at \(filePath)")
+        }
+    }
+    
+    fileprivate func populateNetworkedNoDeletion() {
+        for model in models {
+            for field in model.fields {
+                var networkedTable: TableName?
+                if field.constraints.contains(where: { constraint in
+                    if case SQLConstraints.noDeletionIfNetworked(let tableName) = constraint {
+                        networkedTable = tableName
+                        return true
+                    }
+                    return false
+                }), let networkedTable = networkedTable
+                {
+                    var networkedFields = networkedNoDeletion[networkedTable] ?? [Networking]()
+                    networkedFields.append(Networking(table: model.table.dbTable(), field: field.dbField()))
+                    networkedNoDeletion[networkedTable] = networkedFields
+                }
+            }
         }
     }
     
