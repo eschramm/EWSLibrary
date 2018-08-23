@@ -526,8 +526,41 @@ public class DBManager {
         NotificationCenter.default.post(name: DBManager.didCompleteInitialization, object: self, userInfo: nil)
     }
     
-    public func createDatabaseIfNotExist() -> Bool {
+    public func createDatabaseIfNotExistAndOpen() -> Bool {
         return openDatabase()
+    }
+    
+    public func createTable(model: DBModel.Type) -> Bool {
+        guard database != nil else {
+            print("database is null")
+            return false
+        }
+        var created = false
+        var statements = [String]()
+        statements.append(model.createTableStatement())
+        let indexStatement = model.createIndexesStatement()
+        if !indexStatement.isEmpty {
+            statements.append(indexStatement)
+        }
+        for statement in statements {
+            //print(statement)
+            // Open the database.
+            if database.open() {
+                do {
+                    try database.executeUpdate(statement, values: nil)
+                    created = true
+                }
+                catch {
+                    print("Could not create table.")
+                    print(error.localizedDescription)
+                }
+                // At the end close the database.
+                database.close()
+            } else {
+                print("Could not open the database.")
+            }
+        }
+        return created
     }
     
     public func nukeDatabase() {
