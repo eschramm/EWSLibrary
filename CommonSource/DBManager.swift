@@ -246,6 +246,7 @@ public extension DBModel {
             
             do {
                 let result = try dbManager.database.executeQuery("SELECT * FROM \(Self.table.dbTable()) WHERE \(zIDfield()) IN (\(queryQuestionMarks))", values: faultedIDs)
+                dbManager.queryCount += 1
                 while result.next() {
                     let recordAndID : RecordAndID<T> = record(for: result, dbManager: dbManager)
                     if let record = recordAndID.record, let id = recordAndID.id {
@@ -282,6 +283,7 @@ public extension DBModel {
         var ids = [RecordID]()
         do {
             let results = try dbManager.database.executeQuery(query, values: values)
+            dbManager.queryCount += 1
             while(results.next()) {
                 if let id = results.string(forColumn: Self.zIDfield()) {
                     ids.append(id)
@@ -521,6 +523,7 @@ public class DBManager {
     public var debugMode = false
     var caches = [String : RecordCache]()
     var cacheSaves = 0
+    var queryCount = 0
     let numberFormatter = NumberFormatter()
     var networkedNoDeletion = [TableName : [Networking]]()
     
@@ -671,6 +674,7 @@ public class DBManager {
     
     public func cacheStatus() {
         print("Cache Saves: \(numberFormatter.string(from: NSNumber(value: cacheSaves))!)")
+        print("Query Count: \(numberFormatter.string(from: NSNumber(value: queryCount))!)")
         for (key, value) in caches {
             print("Cache - '\(key)'")
             print(" - \(numberFormatter.string(from: NSNumber(value: value.count))!) records")
