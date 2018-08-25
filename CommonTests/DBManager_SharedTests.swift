@@ -147,7 +147,7 @@ func createManager() -> DBManager {
 class DBManager_SharedTests: XCTestCase {
     
     class func testDatabaseExists(dbManager: DBManager) {
-        XCTAssert(dbManager.createDatabaseIfNotExist(), "Unable to create database, other tests may be in accurate")
+        XCTAssert(dbManager.createDatabaseIfNotExistAndOpen(), "Unable to create database, other tests may be in accurate")
     }
     
     class func testWriteReadTypes(dbManager: DBManager) {
@@ -175,7 +175,7 @@ class DBManager_SharedTests: XCTestCase {
     }
     
     class func testDeleteNetworked(dbManager: DBManager) {
-        _ = dbManager.createDatabaseIfNotExist()
+        _ = dbManager.createDatabaseIfNotExistAndOpen()
         let friend1 = Person(firstName: "Eric", lastName: "Schramm", weight: 123.45, age: 41, timeStamp: Date())
         let friend1saveResult: Result<Person> = friend1.save(dbManager: dbManager)
         var friend1Saved: Person!

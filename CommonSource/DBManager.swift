@@ -13,7 +13,7 @@ import Foundation
 import Foundation
 import FMDB
 
-public typealias RecordID = Int32
+public typealias RecordID = String
 
 public protocol DBModel {
     static var table: DBTable { get }
@@ -247,7 +247,7 @@ public extension DBModel {
             do {
                 let result = try dbManager.database.executeQuery("SELECT * FROM \(Self.table.dbTable()) WHERE \(zIDfield()) IN (\(queryQuestionMarks))", values: faultedIDs)
                 while result.next() {
-                    let recordAndID: (record: T?, id: RecordID?) = record(for: result, dbManager: dbManager)
+                    let recordAndID : RecordAndID<T> = record(for: result, dbManager: dbManager)
                     if let record = recordAndID.record, let id = recordAndID.id {
                         cache[id] = record as? DBModel
                     }
@@ -283,7 +283,9 @@ public extension DBModel {
         do {
             let results = try dbManager.database.executeQuery(query, values: values)
             while(results.next()) {
-                ids.append(RecordID(results.int(forColumn: Self.zIDfield())))
+                if let id = results.string(forColumn: Self.zIDfield()) {
+                    ids.append(id)
+                }
             }
         } catch {
             let errorString = "Error fetching with query '\(query)' - returning empty array of IDs"
@@ -312,7 +314,7 @@ public extension DBModel {
         }
     }
     
-    static func record<T>(for result: FMResultSet, dbManager: DBManager) -> (record: T?, id: RecordID?) {
+    static func record<T>(for result: FMResultSet, dbManager: DBManager) -> RecordAndID<T> {
         var dataDict = [String : Any]()
         for field in Self.allFields() {
             //check for nulls, first
@@ -328,7 +330,7 @@ public extension DBModel {
                 case .integer:
                     value = result.int(forColumn: field.dbField()) as Any   //returns an Int32 by default
                 case .recordID:
-                    value = RecordID(result.int(forColumn: field.dbField())) as Any
+                    value = result.string(forColumn: field.dbField()) as Any
                 case .real:
                     value = result.double(forColumn: field.dbField()) as Any
                 case .blob:
@@ -345,8 +347,15 @@ public extension DBModel {
             }
             dataDict[field.keyName] = value
         }
-        return (Self.init(dataDictionary: dataDict) as? T, dataDict[zIDfieldKey()] as? RecordID)
+        let record = Self.init(dataDictionary: dataDict) as? T
+        let id = dataDict[zIDfieldKey()] as? RecordID
+        return RecordAndID(record: record, id: id)
     }
+}
+
+public struct RecordAndID<T> {
+    let record: T?
+    let id: RecordID?
 }
 
 public enum SQLDataType {
