@@ -265,8 +265,8 @@ public extension DBModel {
             print("Cache Saves: \(IDs.count - faultedIDs.count)")
             print("Query Time: \(timeStampDiff(start: startTime, end: mach_absolute_time()))")
         }
-        return Result.success(IDs.map({ (recordID) -> T in
-            cache[recordID] as! T
+        return Result.success(IDs.compactMap({ (recordID) -> T? in
+            cache[recordID] as? T
         }))
     }
     

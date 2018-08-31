@@ -150,6 +150,27 @@ class DBManager_SharedTests: XCTestCase {
         XCTAssert(dbManager.createDatabaseIfNotExistAndOpen(), "Unable to create database, other tests may be in accurate")
     }
     
+    class func testFetch(dbManager: DBManager) {
+        
+        let person = Person(firstName: "Eric", lastName: "Schramm", weight: 123.456, age: 41, timeStamp: Date())
+        _ = person.save(dbManager: dbManager) as Result<Person>
+        
+        //test fetch by record - exists
+        let foundResult: Result<[Person]> = Person.fetch(for: ["1"], dbManager: dbManager)
+        if case .error(let errorString) = foundResult {
+            XCTAssert(false, "This search should succeed - \(errorString)")
+        }
+        
+        //test fetch by record - not exists
+        let notFoundResult: Result<[Person]> = Person.fetch(for: ["999"], dbManager: dbManager)
+        switch notFoundResult {
+        case .error(let errorString):
+            XCTAssert(false, "This search should succed - \(errorString)")
+        case .success(let founds):
+            XCTAssert(founds.isEmpty, "This should be an empty array")
+        }
+    }
+    
     class func testWriteReadTypes(dbManager: DBManager) {
         let person = Person(firstName: "Eric", lastName: "Schramm", weight: 123.456, age: 41, timeStamp: Date())
         let savedResult: Result<Person> = person.save(dbManager: dbManager)
