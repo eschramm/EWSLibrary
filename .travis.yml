@@ -9,7 +9,7 @@ env:
     - SCHEME_IPHONE="EWSLibrary_iOS"
     - SDK_IPHONE=iphonesimulator12.0
     - SDK_MAC=macosx10.14
-    - DESTINATION_IOS="platform=iOS Simulator,name=iPhone X,OS=12"
+    - DESTINATION_IOS="platform=iOS Simulator,name=iPhone X,OS=12.0"
     - DESTINATION_MAC="platform=macOS,arch=x86_64,id=42044A08-8570-4C2D-BD4A-BB3EA7766E60"
 
 before_install:
