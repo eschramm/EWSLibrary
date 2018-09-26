@@ -13,12 +13,14 @@ import Foundation
 import Foundation
 import FMDB
 
-public typealias RecordID = Int32
+public typealias RecordID = String
 
 public protocol DBModel {
     static var table: DBTable { get }
     static var fields: [DBField] { get }
     var zID: RecordID? { get }
+    static var zIDfieldOverride: String? { get }
+    static var zIDfieldKeyOverride: String? { get }
     var dataDictionary: [String : Any] { get }
     init?(dataDictionary: [String : Any])
 }
@@ -35,8 +37,19 @@ public enum Success {
 
 public extension DBModel {
     
+    static func zIDfield() -> String {
+        return zIDfieldOverride ?? "zID"
+    }
+    
+    static func zIDfieldKey() -> String {
+        return zIDfieldKeyOverride ?? "zID"
+    }
+    
     static func allFields() -> [DBField] {
-        var output = [DBField(keyName: "zID", dbFieldName: nil, dataType: .recordID, constraints: [.notNull, .primaryKey, .autoIncrement])]
+        if zIDfield() != "zID" {
+            return fields
+        }
+        var output = [DBField(keyName: zIDfield(), dbFieldName: nil, dataType: .recordID, constraints: [.notNull, .primaryKey, .autoIncrement])]
         output.append(contentsOf: fields)
         return output
     }
@@ -65,11 +78,30 @@ public extension DBModel {
     }
     
     func delete(dbManager: DBManager) -> Success {
-        if let primaryKey = dataDictionary["zID"] as? RecordID, dbManager.openDatabase() {
+        if let primaryKey = dataDictionary[Self.zIDfield()] as? RecordID, dbManager.openDatabase() {
             defer {
                 dbManager.database.close()
             }
-            let deleteStatement = "DELETE FROM \(Self.table.dbTable()) WHERE zID=?"
+            
+            //check if networked
+            if let networkings = dbManager.networkedNoDeletion[Self.table.dbTable()] {
+                for networking in networkings {
+                    let testStatement = "SELECT COUNT(\(networking.field)) FROM \(networking.table) WHERE \(networking.field)=?"
+                    do {
+                        let result = try dbManager.database.executeQuery(testStatement, values: [primaryKey])
+                        if result.next(), result.int(forColumnIndex: 0) > 0 {
+                            let count = result.int(forColumnIndex: 0)
+                            return .error("Cannot delete \(Self.table.keyName) with zID=\(primaryKey) as this record is networked to \(count) records on field '\(networking.field)' in table '\(networking.table)'")
+                        }
+                    } catch {
+                        let errorString = "Error retrieving \(networking.field) on )\(networking.table) for count for deletion permission check"
+                        print(errorString)
+                        return .error(errorString)
+                    }
+                }
+            }
+            
+            let deleteStatement = "DELETE FROM \(Self.table.dbTable()) WHERE \(Self.zIDfield())=?"
             do {
                 try dbManager.database.executeUpdate(deleteStatement, values: [primaryKey])
                 //delete from cache
@@ -82,7 +114,7 @@ public extension DBModel {
                 return .error("Error deleting '\(Self.table.keyName)'\n\(error.localizedDescription)")
             }
         }
-        return .error("Error deleting '\(Self.table.keyName) - no primary key (zID)")
+        return .error("Error deleting '\(Self.table.keyName) - no primary key (\(Self.zIDfield())")
     }
     
     func save<T>(dbManager: DBManager) -> Result<T> {
@@ -97,13 +129,13 @@ public extension DBModel {
             dbManager.database.close()
         }
         
-        if let recordID = dataDictionary["zID"] as? RecordID {
+        if let recordID = dataDictionary[Self.zIDfield()] as? RecordID {
             var updateStatement = "UPDATE \(Self.table.dbTable()) SET "
             let fields = Self.allFields().map { (field) -> String in
                 "\n\(field.dbField())=?"
                 }.joined(separator: ", ")
             updateStatement += fields
-            updateStatement += " \nWHERE zID=?"
+            updateStatement += " \nWHERE \(Self.zIDfield())=?"
             var values = Self.allFields().map { (field) -> Any in
                 let value = dataDictionary[field.keyName]
                 if let date = value as? Date {
@@ -154,7 +186,7 @@ public extension DBModel {
                     for field in Self.allFields() {
                         dataDict[field.keyName] = dataDictionary[field.keyName]
                     }
-                    dataDict["zID"] = id
+                    dataDict[Self.zIDfield()] = id
                     let record = Self.init(dataDictionary: dataDict) as! T
                     updateCache(record: record as! Self, dbManager: dbManager)
                     return Result.success(record)
@@ -178,13 +210,14 @@ public extension DBModel {
         if let zID = record.zID {
             cache[zID] = record as DBModel
         } else {
-            print("Attempting to cache record without a recordID (zID)!")
+            print("Attempting to cache record without a recordID (\(Self.zIDfield())!")
         }
         dbManager.caches[Self.table.keyName] = cache
     }
     
-    static func fetch<T>(for IDs: [RecordID], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
+    static func fetch<T>(for IDs: [RecordID], dbManager: DBManager, skipCache: Bool = false) -> Result<[T]> {
         
+        let startTime = mach_absolute_time()
         var faultedIDs = [RecordID]()
         if !skipCache, let cache = dbManager.caches[table.keyName] {
             for id in IDs {
@@ -212,9 +245,10 @@ public extension DBModel {
             let queryQuestionMarks = String(repeating: "?, ", count: faultedIDs.count - 1) + "?"
             
             do {
-                let result = try dbManager.database.executeQuery("SELECT * FROM \(Self.table.dbTable()) WHERE zID IN (\(queryQuestionMarks))", values: faultedIDs)
+                let result = try dbManager.database.executeQuery("SELECT * FROM \(Self.table.dbTable()) WHERE \(zIDfield()) IN (\(queryQuestionMarks))", values: faultedIDs)
+                dbManager.queryCount += 1
                 while result.next() {
-                    let recordAndID: (record: T?, id: RecordID?) = record(for: result, dbManager: dbManager)
+                    let recordAndID : RecordAndID<T> = record(for: result, dbManager: dbManager)
                     if let record = recordAndID.record, let id = recordAndID.id {
                         cache[id] = record as? DBModel
                     }
@@ -226,13 +260,18 @@ public extension DBModel {
             }
             dbManager.caches[table.keyName] = cache
         }
-        return Result.success(IDs.map({ (recordID) -> T in
-            cache[recordID] as! T
+        if dbManager.debugMode {
+            print("Query from IDs: '\(faultedIDs)'")
+            print("Cache Saves: \(IDs.count - faultedIDs.count)")
+            print("Query Time: \(timeStampDiff(start: startTime, end: mach_absolute_time()))")
+        }
+        return Result.success(IDs.compactMap({ (recordID) -> T? in
+            cache[recordID] as? T
         }))
     }
     
-    static func fetchIDs(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[RecordID]> {
-        guard dbManager.database.open() else {
+    static func fetchIDs(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool = false) -> Result<[RecordID]> {
+        guard dbManager.openDatabase()  else {
             let errorString = "Error opening database - returning empty array of IDs"
             print(errorString)
             return .error(errorString)
@@ -240,23 +279,30 @@ public extension DBModel {
         defer {
             dbManager.database.close()
         }
+        let startTime = mach_absolute_time()
         var ids = [RecordID]()
         do {
             let results = try dbManager.database.executeQuery(query, values: values)
+            dbManager.queryCount += 1
             while(results.next()) {
-                ids.append(RecordID(results.int(forColumn: "zID")))
+                if let id = results.string(forColumn: Self.zIDfield()) {
+                    ids.append(id)
+                }
             }
         } catch {
             let errorString = "Error fetching with query '\(query)' - returning empty array of IDs"
             print(errorString)
             return .error(errorString)
         }
+        if dbManager.debugMode {
+            print("Query IDs: '\(query)' with values '\(values)'")
+            print("Query Time: \(timeStampDiff(start: startTime, end: mach_absolute_time()))")
+        }
         return .success(ids)
     }
     
-    static func fetch<T>(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool) -> Result<[T]> {
-        
-        guard dbManager.database.open() else {
+    static func fetch<T>(for query: String, values: [Any], dbManager: DBManager, skipCache: Bool = false) -> Result<[T]> {
+        guard dbManager.openDatabase()  else {
             let errorString = "Error opening database - returning empty array of \(Self.table.keyName)"
             print(errorString)
             return Result.error(errorString)
@@ -270,36 +316,48 @@ public extension DBModel {
         }
     }
     
-    static func record<T>(for result: FMResultSet, dbManager: DBManager) -> (record: T?, id: RecordID?) {
+    static func record<T>(for result: FMResultSet, dbManager: DBManager) -> RecordAndID<T> {
         var dataDict = [String : Any]()
         for field in Self.allFields() {
+            //check for nulls, first
             let value: Any
-            switch field.dataType {
-            case .text:
-                value = result.string(forColumn: field.dbField()) as Any
-            case .numeric:
-                value = result.double(forColumn: field.dbField()) as Any
-            case .integer:
-                value = result.int(forColumn: field.dbField()) as Any   //returns an Int32 by default
-            case .recordID:
-                value = RecordID(result.int(forColumn: field.dbField())) as Any
-            case .real:
-                value = result.double(forColumn: field.dbField()) as Any
-            case .blob:
-                value = result.data(forColumn: field.dbField()) as Any
-            case .dateTime:
-                if let stringDate = result.string(forColumn: field.dbField()) {
-                    value = dbManager.sqlDateFormatter.date(from: stringDate) as Any
-                } else {
-                    value = NSNull()
+            if !field.constraints.contains(.notNull), let _ = result.object(forColumn: field.dbField()) as? NSNull {
+                value = NSNull()
+            } else {
+                switch field.dataType {
+                case .text:
+                    value = result.string(forColumn: field.dbField()) as Any
+                case .numeric:
+                    value = result.double(forColumn: field.dbField()) as Any
+                case .integer:
+                    value = result.int(forColumn: field.dbField()) as Any   //returns an Int32 by default
+                case .recordID:
+                    value = result.string(forColumn: field.dbField()) as Any
+                case .real:
+                    value = result.double(forColumn: field.dbField()) as Any
+                case .blob:
+                    value = result.data(forColumn: field.dbField()) as Any
+                case .dateTime:
+                    if let stringDate = result.string(forColumn: field.dbField()) {
+                        value = dbManager.sqlDateFormatter.date(from: stringDate) as Any
+                    } else {
+                        value = NSNull()
+                    }
+                case .bool:
+                    value = (result.int(forColumn: field.dbField()) == 1) as Any
                 }
-            case .bool:
-                value = (result.int(forColumn: field.dbField()) == 1) as Any
             }
             dataDict[field.keyName] = value
         }
-        return (Self.init(dataDictionary: dataDict) as? T, dataDict["zID"] as? RecordID)
+        let record = Self.init(dataDictionary: dataDict) as? T
+        let id = dataDict[zIDfieldKey()] as? RecordID
+        return RecordAndID(record: record, id: id)
     }
+}
+
+public struct RecordAndID<T> {
+    let record: T?
+    let id: RecordID?
 }
 
 public enum SQLDataType {
@@ -335,12 +393,13 @@ public enum SQLDataType {
     }
 }
 
-public enum SQLConstraints: Int {
+public enum SQLConstraints : Hashable, Equatable {
     //see: https://www.w3schools.com/sql/sql_constraints.asp
     case unique
     case primaryKey
     case autoIncrement
     case notNull
+    case noDeletionIfNetworked(toTable: TableName)
     //case foreignKey(toTable: DBTable, toField: DBField)
     //case check(evalPredicate: String)
     //case hasDefault(defaultValue: String)
@@ -355,6 +414,8 @@ public enum SQLConstraints: Int {
             return "UNIQUE"
         case .primaryKey:
             return "PRIMARY KEY"
+        case .noDeletionIfNetworked(toTable: _):
+            return ""
             /* case .foreignKey(let toTable, let toField):
              return "FOREIGN KEY(\(forField.DBFieldName ?? forField.keyName) REFERENCES \(toTable.DBTableName ?? toTable.keyName)(\(toField.DBFieldName ?? toField.keyName)"  //FOREIGN KEY(trackartist) REFERENCES artist(artistid)
              case .check(let evalPredicate):
@@ -363,9 +424,24 @@ public enum SQLConstraints: Int {
              */
         }
     }
+    
+    func sortValue() -> Int {
+        switch self {
+        case .primaryKey:
+            return 0
+        case .autoIncrement:
+            return 1
+        case .notNull:
+            return 2
+        case .unique:
+            return 3
+        case .noDeletionIfNetworked(toTable: _):
+            return 4
+        }
+    }
 }
 
-public struct DBTable {
+public struct DBTable: Equatable, Hashable {
     public let keyName: String
     public let dbTableName: String?
     public let indexes: [DBIndex]
@@ -381,7 +457,7 @@ public struct DBTable {
     }
 }
 
-public struct DBField : Equatable {
+public struct DBField : Equatable, Hashable {
     
     public let keyName: String
     public let dbFieldName: String?
@@ -401,7 +477,7 @@ public struct DBField : Equatable {
     
     func constraintsStatement() -> String {
         let sortedConstraints = constraints.sorted { (constraint1, constraint2) -> Bool in
-            constraint1.rawValue < constraint2.rawValue
+            constraint1.sortValue() < constraint2.sortValue()
         }
         let constraintsStrings = sortedConstraints.map { (constraint) -> String in
             constraint.statementText()
@@ -414,7 +490,7 @@ public struct DBField : Equatable {
     }
 }
 
-public struct DBIndex {
+public struct DBIndex: Equatable, Hashable {
     public let name: String
     public let fields: [DBField]
     public let unique: Bool
@@ -427,15 +503,29 @@ public struct DBIndex {
 }
 
 typealias RecordCache = [RecordID : DBModel]
+public typealias TableName = String
+public typealias FieldName = String
+
+struct Networking {
+    let table: TableName
+    let field: FieldName
+}
+
+public extension DBManager {
+    public static let didCompleteInitialization = Notification.Name("DBManagerDidCompleteInitialization")
+}
 
 public class DBManager {
     
     public let filePath: String
     public let models: [DBModel.Type]
     public private(set) var database: FMDatabase!
+    public var debugMode = false
     var caches = [String : RecordCache]()
     var cacheSaves = 0
+    var queryCount = 0
     let numberFormatter = NumberFormatter()
+    var networkedNoDeletion = [TableName : [Networking]]()
     
     public let sqlDateFormatter = DateFormatter()
     
@@ -444,10 +534,45 @@ public class DBManager {
         self.models = models
         sqlDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         numberFormatter.numberStyle = .decimal
+        populateNetworkedNoDeletion()
+        NotificationCenter.default.post(name: DBManager.didCompleteInitialization, object: self, userInfo: nil)
     }
     
-    public func createDatabaseIfNotExist() -> Bool {
+    public func createDatabaseIfNotExistAndOpen() -> Bool {
         return openDatabase()
+    }
+    
+    public func createTable(model: DBModel.Type) -> Bool {
+        guard database != nil else {
+            print("database is null")
+            return false
+        }
+        var created = false
+        var statements = [String]()
+        statements.append(model.createTableStatement())
+        let indexStatement = model.createIndexesStatement()
+        if !indexStatement.isEmpty {
+            statements.append(indexStatement)
+        }
+        for statement in statements {
+            //print(statement)
+            // Open the database.
+            if database.open() {
+                do {
+                    try database.executeUpdate(statement, values: nil)
+                    created = true
+                }
+                catch {
+                    print("Could not create table.")
+                    print(error.localizedDescription)
+                }
+                // At the end close the database.
+                database.close()
+            } else {
+                print("Could not open the database.")
+            }
+        }
+        return created
     }
     
     public func nukeDatabase() {
@@ -456,6 +581,26 @@ public class DBManager {
             try FileManager.default.removeItem(atPath: filePath)
         } catch {
             print("Error deleting database at \(filePath)")
+        }
+    }
+    
+    fileprivate func populateNetworkedNoDeletion() {
+        for model in models {
+            for field in model.fields {
+                var networkedTable: TableName?
+                if field.constraints.contains(where: { constraint in
+                    if case SQLConstraints.noDeletionIfNetworked(let tableName) = constraint {
+                        networkedTable = tableName
+                        return true
+                    }
+                    return false
+                }), let networkedTable = networkedTable
+                {
+                    var networkedFields = networkedNoDeletion[networkedTable] ?? [Networking]()
+                    networkedFields.append(Networking(table: model.table.dbTable(), field: field.dbField()))
+                    networkedNoDeletion[networkedTable] = networkedFields
+                }
+            }
         }
     }
     
@@ -529,9 +674,16 @@ public class DBManager {
     
     public func cacheStatus() {
         print("Cache Saves: \(numberFormatter.string(from: NSNumber(value: cacheSaves))!)")
+        print("Query Count: \(numberFormatter.string(from: NSNumber(value: queryCount))!)")
         for (key, value) in caches {
             print("Cache - '\(key)'")
             print(" - \(numberFormatter.string(from: NSNumber(value: value.count))!) records")
         }
     }
+}
+
+func timeStampDiff(start: UInt64, end: UInt64) -> String {
+    let diffInNanoseconds = end - start
+    let diffInSeconds = Double(Double(Int(Double(diffInNanoseconds) / 1_000_000_000 * 10000)) / 10000)  //round to four decimal places
+    return "\(diffInSeconds) seconds"
 }

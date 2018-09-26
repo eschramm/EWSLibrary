@@ -31,6 +31,14 @@ class DBManager_iOSTests: XCTestCase {
         DBManager_SharedTests.testWriteReadTypes(dbManager: dbManager)
     }
     
+    func testDeleteNetworked() {
+        DBManager_SharedTests.testDeleteNetworked(dbManager: dbManager)
+    }
+    
+    func testFetched() {
+        DBManager_SharedTests.testFetch(dbManager: dbManager)
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measure {
