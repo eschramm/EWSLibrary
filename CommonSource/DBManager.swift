@@ -522,8 +522,8 @@ public class DBManager {
     public private(set) var database: FMDatabase!
     public var debugMode = false
     var caches = [String : RecordCache]()
-    var cacheSaves = 0
-    var queryCount = 0
+    public var cacheSaves = 0
+    public var queryCount = 0
     let numberFormatter = NumberFormatter()
     var networkedNoDeletion = [TableName : [Networking]]()
     
