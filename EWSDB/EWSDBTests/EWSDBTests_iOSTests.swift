@@ -1,5 +1,5 @@
 //
-//  DBManager_iOSTests.swift
+//  EWSDB_iOSTests.swift
 //  EWSLibrary_iOS
 //
 //  Created by Eric Schramm on 7/24/18.

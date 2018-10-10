@@ -6,8 +6,6 @@
 //  Copyright © 2018 eware. All rights reserved.
 //
 
-import Foundation
-
 //see: https://www.appcoda.com/fmdb-sqlite-database/
 
 import Foundation

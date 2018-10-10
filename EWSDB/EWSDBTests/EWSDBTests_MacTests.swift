@@ -1,5 +1,5 @@
 //
-//  DBManager_MacTests.swift
+//  EWSDB_MacTests.swift
 //  EWSLibrary_Mac
 //
 //  Created by Eric Schramm on 7/24/18.
