@@ -1,13 +1,13 @@
 //
-//  DBManager_SharedTests.swift
-//  EWSLibrary_iOS
+//  EWSDB_SharedTests.swift
+//  EWSLibrary_Shared
 //
 //  Created by Eric Schramm on 7/25/18.
 //  Copyright © 2018 eware. All rights reserved.
 //
 
 import XCTest
-@testable import EWSLibrary
+@testable import EWSDB
 
 struct Person: DBModel {
     
