@@ -1,15 +1,15 @@
 //
-//  DBManager_iOSTests.swift
-//  EWSLibrary_iOS
+//  DBManager_MacTests.swift
+//  EWSLibrary_Mac
 //
 //  Created by Eric Schramm on 7/24/18.
 //  Copyright © 2018 eware. All rights reserved.
 //
 
 import XCTest
-@testable import EWSLibrary
+@testable import EWSDB
 
-class DBManager_iOSTests: XCTestCase {
+class EWSDB_MacTests: XCTestCase {
     
     var dbManager: DBManager!
     

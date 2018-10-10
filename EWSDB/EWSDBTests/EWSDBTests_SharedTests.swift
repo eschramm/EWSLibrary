@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import EWSLibrary
+@testable import EWSDB
 
 struct Person: DBModel {
     
