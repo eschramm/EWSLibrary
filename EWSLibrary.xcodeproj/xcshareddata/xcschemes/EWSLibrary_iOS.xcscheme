@@ -38,6 +38,16 @@
                ReferencedContainer = "container:EWSLibrary.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DA99A4562171517D00E83EFC"
+               BuildableName = "EWSDB_iOSTests.xctest"
+               BlueprintName = "EWSDB_iOSTests"
+               ReferencedContainer = "container:EWSLibrary.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
