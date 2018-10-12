@@ -7,17 +7,22 @@
 		<key>EWSDB_Mac.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>7</integer>
+			<integer>8</integer>
 		</dict>
-		<key>EWSDB_MacTests.xcscheme</key>
+		<key>EWSDB_MacTests.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>11</integer>
+			<integer>5</integer>
 		</dict>
 		<key>EWSDB_iOS.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>10</integer>
+			<integer>7</integer>
+		</dict>
+		<key>EWSDB_iOSTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
 		</dict>
 		<key>EWSLibrary_Mac.xcscheme_^#shared#^_</key>
 		<dict>
@@ -38,6 +43,11 @@
 			<true/>
 		</dict>
 		<key>DA995A56216E84A60082B3DD</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DAAA3105217022BA0083CE69</key>
 		<dict>
 			<key>primary</key>
 			<true/>

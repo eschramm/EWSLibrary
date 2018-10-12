@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import EWSDB
+@testable import EWSDB_iOS
 
 class EWSDB_iOSTests: XCTestCase {
     

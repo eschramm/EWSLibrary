@@ -7,7 +7,12 @@
 //
 
 import XCTest
-@testable import EWSDB
+
+#if os(macOS)
+    @testable import EWSDB_Mac
+#else
+    @testable import EWSDB_iOS
+#endif
 
 struct Person: DBModel {
     
