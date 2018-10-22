@@ -26,6 +26,35 @@
 		DADDA08421066DB000827123 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA97B9892106601700135BF1 /* Shell.swift */; };
 		DADDA0882106712100827123 /* EWSLibrary_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */; };
 		DAE756CC21079880002C5DFA /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE756CB21079880002C5DFA /* FMDB.framework */; };
+		DAF7263E2175665D00223AB5 /* LineChart_Mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF7263C2175650100223AB5 /* LineChart_Mac.swift */; };
+		DAF7263F2175666000223AB5 /* LineChart_Mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF7263C2175650100223AB5 /* LineChart_Mac.swift */; };
+		DAF8BAEE2171751B00EBF484 /* EWSChart_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */; };
+		DAF8BAF32171751B00EBF484 /* EWSChart_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BAF22171751B00EBF484 /* EWSChart_iOSTests.swift */; };
+		DAF8BAF52171751B00EBF484 /* EWSChart.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF8BAE72171751A00EBF484 /* EWSChart.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DAF8BB0A2171753600EBF484 /* EWSChart_Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */; };
+		DAF8BB1F2171756000EBF484 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB1E2171756000EBF484 /* AppDelegate.swift */; };
+		DAF8BB212171756000EBF484 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB202171756000EBF484 /* ViewController.swift */; };
+		DAF8BB242171756000EBF484 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB222171756000EBF484 /* Main.storyboard */; };
+		DAF8BB262171756100EBF484 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB252171756100EBF484 /* Assets.xcassets */; };
+		DAF8BB292171756100EBF484 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB272171756100EBF484 /* LaunchScreen.storyboard */; };
+		DAF8BB342171756100EBF484 /* EWSChartSample_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB332171756100EBF484 /* EWSChartSample_iOSTests.swift */; };
+		DAF8BB3F2171756100EBF484 /* EWSChartSample_iOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB3E2171756100EBF484 /* EWSChartSample_iOSUITests.swift */; };
+		DAF8BB512171758B00EBF484 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB502171758B00EBF484 /* AppDelegate.swift */; };
+		DAF8BB532171758B00EBF484 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB522171758B00EBF484 /* ViewController.swift */; };
+		DAF8BB552171758B00EBF484 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB542171758B00EBF484 /* Assets.xcassets */; };
+		DAF8BB582171758B00EBF484 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB562171758B00EBF484 /* Main.storyboard */; };
+		DAF8BB642171758B00EBF484 /* EWSChartSample_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB632171758B00EBF484 /* EWSChartSample_MacTests.swift */; };
+		DAF8BB6F2171758B00EBF484 /* EWSChartSample_MacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB6E2171758B00EBF484 /* EWSChartSample_MacUITests.swift */; };
+		DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB7D2171933600EBF484 /* Chart.swift */; };
+		DAF8BB7F217193AA00EBF484 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB7D2171933600EBF484 /* Chart.swift */; };
+		DAF8BB80217193AB00EBF484 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB7D2171933600EBF484 /* Chart.swift */; };
+		DAF8BB83217193F400EBF484 /* BarChart_Mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB81217193C100EBF484 /* BarChart_Mac.swift */; };
+		DAF8BB842171971300EBF484 /* EWSChart_Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */; };
+		DAF8BB852171971300EBF484 /* EWSChart_Mac.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DAF8BB8B21719B4000EBF484 /* BarChart_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB8921719ACA00EBF484 /* BarChart_iOS.swift */; };
+		DAF8BB8C21719BD500EBF484 /* EWSChart_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB0E2171753600EBF484 /* EWSChart_MacTests.swift */; };
+		DAF8BB8D21719C5300EBF484 /* EWSChart_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */; };
+		DAF8BB8E21719C5300EBF484 /* EWSChart_iOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +79,88 @@
 			remoteGlobalIDString = DACDE82321065E1D0077A612;
 			remoteInfo = EWSLibrary_Mac;
 		};
+		DAF8BAEF2171751B00EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BAE42171751A00EBF484;
+			remoteInfo = EWSChart_iOS;
+		};
+		DAF8BB0B2171753600EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BB002171753500EBF484;
+			remoteInfo = EWSChart_Mac;
+		};
+		DAF8BB302171756100EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BB1B2171756000EBF484;
+			remoteInfo = EWSChartSample_iOS;
+		};
+		DAF8BB3B2171756100EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BB1B2171756000EBF484;
+			remoteInfo = EWSChartSample_iOS;
+		};
+		DAF8BB602171758B00EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BB4D2171758B00EBF484;
+			remoteInfo = EWSChartSample_Mac;
+		};
+		DAF8BB6B2171758B00EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BB4D2171758B00EBF484;
+			remoteInfo = EWSChartSample_Mac;
+		};
+		DAF8BB862171971300EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BB002171753500EBF484;
+			remoteInfo = EWSChart_Mac;
+		};
+		DAF8BB8F21719C5300EBF484 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAF8BAE42171751A00EBF484;
+			remoteInfo = EWSChart_iOS;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DAF8BB882171971300EBF484 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DAF8BB852171971300EBF484 /* EWSChart_Mac.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB9121719C5300EBF484 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DAF8BB8E21719C5300EBF484 /* EWSChart_iOS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
@@ -78,6 +188,45 @@
 		DACDE84021065EB50077A612 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibrary_MacTests.swift; sourceTree = "<group>"; };
 		DAE756CB21079880002C5DFA /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF7263C2175650100223AB5 /* LineChart_Mac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChart_Mac.swift; sourceTree = "<group>"; };
+		DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSChart_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BAE72171751A00EBF484 /* EWSChart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EWSChart.h; sourceTree = "<group>"; };
+		DAF8BAE82171751A00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BAED2171751B00EBF484 /* EWSChart_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChart_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BAF22171751B00EBF484 /* EWSChart_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChart_iOSTests.swift; sourceTree = "<group>"; };
+		DAF8BAF42171751B00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSChart_Mac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB092171753600EBF484 /* EWSChart_MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChart_MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB0E2171753600EBF484 /* EWSChart_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChart_MacTests.swift; sourceTree = "<group>"; };
+		DAF8BB1C2171756000EBF484 /* EWSChartSample_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EWSChartSample_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB1E2171756000EBF484 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DAF8BB202171756000EBF484 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		DAF8BB232171756000EBF484 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DAF8BB252171756100EBF484 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DAF8BB282171756100EBF484 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DAF8BB2A2171756100EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB2F2171756100EBF484 /* EWSChartSample_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChartSample_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB332171756100EBF484 /* EWSChartSample_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChartSample_iOSTests.swift; sourceTree = "<group>"; };
+		DAF8BB352171756100EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB3A2171756100EBF484 /* EWSChartSample_iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChartSample_iOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB3E2171756100EBF484 /* EWSChartSample_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChartSample_iOSUITests.swift; sourceTree = "<group>"; };
+		DAF8BB402171756100EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB4E2171758B00EBF484 /* EWSChartSample_Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EWSChartSample_Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB502171758B00EBF484 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DAF8BB522171758B00EBF484 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		DAF8BB542171758B00EBF484 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DAF8BB572171758B00EBF484 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DAF8BB592171758B00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB5A2171758B00EBF484 /* EWSChartSample_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EWSChartSample_Mac.entitlements; sourceTree = "<group>"; };
+		DAF8BB5F2171758B00EBF484 /* EWSChartSample_MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChartSample_MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB632171758B00EBF484 /* EWSChartSample_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChartSample_MacTests.swift; sourceTree = "<group>"; };
+		DAF8BB652171758B00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB6A2171758B00EBF484 /* EWSChartSample_MacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChartSample_MacUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF8BB6E2171758B00EBF484 /* EWSChartSample_MacUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChartSample_MacUITests.swift; sourceTree = "<group>"; };
+		DAF8BB702171758B00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAF8BB7D2171933600EBF484 /* Chart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
+		DAF8BB81217193C100EBF484 /* BarChart_Mac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarChart_Mac.swift; sourceTree = "<group>"; };
+		DAF8BB8921719ACA00EBF484 /* BarChart_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarChart_iOS.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,13 +293,89 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DAF8BAE22171751A00EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAEA2171751B00EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BAEE2171751B00EBF484 /* EWSChart_iOS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAFE2171753500EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB062171753600EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB0A2171753600EBF484 /* EWSChart_Mac.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB192171756000EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB8D21719C5300EBF484 /* EWSChart_iOS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB2C2171756100EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB372171756100EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB4B2171758B00EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB842171971300EBF484 /* EWSChart_Mac.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB5C2171758B00EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB672171758B00EBF484 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		DA995A50216E84A60082B3DD /* EWSDB */ = {
 			isa = PBXGroup;
 			children = (
-				DA995ABB216E8D210082B3DD /* CommonSource */,
+				DAB73CDC21075A5A00F94664 /* DBManager.swift */,
+				DA995A51216E84A60082B3DD /* EWSDB.h */,
+				DA995A52216E84A60082B3DD /* Info.plist */,
 				DA995A5B216E84A60082B3DD /* EWSDBTests */,
 			);
 			path = EWSDB;
@@ -165,16 +390,6 @@
 				DA995A5E216E84A60082B3DD /* Info.plist */,
 			);
 			path = EWSDBTests;
-			sourceTree = "<group>";
-		};
-		DA995ABB216E8D210082B3DD /* CommonSource */ = {
-			isa = PBXGroup;
-			children = (
-				DAB73CDC21075A5A00F94664 /* DBManager.swift */,
-				DA995A51216E84A60082B3DD /* EWSDB.h */,
-				DA995A52216E84A60082B3DD /* Info.plist */,
-			);
-			path = CommonSource;
 			sourceTree = "<group>";
 		};
 		DAB73DC621075D2600F94664 /* Frameworks */ = {
@@ -195,6 +410,7 @@
 				DADDA08A2106720800827123 /* iOS Only */,
 				DADDA089210671FD00827123 /* Mac Only */,
 				DA995A50216E84A60082B3DD /* EWSDB */,
+				DAF8BADF2171746800EBF484 /* EWSChart */,
 				DACDE80621065D910077A612 /* Products */,
 				DACDE83E21065EB50077A612 /* CommonTests */,
 				DAB73DC621075D2600F94664 /* Frameworks */,
@@ -212,6 +428,16 @@
 				DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */,
 				DA995AA4216E8CDE0082B3DD /* EWSDB_Mac.framework */,
 				DA99A4572171517D00E83EFC /* EWSDB_iOSTests.xctest */,
+				DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */,
+				DAF8BAED2171751B00EBF484 /* EWSChart_iOSTests.xctest */,
+				DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */,
+				DAF8BB092171753600EBF484 /* EWSChart_MacTests.xctest */,
+				DAF8BB1C2171756000EBF484 /* EWSChartSample_iOS.app */,
+				DAF8BB2F2171756100EBF484 /* EWSChartSample_iOSTests.xctest */,
+				DAF8BB3A2171756100EBF484 /* EWSChartSample_iOSUITests.xctest */,
+				DAF8BB4E2171758B00EBF484 /* EWSChartSample_Mac.app */,
+				DAF8BB5F2171758B00EBF484 /* EWSChartSample_MacTests.xctest */,
+				DAF8BB6A2171758B00EBF484 /* EWSChartSample_MacUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -250,6 +476,106 @@
 			path = "iOS Only";
 			sourceTree = "<group>";
 		};
+		DAF8BADF2171746800EBF484 /* EWSChart */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BAE72171751A00EBF484 /* EWSChart.h */,
+				DAF8BB7D2171933600EBF484 /* Chart.swift */,
+				DAF8BB81217193C100EBF484 /* BarChart_Mac.swift */,
+				DAF7263C2175650100223AB5 /* LineChart_Mac.swift */,
+				DAF8BB8921719ACA00EBF484 /* BarChart_iOS.swift */,
+				DAF8BAE82171751A00EBF484 /* Info.plist */,
+				DAF8BB7A2171761C00EBF484 /* EWSChartTests */,
+				DAF8BB7C2171767300EBF484 /* EWSChartSample Apps */,
+			);
+			path = EWSChart;
+			sourceTree = "<group>";
+		};
+		DAF8BB1D2171756000EBF484 /* EWSChartSample_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB1E2171756000EBF484 /* AppDelegate.swift */,
+				DAF8BB202171756000EBF484 /* ViewController.swift */,
+				DAF8BB222171756000EBF484 /* Main.storyboard */,
+				DAF8BB252171756100EBF484 /* Assets.xcassets */,
+				DAF8BB272171756100EBF484 /* LaunchScreen.storyboard */,
+				DAF8BB2A2171756100EBF484 /* Info.plist */,
+			);
+			path = EWSChartSample_iOS;
+			sourceTree = "<group>";
+		};
+		DAF8BB322171756100EBF484 /* EWSChartSample_iOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB332171756100EBF484 /* EWSChartSample_iOSTests.swift */,
+				DAF8BB352171756100EBF484 /* Info.plist */,
+			);
+			path = EWSChartSample_iOSTests;
+			sourceTree = "<group>";
+		};
+		DAF8BB3D2171756100EBF484 /* EWSChartSample_iOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB3E2171756100EBF484 /* EWSChartSample_iOSUITests.swift */,
+				DAF8BB402171756100EBF484 /* Info.plist */,
+			);
+			path = EWSChartSample_iOSUITests;
+			sourceTree = "<group>";
+		};
+		DAF8BB4F2171758B00EBF484 /* EWSChartSample_Mac */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB502171758B00EBF484 /* AppDelegate.swift */,
+				DAF8BB522171758B00EBF484 /* ViewController.swift */,
+				DAF8BB542171758B00EBF484 /* Assets.xcassets */,
+				DAF8BB562171758B00EBF484 /* Main.storyboard */,
+				DAF8BB592171758B00EBF484 /* Info.plist */,
+				DAF8BB5A2171758B00EBF484 /* EWSChartSample_Mac.entitlements */,
+			);
+			path = EWSChartSample_Mac;
+			sourceTree = "<group>";
+		};
+		DAF8BB622171758B00EBF484 /* EWSChartSample_MacTests */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB632171758B00EBF484 /* EWSChartSample_MacTests.swift */,
+				DAF8BB652171758B00EBF484 /* Info.plist */,
+			);
+			path = EWSChartSample_MacTests;
+			sourceTree = "<group>";
+		};
+		DAF8BB6D2171758B00EBF484 /* EWSChartSample_MacUITests */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB6E2171758B00EBF484 /* EWSChartSample_MacUITests.swift */,
+				DAF8BB702171758B00EBF484 /* Info.plist */,
+			);
+			path = EWSChartSample_MacUITests;
+			sourceTree = "<group>";
+		};
+		DAF8BB7A2171761C00EBF484 /* EWSChartTests */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BAF22171751B00EBF484 /* EWSChart_iOSTests.swift */,
+				DAF8BB0E2171753600EBF484 /* EWSChart_MacTests.swift */,
+				DAF8BAF42171751B00EBF484 /* Info.plist */,
+			);
+			path = EWSChartTests;
+			sourceTree = "<group>";
+		};
+		DAF8BB7C2171767300EBF484 /* EWSChartSample Apps */ = {
+			isa = PBXGroup;
+			children = (
+				DAF8BB1D2171756000EBF484 /* EWSChartSample_iOS */,
+				DAF8BB322171756100EBF484 /* EWSChartSample_iOSTests */,
+				DAF8BB3D2171756100EBF484 /* EWSChartSample_iOSUITests */,
+				DAF8BB4F2171758B00EBF484 /* EWSChartSample_Mac */,
+				DAF8BB622171758B00EBF484 /* EWSChartSample_MacTests */,
+				DAF8BB6D2171758B00EBF484 /* EWSChartSample_MacUITests */,
+			);
+			path = "EWSChartSample Apps";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -280,6 +606,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA97B98621065F5900135BF1 /* EWSLibrary.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAE02171751A00EBF484 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BAF52171751B00EBF484 /* EWSChart.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAFC2171753500EBF484 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +770,188 @@
 			productReference = DACDE82C21065E1D0077A612 /* EWSLibrary_MacTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		DAF8BAE42171751A00EBF484 /* EWSChart_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BAF62171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOS" */;
+			buildPhases = (
+				DAF8BAE02171751A00EBF484 /* Headers */,
+				DAF8BAE12171751A00EBF484 /* Sources */,
+				DAF8BAE22171751A00EBF484 /* Frameworks */,
+				DAF8BAE32171751A00EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EWSChart_iOS;
+			productName = EWSChart_iOS;
+			productReference = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DAF8BAEC2171751B00EBF484 /* EWSChart_iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BAF92171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOSTests" */;
+			buildPhases = (
+				DAF8BAE92171751B00EBF484 /* Sources */,
+				DAF8BAEA2171751B00EBF484 /* Frameworks */,
+				DAF8BAEB2171751B00EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BAF02171751B00EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChart_iOSTests;
+			productName = EWSChart_iOSTests;
+			productReference = DAF8BAED2171751B00EBF484 /* EWSChart_iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DAF8BB002171753500EBF484 /* EWSChart_Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB122171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_Mac" */;
+			buildPhases = (
+				DAF8BAFC2171753500EBF484 /* Headers */,
+				DAF8BAFD2171753500EBF484 /* Sources */,
+				DAF8BAFE2171753500EBF484 /* Frameworks */,
+				DAF8BAFF2171753500EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EWSChart_Mac;
+			productName = EWSChart_Mac;
+			productReference = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DAF8BB082171753600EBF484 /* EWSChart_MacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB152171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_MacTests" */;
+			buildPhases = (
+				DAF8BB052171753600EBF484 /* Sources */,
+				DAF8BB062171753600EBF484 /* Frameworks */,
+				DAF8BB072171753600EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB0C2171753600EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChart_MacTests;
+			productName = EWSChart_MacTests;
+			productReference = DAF8BB092171753600EBF484 /* EWSChart_MacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DAF8BB1B2171756000EBF484 /* EWSChartSample_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB412171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOS" */;
+			buildPhases = (
+				DAF8BB182171756000EBF484 /* Sources */,
+				DAF8BB192171756000EBF484 /* Frameworks */,
+				DAF8BB1A2171756000EBF484 /* Resources */,
+				DAF8BB9121719C5300EBF484 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB9021719C5300EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChartSample_iOS;
+			productName = EWSChartSample_iOS;
+			productReference = DAF8BB1C2171756000EBF484 /* EWSChartSample_iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DAF8BB2E2171756100EBF484 /* EWSChartSample_iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB442171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOSTests" */;
+			buildPhases = (
+				DAF8BB2B2171756100EBF484 /* Sources */,
+				DAF8BB2C2171756100EBF484 /* Frameworks */,
+				DAF8BB2D2171756100EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB312171756100EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChartSample_iOSTests;
+			productName = EWSChartSample_iOSTests;
+			productReference = DAF8BB2F2171756100EBF484 /* EWSChartSample_iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DAF8BB392171756100EBF484 /* EWSChartSample_iOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB472171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOSUITests" */;
+			buildPhases = (
+				DAF8BB362171756100EBF484 /* Sources */,
+				DAF8BB372171756100EBF484 /* Frameworks */,
+				DAF8BB382171756100EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB3C2171756100EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChartSample_iOSUITests;
+			productName = EWSChartSample_iOSUITests;
+			productReference = DAF8BB3A2171756100EBF484 /* EWSChartSample_iOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		DAF8BB4D2171758B00EBF484 /* EWSChartSample_Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB712171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_Mac" */;
+			buildPhases = (
+				DAF8BB4A2171758B00EBF484 /* Sources */,
+				DAF8BB4B2171758B00EBF484 /* Frameworks */,
+				DAF8BB4C2171758B00EBF484 /* Resources */,
+				DAF8BB882171971300EBF484 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB872171971300EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChartSample_Mac;
+			productName = EWSChartSample_Mac;
+			productReference = DAF8BB4E2171758B00EBF484 /* EWSChartSample_Mac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DAF8BB5E2171758B00EBF484 /* EWSChartSample_MacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB742171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_MacTests" */;
+			buildPhases = (
+				DAF8BB5B2171758B00EBF484 /* Sources */,
+				DAF8BB5C2171758B00EBF484 /* Frameworks */,
+				DAF8BB5D2171758B00EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB612171758B00EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChartSample_MacTests;
+			productName = EWSChartSample_MacTests;
+			productReference = DAF8BB5F2171758B00EBF484 /* EWSChartSample_MacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DAF8BB692171758B00EBF484 /* EWSChartSample_MacUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAF8BB772171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_MacUITests" */;
+			buildPhases = (
+				DAF8BB662171758B00EBF484 /* Sources */,
+				DAF8BB672171758B00EBF484 /* Frameworks */,
+				DAF8BB682171758B00EBF484 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAF8BB6C2171758B00EBF484 /* PBXTargetDependency */,
+			);
+			name = EWSChartSample_MacUITests;
+			productName = EWSChartSample_MacUITests;
+			productReference = DAF8BB6A2171758B00EBF484 /* EWSChartSample_MacUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -466,6 +989,40 @@
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 1000;
 					};
+					DAF8BAE42171751A00EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					DAF8BAEC2171751B00EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					DAF8BB002171753500EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					DAF8BB082171753600EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					DAF8BB1B2171756000EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					DAF8BB2E2171756100EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+						TestTargetID = DAF8BB1B2171756000EBF484;
+					};
+					DAF8BB392171756100EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+						TestTargetID = DAF8BB1B2171756000EBF484;
+					};
+					DAF8BB4D2171758B00EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+					};
+					DAF8BB5E2171758B00EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+						TestTargetID = DAF8BB4D2171758B00EBF484;
+					};
+					DAF8BB692171758B00EBF484 = {
+						CreatedOnToolsVersion = 10.0;
+						TestTargetID = DAF8BB4D2171758B00EBF484;
+					};
 				};
 			};
 			buildConfigurationList = DACDE7FF21065D910077A612 /* Build configuration list for PBXProject "EWSLibrary" */;
@@ -474,6 +1031,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = DACDE7FB21065D910077A612;
 			productRefGroup = DACDE80621065D910077A612 /* Products */;
@@ -485,9 +1043,19 @@
 				DACDE82321065E1D0077A612 /* EWSLibrary_Mac */,
 				DACDE82B21065E1D0077A612 /* EWSLibrary_MacTests */,
 				DA995A87216E8CB00082B3DD /* EWSDB_iOS */,
+				DA99A4562171517D00E83EFC /* EWSDB_iOSTests */,
 				DA995AA3216E8CDE0082B3DD /* EWSDB_Mac */,
 				DA995A56216E84A60082B3DD /* EWSDB_MacTests */,
-				DA99A4562171517D00E83EFC /* EWSDB_iOSTests */,
+				DAF8BAE42171751A00EBF484 /* EWSChart_iOS */,
+				DAF8BAEC2171751B00EBF484 /* EWSChart_iOSTests */,
+				DAF8BB002171753500EBF484 /* EWSChart_Mac */,
+				DAF8BB082171753600EBF484 /* EWSChart_MacTests */,
+				DAF8BB1B2171756000EBF484 /* EWSChartSample_iOS */,
+				DAF8BB2E2171756100EBF484 /* EWSChartSample_iOSTests */,
+				DAF8BB392171756100EBF484 /* EWSChartSample_iOSUITests */,
+				DAF8BB4D2171758B00EBF484 /* EWSChartSample_Mac */,
+				DAF8BB5E2171758B00EBF484 /* EWSChartSample_MacTests */,
+				DAF8BB692171758B00EBF484 /* EWSChartSample_MacUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -550,6 +1118,81 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DAF8BAE32171751A00EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAEB2171751B00EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAFF2171753500EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB072171753600EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB1A2171756000EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB292171756100EBF484 /* LaunchScreen.storyboard in Resources */,
+				DAF8BB262171756100EBF484 /* Assets.xcassets in Resources */,
+				DAF8BB242171756000EBF484 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB2D2171756100EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB382171756100EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB4C2171758B00EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB552171758B00EBF484 /* Assets.xcassets in Resources */,
+				DAF8BB582171758B00EBF484 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB5D2171758B00EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB682171758B00EBF484 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -591,6 +1234,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +1262,92 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DAF8BAE12171751A00EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB8B21719B4000EBF484 /* BarChart_iOS.swift in Sources */,
+				DAF8BB80217193AB00EBF484 /* Chart.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAE92171751B00EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BAF32171751B00EBF484 /* EWSChart_iOSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BAFD2171753500EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB83217193F400EBF484 /* BarChart_Mac.swift in Sources */,
+				DAF8BB7F217193AA00EBF484 /* Chart.swift in Sources */,
+				DAF7263E2175665D00223AB5 /* LineChart_Mac.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB052171753600EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF7263F2175666000223AB5 /* LineChart_Mac.swift in Sources */,
+				DAF8BB8C21719BD500EBF484 /* EWSChart_MacTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB182171756000EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB212171756000EBF484 /* ViewController.swift in Sources */,
+				DAF8BB1F2171756000EBF484 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB2B2171756100EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB342171756100EBF484 /* EWSChartSample_iOSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB362171756100EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB3F2171756100EBF484 /* EWSChartSample_iOSUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB4A2171758B00EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB532171758B00EBF484 /* ViewController.swift in Sources */,
+				DAF8BB512171758B00EBF484 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB5B2171758B00EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB642171758B00EBF484 /* EWSChartSample_MacTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAF8BB662171758B00EBF484 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAF8BB6F2171758B00EBF484 /* EWSChartSample_MacUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -636,7 +1366,74 @@
 			target = DACDE82321065E1D0077A612 /* EWSLibrary_Mac */;
 			targetProxy = DACDE82E21065E1D0077A612 /* PBXContainerItemProxy */;
 		};
+		DAF8BAF02171751B00EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BAE42171751A00EBF484 /* EWSChart_iOS */;
+			targetProxy = DAF8BAEF2171751B00EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB0C2171753600EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BB002171753500EBF484 /* EWSChart_Mac */;
+			targetProxy = DAF8BB0B2171753600EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB312171756100EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BB1B2171756000EBF484 /* EWSChartSample_iOS */;
+			targetProxy = DAF8BB302171756100EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB3C2171756100EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BB1B2171756000EBF484 /* EWSChartSample_iOS */;
+			targetProxy = DAF8BB3B2171756100EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB612171758B00EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BB4D2171758B00EBF484 /* EWSChartSample_Mac */;
+			targetProxy = DAF8BB602171758B00EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB6C2171758B00EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BB4D2171758B00EBF484 /* EWSChartSample_Mac */;
+			targetProxy = DAF8BB6B2171758B00EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB872171971300EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BB002171753500EBF484 /* EWSChart_Mac */;
+			targetProxy = DAF8BB862171971300EBF484 /* PBXContainerItemProxy */;
+		};
+		DAF8BB9021719C5300EBF484 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAF8BAE42171751A00EBF484 /* EWSChart_iOS */;
+			targetProxy = DAF8BB8F21719C5300EBF484 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		DAF8BB222171756000EBF484 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAF8BB232171756000EBF484 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		DAF8BB272171756100EBF484 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAF8BB282171756100EBF484 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		DAF8BB562171758B00EBF484 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAF8BB572171758B00EBF484 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		DA995A62216E84A60082B3DD /* Debug */ = {
@@ -1017,6 +1814,7 @@
 		DACDE81D21065D920077A612 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VM6VE536WY;
 				INFOPLIST_FILE = CommonTests/Info.plist;
@@ -1035,6 +1833,7 @@
 		DACDE81E21065D920077A612 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VM6VE536WY;
 				INFOPLIST_FILE = CommonTests/Info.plist;
@@ -1150,6 +1949,474 @@
 			};
 			name = Release;
 		};
+		DAF8BAF72171751B00EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = EWSChart/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAF8BAF82171751B00EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = EWSChart/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DAF8BAFA2171751B00EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChart_iOSTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAF8BAFB2171751B00EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChart_iOSTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DAF8BB132171753600EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = EWSChart/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-Mac";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		DAF8BB142171753600EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = EWSChart/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-Mac";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		DAF8BB162171753600EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChart_MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-MacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		DAF8BB172171753600EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChart_MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-MacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		DAF8BB422171756100EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_iOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAF8BB432171756100EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_iOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DAF8BB452171756100EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_iOSTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EWSChartSample_iOS.app/EWSChartSample_iOS";
+			};
+			name = Debug;
+		};
+		DAF8BB462171756100EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_iOSTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EWSChartSample_iOS.app/EWSChartSample_iOS";
+			};
+			name = Release;
+		};
+		DAF8BB482171756100EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_iOSUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EWSChartSample_iOS;
+			};
+			name = Debug;
+		};
+		DAF8BB492171756100EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_iOSUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = EWSChartSample_iOS;
+			};
+			name = Release;
+		};
+		DAF8BB722171758B00EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/EWSChartSample_Mac.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-Mac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		DAF8BB732171758B00EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/EWSChartSample_Mac.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-Mac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		DAF8BB752171758B00EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-MacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EWSChartSample_Mac.app/Contents/MacOS/EWSChartSample_Mac";
+			};
+			name = Debug;
+		};
+		DAF8BB762171758B00EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_MacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-MacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EWSChartSample_Mac.app/Contents/MacOS/EWSChartSample_Mac";
+			};
+			name = Release;
+		};
+		DAF8BB782171758B00EBF484 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_MacUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-MacUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+				TEST_TARGET_NAME = EWSChartSample_Mac;
+			};
+			name = Debug;
+		};
+		DAF8BB792171758B00EBF484 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = VM6VE536WY;
+				INFOPLIST_FILE = EWSChartSample_MacUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-MacUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 4.2;
+				TEST_TARGET_NAME = EWSChartSample_Mac;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1230,6 +2497,96 @@
 			buildConfigurations = (
 				DACDE83921065E1D0077A612 /* Debug */,
 				DACDE83A21065E1D0077A612 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BAF62171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BAF72171751B00EBF484 /* Debug */,
+				DAF8BAF82171751B00EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BAF92171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BAFA2171751B00EBF484 /* Debug */,
+				DAF8BAFB2171751B00EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB122171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB132171753600EBF484 /* Debug */,
+				DAF8BB142171753600EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB152171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_MacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB162171753600EBF484 /* Debug */,
+				DAF8BB172171753600EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB412171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB422171756100EBF484 /* Debug */,
+				DAF8BB432171756100EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB442171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB452171756100EBF484 /* Debug */,
+				DAF8BB462171756100EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB472171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB482171756100EBF484 /* Debug */,
+				DAF8BB492171756100EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB712171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB722171758B00EBF484 /* Debug */,
+				DAF8BB732171758B00EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB742171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_MacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB752171758B00EBF484 /* Debug */,
+				DAF8BB762171758B00EBF484 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAF8BB772171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_MacUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAF8BB782171758B00EBF484 /* Debug */,
+				DAF8BB792171758B00EBF484 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
