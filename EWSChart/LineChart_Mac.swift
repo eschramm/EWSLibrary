@@ -9,14 +9,6 @@
 import AppKit
 
 class LineChartView : NSView, AxisDrawable {
-    func drawAxis(from: CGPoint, to: CGPoint, width: CGFloat, colorAlpha: CGFloat) {
-        //complete below
-    }
-    
-    func drawAxisStepLabel(label: String, atPoint: CGPoint) {
-        //complete below
-    }
-    
     
     //recall
     // ^
@@ -61,7 +53,7 @@ class LineChartView : NSView, AxisDrawable {
         //Drawing Code
         
         drawBackground(with: NSColor.clear)
-        //chartCalc.drawAxes(drawer: self)
+        chartCalc.drawAxes(drawer: self)
         drawData()
         
     }
@@ -71,7 +63,6 @@ class LineChartView : NSView, AxisDrawable {
         NSRect(origin: frame.origin, size: frame.size).fill()
     }
     
-    /*
     func drawAxis(from: CGPoint, to: CGPoint, width: CGFloat, colorAlpha: CGFloat) {
         let axisPath = NSBezierPath()
         let chartAxisColor = NSColor.red.withAlphaComponent(colorAlpha)
@@ -98,26 +89,27 @@ class LineChartView : NSView, AxisDrawable {
         
         //let chartAxisStepWidth: CGFloat = chartAxisWidth / 2
         let chartAxisColor = NSColor.red
-        let yAxisPath = NSBezierPath()
-        let axisWidth = chartCalc.parameters.axisWidth
-        let xPaddingToAxis = chartCalc.parameters.xPaddingToAxis
-        let yPaddingToAxis = chartCalc.parameters.yPaddingToAxis
-        yAxisPath.lineWidth = axisWidth
-        yAxisPath.move(to: CGPoint(x: xPaddingToAxis + axisWidth / 2, y: yPaddingToAxis))
-        yAxisPath.line(to: CGPoint(x: xPaddingToAxis + axisWidth / 2, y: frame.size.height - yPaddingToAxis))
-        
-        let xAxisPath = NSBezierPath()
-        xAxisPath.lineWidth = axisWidth
-        let xAxisYval = chartCalc.yValueCalculated(for: 0)  //exact center
-        xAxisPath.move(to: CGPoint(x: xPaddingToAxis, y: xAxisYval))
-        xAxisPath.line(to: CGPoint(x: frame.size.width - xPaddingToAxis, y: xAxisYval))
-        
         chartAxisColor.setStroke()
-        yAxisPath.stroke()
-        xAxisPath.stroke()
         
+        if chartCalc.parameters.yAxis.width > 0 {
+            let yAxisPath = NSBezierPath()
+            let yAxis = chartCalc.parameters.yAxis
+            yAxisPath.lineWidth = yAxis.width
+            yAxisPath.move(to: CGPoint(x: yAxis.xPadding + yAxis.width / 2, y: yAxis.yPadding))
+            yAxisPath.line(to: CGPoint(x: yAxis.xPadding + yAxis.width / 2, y: frame.size.height - yAxis.yPadding))
+            yAxisPath.stroke()
+        }
+        
+        if chartCalc.parameters.xAxis.width > 0 {
+            let xAxisPath = NSBezierPath()
+            let xAxis = chartCalc.parameters.xAxis
+            xAxisPath.lineWidth = xAxis.width
+            let xAxisYval = chartCalc.yValueCalculated(for: 0)  //exact center
+            xAxisPath.move(to: CGPoint(x: xAxis.xPadding, y: xAxisYval))
+            xAxisPath.line(to: CGPoint(x: frame.size.width - xAxis.xPadding, y: xAxisYval))
+            xAxisPath.stroke()
+        }
     }
-    */
     
     func drawData() {
         
@@ -149,7 +141,6 @@ class LineChartView : NSView, AxisDrawable {
             lineColor.setStroke()
             dataLine.stroke()
             
-            /*
             if let labelText = dataSource.label(for: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
@@ -167,12 +158,12 @@ class LineChartView : NSView, AxisDrawable {
                         addSubview(label)
                         textFields.append(label)
                     }
-                    label.frame = NSRect(x: barRectCenterX - (sizeOfFont.width / 2), y: yZeroVal - (sizeOfFont.width * 0.6 * CGFloat(sqrt(2))), width: sizeOfFont.width + 10, height: sizeOfFont.height)
+                    label.frame = NSRect(x: dataPoint.x - (sizeOfFont.width / 2), y: yZeroVal - (sizeOfFont.width * 0.6 * CGFloat(sqrt(2))), width: sizeOfFont.width + 10, height: sizeOfFont.height)
                     label.stringValue = labelText
                 } else {
                     let sizeOfFont = labelText.size(withAttributes: [NSAttributedString.Key.font : labelsFont])
                     
-                    let labelRect = NSRect(x: barRectCenterX - (sizeOfFont.width / 2), y: yZeroVal - sizeOfFont.height - 2, width: sizeOfFont.width, height: sizeOfFont.height)
+                    let labelRect = NSRect(x: dataPoint.x - (sizeOfFont.width / 2), y: yZeroVal - sizeOfFont.height - 2, width: sizeOfFont.width, height: sizeOfFont.height)
                     if !labelRect.intersects(lastUpperRect) {
                         labelText.draw(in: labelRect, withAttributes: [NSAttributedString.Key.font : labelsFont])
                         lastUpperRect = labelRect
@@ -185,7 +176,6 @@ class LineChartView : NSView, AxisDrawable {
                     }
                 }
             }
-             */
         }
     }
     
@@ -270,8 +260,14 @@ class TestLineChartViewController : NSViewController {
         var parameters = ChartParameters()
         //parameters.yAxisMin = -4
         parameters.drawXaxisLabelsAtAngle = true
-        parameters.yAxis.yPadding = 100
-        parameters.xAxis.yPadding = 100
+        parameters.xAxis.width = 0
+        parameters.yAxis.width = 0
+        parameters.yAxis.yPadding = 0
+        parameters.xAxis.yPadding = 0
+        parameters.yAxis.xPadding = 0
+        parameters.xAxis.xPadding = 0
+        parameters.xAxis.anchorAxisAt0unlessNegative = false
+        parameters.yAxis.anchorAxisAt0unlessNegative = false
         
         lineChart = LineChartView(frame: NSRect.zero, dataSource: self, parameters: parameters)
         lineChart.translatesAutoresizingMaskIntoConstraints = false
@@ -305,7 +301,7 @@ extension TestLineChartViewController : ChartDataSource {
         return elements.count
     }
     
-    func xValue(for index: Int) -> Double? {
+    func xValue(for index: Int) -> Double {
         return elements[index].xVal
     }
     

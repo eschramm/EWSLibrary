@@ -292,7 +292,7 @@ extension TestBarChartViewController : ChartDataSource {
         return elements.count
     }
     
-    func xValue(for index: Int) -> Double? {
+    func xValue(for index: Int) -> Double {
         return elements[index].xVal
     }
     

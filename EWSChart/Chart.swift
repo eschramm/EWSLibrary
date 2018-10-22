@@ -11,7 +11,7 @@ import CoreGraphics
 
 protocol ChartDataSource {
     func dataCount() -> Int
-    func xValue(for index: Int) -> Double?
+    func xValue(for index: Int) -> Double
     func yValue(for index: Int) -> Double
     func label(for index: Int) -> String?
 }
@@ -64,6 +64,7 @@ struct Axis {
     var width: CGFloat = 6
     var min: CGFloat!
     var max: CGFloat!
+    var anchorAxisAt0unlessNegative = true
 }
 
 struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assume isAppKit to flip y-axis if needed
@@ -123,14 +124,13 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             let xValue = dataSource.xValue(for: index)
             let yValue = dataSource.yValue(for: index)
             
-            if let xValue = xValue {
-                if xValue < minXvalue {
-                    minXvalue = xValue
-                }
-                if xValue > maxXvalue {
-                    maxXvalue = xValue
-                }
+            if xValue < minXvalue {
+                minXvalue = xValue
             }
+            if xValue > maxXvalue {
+                maxXvalue = xValue
+            }
+
             if yValue < minYvalue {
                 minYvalue = yValue
             }
@@ -148,25 +148,32 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             self.parameters.yAxis.max = CGFloat(maxYvalue * 1.1)
         }
         
+        self.chartScaling = ChartScaling(xMin: CGFloat(minXvalue), xMax: CGFloat(maxXvalue), yMin: CGFloat(minYvalue), yMax: CGFloat(maxYvalue))
+        
         if self.parameters.xAxis.min == nil {
-            if minXvalue < 0 {
-                self.parameters.xAxis.min = CGFloat(minYvalue * 1.1)
+            if minXvalue < 0 || !self.parameters.xAxis.anchorAxisAt0unlessNegative {
+                self.parameters.xAxis.min = (minXvalue < 0) ? CGFloat(minXvalue * 1.1) : CGFloat(minXvalue * 0.9)
             } else {
                 self.parameters.xAxis.min = 0
             }
         }
+        
         if self.parameters.yAxis.min == nil {
-            self.parameters.yAxis.min = (minYvalue < 0) ? CGFloat(minYvalue * 1.1) : 0
+            if minYvalue < 0 || !self.parameters.yAxis.anchorAxisAt0unlessNegative {
+                self.parameters.yAxis.min = (minYvalue < 0) ? CGFloat(minYvalue * 1.1) : CGFloat(minYvalue * 0.9)
+            } else {
+                self.parameters.yAxis.min = 0
+            }
         }
-        
-        self.chartScaling = ChartScaling(xMin: CGFloat(minXvalue), xMax: CGFloat(maxXvalue), yMin: CGFloat(minYvalue), yMax: CGFloat(maxYvalue))
-        
     }
     
     //LINE AND BAR
     
-    func ratio(for chartValue: CGFloat) -> CGFloat {
+    func yRatio(for chartValue: CGFloat) -> CGFloat {
         return (chartValue - parameters.yAxis.min) / (parameters.yAxis.max - parameters.yAxis.min)
+    }
+    func xRatio(for chartValue: CGFloat) -> CGFloat {
+        return (chartValue - parameters.xAxis.min) / (parameters.xAxis.max - parameters.xAxis.min)
     }
     func chartHeight() -> CGFloat {
         return cocoaView.frame.size.height - (parameters.xAxis.yPadding + parameters.yAxis.yPadding)
@@ -177,17 +184,17 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     
     func yValueCalculated(for chartValue: CGFloat) -> CGFloat {
         if cocoaView.isAppKit {
-            return ratio(for: chartValue) * chartHeight() + parameters.xAxis.yPadding
+            return yRatio(for: chartValue) * chartHeight() + parameters.xAxis.yPadding
         } else {
-            return cocoaView.frame.size.height - parameters.xAxis.yPadding - (ratio(for: chartValue) * chartHeight()) - parameters.xAxis.width
+            return cocoaView.frame.size.height - parameters.xAxis.yPadding - (yRatio(for: chartValue) * chartHeight()) - parameters.xAxis.width
         }
     }
     
     func xValueCalculated(for chartValue: CGFloat) -> CGFloat {
         if cocoaView.isAppKit {
-            return ratio(for: chartValue) * chartWidth() + parameters.yAxis.xPadding
+            return xRatio(for: chartValue) * chartWidth() + parameters.yAxis.xPadding
         } else {
-            return cocoaView.frame.size.width - parameters.yAxis.xPadding - (ratio(for: chartValue) * chartWidth()) - parameters.yAxis.width
+            return cocoaView.frame.size.width - parameters.yAxis.xPadding - (xRatio(for: chartValue) * chartWidth()) - parameters.yAxis.width
         }
     }
     
@@ -332,7 +339,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     //LINE
     
     func linePoint(index: Int) -> Originable {
-        return Origin(x: xValueCalculated(for: CGFloat(dataSource.xValue(for: index) ?? Double(index))), y: yValueCalculated(for: CGFloat(dataSource.yValue(for: index))))
+        return Origin(x: xValueCalculated(for: CGFloat(dataSource.xValue(for: index))), y: yValueCalculated(for: CGFloat(dataSource.yValue(for: index))))
     }
     
 }
