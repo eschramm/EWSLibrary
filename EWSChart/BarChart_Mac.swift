@@ -89,24 +89,26 @@ class BarChartView: NSView, AxisDrawable {
         
         //let chartAxisStepWidth: CGFloat = chartAxisWidth / 2
         let chartAxisColor = NSColor.red
-        let yAxisPath = NSBezierPath()
-        let axisWidth = chartCalc.parameters.axisWidth
-        let xPaddingToAxis = chartCalc.parameters.xPaddingToAxis
-        let yPaddingToAxis = chartCalc.parameters.yPaddingToAxis
-        yAxisPath.lineWidth = axisWidth
-        yAxisPath.move(to: CGPoint(x: xPaddingToAxis + axisWidth / 2, y: yPaddingToAxis))
-        yAxisPath.line(to: CGPoint(x: xPaddingToAxis + axisWidth / 2, y: frame.size.height - yPaddingToAxis))
-        
-        let xAxisPath = NSBezierPath()
-        xAxisPath.lineWidth = axisWidth
-        let xAxisYval = chartCalc.yValueCalculated(for: 0)  //exact center
-        xAxisPath.move(to: CGPoint(x: xPaddingToAxis, y: xAxisYval))
-        xAxisPath.line(to: CGPoint(x: frame.size.width - xPaddingToAxis, y: xAxisYval))
-        
         chartAxisColor.setStroke()
-        yAxisPath.stroke()
-        xAxisPath.stroke()
         
+        if chartCalc.parameters.yAxis.width > 0 {
+            let yAxisPath = NSBezierPath()
+            let yAxis = chartCalc.parameters.yAxis
+            yAxisPath.lineWidth = yAxis.width
+            yAxisPath.move(to: CGPoint(x: yAxis.xPadding + yAxis.width / 2, y: yAxis.yPadding))
+            yAxisPath.line(to: CGPoint(x: yAxis.xPadding + yAxis.width / 2, y: frame.size.height - yAxis.yPadding))
+            yAxisPath.stroke()
+        }
+        
+        if chartCalc.parameters.xAxis.width > 0 {
+            let xAxisPath = NSBezierPath()
+            let xAxis = chartCalc.parameters.xAxis
+            xAxisPath.lineWidth = xAxis.width
+            let xAxisYval = chartCalc.yValueCalculated(for: 0)  //exact center
+            xAxisPath.move(to: CGPoint(x: xAxis.xPadding, y: xAxisYval))
+            xAxisPath.line(to: CGPoint(x: frame.size.width - xAxis.xPadding, y: xAxisYval))
+            xAxisPath.stroke()
+        }
     }
     
     func drawData() {
@@ -174,8 +176,6 @@ class BarChartView: NSView, AxisDrawable {
     
     func preCalcLabelSizes() {
         
-        var lastUpperRect = NSRect.zero
-        var lastLowerRect = NSRect.zero
         let yZeroVal = chartCalc.yValueCalculated(for: 0)
         var totalLabelsLength: CGFloat = 0
         var maxLabelHeight: CGFloat = 0
@@ -221,7 +221,7 @@ class BarChartView: NSView, AxisDrawable {
         
         if chartCalc.parameters.drawXaxisLabelsAtAngle {
         } else {
-            if maxLabelHeight > chartCalc.parameters.yPaddingToAxis {
+            if maxLabelHeight > chartCalc.parameters.yAxis.yPadding {
                 printView("fart")
             }
         }
@@ -255,7 +255,10 @@ class TestBarChartViewController : NSViewController {
         var parameters = ChartParameters()
         //parameters.yAxisMin = -4
         parameters.drawXaxisLabelsAtAngle = true
-        parameters.yPaddingToAxis = 100
+        parameters.yAxis.yPadding = 20
+        parameters.xAxis.yPadding = 20
+        parameters.yAxis.xPadding = 20
+        parameters.xAxis.xPadding = 20
         
         barChart = BarChartView(frame: NSRect.zero, dataSource: self, parameters: parameters)
         barChart.translatesAutoresizingMaskIntoConstraints = false

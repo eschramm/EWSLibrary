@@ -52,19 +52,15 @@ struct Size: Sizeable {
 }
 
 struct ChartParameters {
-    var xPaddingToAxis: CGFloat = 15
-    var yPaddingToAxis: CGFloat = 15
-    var axisWidth: CGFloat = 6
-    var xAxisMin: CGFloat!
-    var xAxisMax: CGFloat!
-    var yAxisMin: CGFloat!
-    var yAxisMax: CGFloat!
+    var xAxis = Axis()
+    var yAxis = Axis()
     var barWidthFactor: CGFloat = 0.75
     var drawXaxisLabelsAtAngle = false
 }
 
 struct Axis {
-    var padding: CGFloat = 15
+    var xPadding: CGFloat = 15
+    var yPadding: CGFloat = 15
     var width: CGFloat = 6
     var min: CGFloat!
     var max: CGFloat!
@@ -76,7 +72,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     var cocoaView: CocoaViewable {
         didSet {
             if chartType == .bar {
-                evenDistributionBarWidth = (cocoaView.frame.size.width - (2 * parameters.xPaddingToAxis) - parameters.axisWidth) / CGFloat(dataCount)
+                evenDistributionBarWidth = (cocoaView.frame.size.width - (2 * parameters.xAxis.xPadding) - parameters.xAxis.width) / CGFloat(dataCount)
             }
         }
     }
@@ -145,26 +141,22 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         
         //auto-size axes max/mins
         
-        if self.parameters.xAxisMax == nil {
-            self.parameters.xAxisMax = CGFloat(maxXvalue * 1.1)
+        if self.parameters.xAxis.max == nil {
+            self.parameters.xAxis.max = CGFloat(maxXvalue * 1.1)
         }
-        if self.parameters.yAxisMax == nil {
-            self.parameters.yAxisMax = CGFloat(maxYvalue * 1.1)
+        if self.parameters.yAxis.max == nil {
+            self.parameters.yAxis.max = CGFloat(maxYvalue * 1.1)
         }
         
-        if self.parameters.xAxisMin == nil {
+        if self.parameters.xAxis.min == nil {
             if minXvalue < 0 {
-                self.parameters.xAxisMin = CGFloat(minYvalue * 1.1)
+                self.parameters.xAxis.min = CGFloat(minYvalue * 1.1)
             } else {
-                self.parameters.xAxisMin = 0
+                self.parameters.xAxis.min = 0
             }
         }
-        if self.parameters.yAxisMin == nil {
-            if minYvalue < 0 {
-                self.parameters.yAxisMin = CGFloat(minYvalue * 1.1)
-            } else {
-                self.parameters.yAxisMin = 0
-            }
+        if self.parameters.yAxis.min == nil {
+            self.parameters.yAxis.min = (minYvalue < 0) ? CGFloat(minYvalue * 1.1) : 0
         }
         
         self.chartScaling = ChartScaling(xMin: CGFloat(minXvalue), xMax: CGFloat(maxXvalue), yMin: CGFloat(minYvalue), yMax: CGFloat(maxYvalue))
@@ -174,58 +166,56 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     //LINE AND BAR
     
     func ratio(for chartValue: CGFloat) -> CGFloat {
-        return (chartValue - parameters.yAxisMin) / (parameters.yAxisMax - parameters.yAxisMin)
+        return (chartValue - parameters.yAxis.min) / (parameters.yAxis.max - parameters.yAxis.min)
     }
     func chartHeight() -> CGFloat {
-        return cocoaView.frame.size.height - parameters.yPaddingToAxis * 2
+        return cocoaView.frame.size.height - (parameters.xAxis.yPadding + parameters.yAxis.yPadding)
     }
     func chartWidth() -> CGFloat {
-        return cocoaView.frame.size.width - parameters.xPaddingToAxis * 2
+        return cocoaView.frame.size.width - (parameters.xAxis.xPadding + parameters.yAxis.xPadding)
     }
     
     func yValueCalculated(for chartValue: CGFloat) -> CGFloat {
         if cocoaView.isAppKit {
-            return ratio(for: chartValue) * chartHeight() + parameters.yPaddingToAxis
+            return ratio(for: chartValue) * chartHeight() + parameters.xAxis.yPadding
         } else {
-            return cocoaView.frame.size.height - parameters.yPaddingToAxis - (ratio(for: chartValue) * chartHeight()) - parameters.axisWidth
+            return cocoaView.frame.size.height - parameters.xAxis.yPadding - (ratio(for: chartValue) * chartHeight()) - parameters.xAxis.width
         }
     }
     
     func xValueCalculated(for chartValue: CGFloat) -> CGFloat {
         if cocoaView.isAppKit {
-            return ratio(for: chartValue) * chartWidth() + parameters.xPaddingToAxis
+            return ratio(for: chartValue) * chartWidth() + parameters.yAxis.xPadding
         } else {
-            return cocoaView.frame.size.width - parameters.xPaddingToAxis - (ratio(for: chartValue) * chartWidth()) - parameters.axisWidth
+            return cocoaView.frame.size.width - parameters.yAxis.xPadding - (ratio(for: chartValue) * chartWidth()) - parameters.yAxis.width
         }
     }
     
     func drawAxes(drawer: AxisDrawable) {
         
-        let axisWidth = parameters.axisWidth
-        let xPaddingToAxis = parameters.xPaddingToAxis
-        let yPaddingToAxis = parameters.yPaddingToAxis
-        
         let yAxisFromPoint: CGPoint
         let yAxisToPoint: CGPoint
         
         if cocoaView.isAppKit {
-            yAxisFromPoint = CGPoint(x: xPaddingToAxis + axisWidth / 2, y: yPaddingToAxis + axisWidth / 2)
-            yAxisToPoint = CGPoint(x: xPaddingToAxis + axisWidth / 2, y: cocoaView.frame.size.height - yPaddingToAxis - axisWidth/2)
+            yAxisFromPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: parameters.yAxis.yPadding + parameters.yAxis.width / 2)
+            yAxisToPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: cocoaView.frame.size.height - parameters.yAxis.yPadding - parameters.yAxis.width / 2)
         } else {
-            yAxisFromPoint = CGPoint(x: xPaddingToAxis + axisWidth / 2, y: yPaddingToAxis)
-            yAxisToPoint = CGPoint(x: xPaddingToAxis + axisWidth / 2, y: cocoaView.frame.size.height - yPaddingToAxis)
+            yAxisFromPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: parameters.yAxis.yPadding)
+            yAxisToPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: cocoaView.frame.size.height - parameters.yAxis.yPadding)
         }
         
-        drawer.drawAxis(from: yAxisFromPoint, to: yAxisToPoint, width: axisWidth, colorAlpha: 1)
+        drawer.drawAxis(from: yAxisFromPoint, to: yAxisToPoint, width: parameters.yAxis.width, colorAlpha: 1)
         
         let xAxisYval = yValueCalculated(for: 0)  //exact center
         
-        let xAxisFromPoint = CGPoint(x: xPaddingToAxis, y: xAxisYval)
-        let xAxisToPoint = CGPoint(x: cocoaView.frame.size.width - xPaddingToAxis, y: xAxisYval)
+        let xAxisFromPoint = CGPoint(x: parameters.xAxis.xPadding, y: xAxisYval)
+        let xAxisToPoint = CGPoint(x: cocoaView.frame.size.width - parameters.xAxis.xPadding, y: xAxisYval)
         
-        drawer.drawAxis(from: xAxisFromPoint, to: xAxisToPoint, width: axisWidth, colorAlpha: 1)
+        drawer.drawAxis(from: xAxisFromPoint, to: xAxisToPoint, width: parameters.xAxis.width, colorAlpha: 1)
         
         //Y-Axis Steps
+        
+        guard parameters.yAxis.width > 0 else { return }
         
         let differenceFromMinToMax = chartScaling.yMax - chartScaling.yMin
         
@@ -250,31 +240,31 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         numberFormatter.roundingIncrement = NSNumber(value: roundingIncrement)
         
         var yStop: CGFloat = 0
-        let stopWidth = axisWidth * 0.5
+        let stopWidth = parameters.yAxis.width * 0.5
         
-        if parameters.yAxisMin < 0 && parameters.yAxisMax > 0 {  //straddles zero axis
+        if parameters.yAxis.min < 0 && parameters.yAxis.max > 0 {  //straddles zero axis
             
             for _ in 1...6 {
                 
-                let yStopRoundedText = numberFormatter.string(from: NSNumber(value: Float(yStop)))!
+                let yStopRoundedText = numberFormatter.string(for: yStop)!
                 yStop = CGFloat(numberFormatter.number(from: yStopRoundedText)!.floatValue)
                 
-                if yStop < parameters.yAxisMax && yStop > parameters.yAxisMin {
+                if yStop < parameters.yAxis.max && yStop > parameters.yAxis.min {
                     let yPosition = yValueCalculated(for: yStop)
-                    let fromPoint = CGPoint(x: cocoaView.frame.size.width - parameters.xPaddingToAxis, y: yPosition)
-                    let toPoint = CGPoint(x: xPaddingToAxis + parameters.axisWidth / 2, y: yPosition)
+                    let fromPoint = CGPoint(x: cocoaView.frame.size.width - parameters.yAxis.xPadding, y: yPosition)
+                    let toPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: yPosition)
                     drawer.drawAxis(from: fromPoint, to: toPoint, width: stopWidth, colorAlpha: 0.3)
                     
-                    drawer.drawAxisStepLabel(label: yStopRoundedText, atPoint: CGPoint(x: xPaddingToAxis + parameters.axisWidth + 3, y: yPosition + 3))
+                    drawer.drawAxisStepLabel(label: yStopRoundedText, atPoint: CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width + 3, y: yPosition + 3))
                 }
                 
-                if -yStop < parameters.yAxisMax && -yStop > parameters.yAxisMin {
+                if -yStop < parameters.yAxis.max && -yStop > parameters.yAxis.min {
                     let yPosition = yValueCalculated(for: -yStop)
-                    let fromPoint = CGPoint(x: cocoaView.frame.size.width - parameters.xPaddingToAxis, y: yPosition)
-                    let toPoint = CGPoint(x: xPaddingToAxis + parameters.axisWidth / 2, y: yPosition)
+                    let fromPoint = CGPoint(x: cocoaView.frame.size.width - parameters.yAxis.xPadding, y: yPosition)
+                    let toPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: yPosition)
                     drawer.drawAxis(from: fromPoint, to: toPoint, width: stopWidth, colorAlpha: 0.3)
                     
-                    drawer.drawAxisStepLabel(label: yStopRoundedText, atPoint: CGPoint(x: xPaddingToAxis + parameters.axisWidth + 3, y: yPosition + 3))
+                    drawer.drawAxisStepLabel(label: yStopRoundedText, atPoint: CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width + 3, y: yPosition + 3))
                 }
                 
                 yStop += suggestedSteps
@@ -286,16 +276,16 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
                 let yStopRoundedText = numberFormatter.string(from: NSNumber(value: Float(yStop)))!
                 yStop = CGFloat(numberFormatter.number(from: yStopRoundedText)!.floatValue)
                 
-                if yStop < parameters.yAxisMax && yStop > parameters.yAxisMin {
+                if yStop < parameters.yAxis.max && yStop > parameters.yAxis.min {
                     let yPosition = yValueCalculated(for: yStop)
-                    let fromPoint = CGPoint(x: cocoaView.frame.size.width - parameters.xPaddingToAxis, y: yPosition)
-                    let toPoint = CGPoint(x: xPaddingToAxis + parameters.axisWidth / 2, y: yPosition)
+                    let fromPoint = CGPoint(x: cocoaView.frame.size.width - parameters.yAxis.xPadding, y: yPosition)
+                    let toPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: yPosition)
                     drawer.drawAxis(from: fromPoint, to: toPoint, width: stopWidth, colorAlpha: 0.3)
                     
-                    drawer.drawAxisStepLabel(label: yStopRoundedText, atPoint: CGPoint(x: xPaddingToAxis + parameters.axisWidth + 3, y: yPosition + 3))
+                    drawer.drawAxisStepLabel(label: yStopRoundedText, atPoint: CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width + 3, y: yPosition + 3))
                 }
                 
-                if parameters.yAxisMin == 0 {
+                if parameters.yAxis.min == 0 {
                     yStop += suggestedSteps
                 } else {
                     yStop -= suggestedSteps
@@ -314,12 +304,12 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     
     func barOrigin(index: Int) -> Originable {
         let xOffset = evenDistributionBarWidth * ((1 - parameters.barWidthFactor) / 2)
-        let x = parameters.xPaddingToAxis + parameters.axisWidth + CGFloat(index) * evenDistributionBarWidth + xOffset
+        let x = parameters.yAxis.xPadding + parameters.yAxis.width + CGFloat(index) * evenDistributionBarWidth + xOffset
         let y: CGFloat
         let dataValue = CGFloat(dataSource.yValue(for: index))
         if cocoaView.isAppKit {
             if dataValue > 0 {
-                y = yValueCalculated(for: 0) + parameters.axisWidth / 2
+                y = yValueCalculated(for: 0) + parameters.yAxis.width / 2
             } else {
                 y = yValueCalculated(for: dataValue)
             }
@@ -327,7 +317,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             if dataValue > 0 {
                 y = yValueCalculated(for: dataValue)
             } else {
-                y = yValueCalculated(for: 0) + parameters.axisWidth / 2
+                y = yValueCalculated(for: 0) + parameters.yAxis.width / 2
             }
         }
         return Origin(x: x, y: y)
@@ -335,7 +325,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     
     func barSize(index: Int) -> Sizeable {
         let width = evenDistributionBarWidth * parameters.barWidthFactor
-        let height = abs(yValueCalculated(for: CGFloat(dataSource.yValue(for: index))) - yValueCalculated(for: 0)) - parameters.axisWidth / 2
+        let height = abs(yValueCalculated(for: CGFloat(dataSource.yValue(for: index))) - yValueCalculated(for: 0)) - parameters.xAxis.width / 2
         return Size(height: height, width: width)
     }
     

@@ -146,7 +146,7 @@ class LineChartView : NSView, AxisDrawable {
             }
             
             dataLine.lineWidth = 4
-            NSColor.green.setStroke()
+            lineColor.setStroke()
             dataLine.stroke()
             
             /*
@@ -191,8 +191,6 @@ class LineChartView : NSView, AxisDrawable {
     
     func preCalcLabelSizes() {
         
-        var lastUpperRect = NSRect.zero
-        var lastLowerRect = NSRect.zero
         let yZeroVal = chartCalc.yValueCalculated(for: 0)
         var totalLabelsLength: CGFloat = 0
         var maxLabelHeight: CGFloat = 0
@@ -238,7 +236,7 @@ class LineChartView : NSView, AxisDrawable {
         
         if chartCalc.parameters.drawXaxisLabelsAtAngle {
         } else {
-            if maxLabelHeight > chartCalc.parameters.yPaddingToAxis {
+            if maxLabelHeight > chartCalc.parameters.yAxis.yPadding {
                 printView("fart")
             }
         }
@@ -272,7 +270,8 @@ class TestLineChartViewController : NSViewController {
         var parameters = ChartParameters()
         //parameters.yAxisMin = -4
         parameters.drawXaxisLabelsAtAngle = true
-        parameters.yPaddingToAxis = 100
+        parameters.yAxis.yPadding = 100
+        parameters.xAxis.yPadding = 100
         
         lineChart = LineChartView(frame: NSRect.zero, dataSource: self, parameters: parameters)
         lineChart.translatesAutoresizingMaskIntoConstraints = false
