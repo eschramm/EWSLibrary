@@ -10,10 +10,10 @@ import Foundation
 import CoreGraphics
 
 public protocol ChartDataSource {
-    func dataCount(chartView: CocoaViewable) -> Int
-    func xValue(chartView: CocoaViewable, index: Int) -> Double
-    func yValue(chartView: CocoaViewable, index: Int) -> Double
-    func label(chartView: CocoaViewable, index: Int) -> String?
+    func dataCount(identifier: String) -> Int
+    func xValue(identifier: String, index: Int) -> Double
+    func yValue(identifier: String, index: Int) -> Double
+    func label(identifier: String, index: Int) -> String?
 }
 
 public protocol CocoaViewable {
@@ -87,6 +87,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     let chartType: ChartType
     let chartScaling: ChartScaling
     var parameters: ChartParameters = ChartParameters()
+    let chartIdentifier: String
     
     let dataCount: Int
     
@@ -106,13 +107,14 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         case line
     }
     
-    init(dataSource: ChartDataSource, cocoaView: CocoaViewable, chartType: ChartType, parameters: ChartParameters?) {
+    init(dataSource: ChartDataSource, cocoaView: CocoaViewable, chartType: ChartType, parameters: ChartParameters?, identifier: String) {
         
         evenDistributionBarWidth = nil
         
         self.dataSource = dataSource
         self.chartType = chartType
         self.cocoaView = cocoaView
+        self.chartIdentifier = identifier
         if let parameters = parameters {
             self.parameters = parameters
         } else {
@@ -124,12 +126,12 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         var minYvalue: Double = Double.greatestFiniteMagnitude
         var maxYvalue: Double = Double.leastNormalMagnitude
         
-        self.dataCount = dataSource.dataCount(chartView: cocoaView)
+        self.dataCount = dataSource.dataCount(identifier: chartIdentifier)
         
-        for index in 0...(dataCount - 1) {
+        for index in 0..<dataCount {
             
-            let xValue = dataSource.xValue(chartView: cocoaView, index: index)
-            let yValue = dataSource.yValue(chartView: cocoaView, index: index)
+            let xValue = dataSource.xValue(identifier: identifier, index: index)
+            let yValue = dataSource.yValue(identifier: identifier, index: index)
             
             if xValue < minXvalue {
                 minXvalue = xValue
@@ -146,20 +148,23 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             }
         }
         
+        let xSpanFactor = (maxXvalue - minXvalue) * 0.1
+        let ySpanFactor = (maxYvalue - minYvalue) * 0.1
+        
         //auto-size axes max/mins
         
         if self.parameters.xAxis.max == nil {
-            self.parameters.xAxis.max = CGFloat(maxXvalue * 1.1)
+            self.parameters.xAxis.max = CGFloat(maxXvalue + xSpanFactor)
         }
         if self.parameters.yAxis.max == nil {
-            self.parameters.yAxis.max = CGFloat(maxYvalue * 1.1)
+            self.parameters.yAxis.max = CGFloat(maxYvalue + ySpanFactor)
         }
         
         self.chartScaling = ChartScaling(xMin: CGFloat(minXvalue), xMax: CGFloat(maxXvalue), yMin: CGFloat(minYvalue), yMax: CGFloat(maxYvalue))
         
         if self.parameters.xAxis.min == nil {
             if minXvalue < 0 || !self.parameters.xAxis.anchorAxisAt0unlessNegative {
-                self.parameters.xAxis.min = (minXvalue < 0) ? CGFloat(minXvalue * 1.1) : CGFloat(minXvalue * 0.9)
+                self.parameters.xAxis.min = (minXvalue < 0) ? CGFloat(minXvalue + xSpanFactor) : CGFloat(minXvalue - xSpanFactor)
             } else {
                 self.parameters.xAxis.min = 0
             }
@@ -167,7 +172,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         
         if self.parameters.yAxis.min == nil {
             if minYvalue < 0 || !self.parameters.yAxis.anchorAxisAt0unlessNegative {
-                self.parameters.yAxis.min = (minYvalue < 0) ? CGFloat(minYvalue * 1.1) : CGFloat(minYvalue * 0.9)
+                self.parameters.yAxis.min = (minYvalue < 0) ? CGFloat(minYvalue + ySpanFactor) : CGFloat(minYvalue - ySpanFactor)
             } else {
                 self.parameters.yAxis.min = 0
             }
@@ -217,15 +222,17 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             yAxisFromPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: parameters.yAxis.yPadding)
             yAxisToPoint = CGPoint(x: parameters.yAxis.xPadding + parameters.yAxis.width / 2, y: cocoaView.frame.size.height - parameters.yAxis.yPadding)
         }
-        
-        drawer.drawAxis(from: yAxisFromPoint, to: yAxisToPoint, width: parameters.yAxis.width, colorAlpha: 1)
+        if parameters.yAxis.width > 0 {
+            drawer.drawAxis(from: yAxisFromPoint, to: yAxisToPoint, width: parameters.yAxis.width, colorAlpha: 1)
+        }
         
         let xAxisYval = yValueCalculated(for: 0)  //exact center
         
         let xAxisFromPoint = CGPoint(x: parameters.xAxis.xPadding, y: xAxisYval)
         let xAxisToPoint = CGPoint(x: cocoaView.frame.size.width - parameters.xAxis.xPadding, y: xAxisYval)
-        
-        drawer.drawAxis(from: xAxisFromPoint, to: xAxisToPoint, width: parameters.xAxis.width, colorAlpha: 1)
+        if parameters.xAxis.width > 0 {
+            drawer.drawAxis(from: xAxisFromPoint, to: xAxisToPoint, width: parameters.xAxis.width, colorAlpha: 1)
+        }
         
         //Y-Axis Steps
         
@@ -320,7 +327,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         let xOffset = evenDistributionBarWidth * ((1 - parameters.barWidthFactor) / 2)
         let x = parameters.yAxis.xPadding + parameters.yAxis.width + CGFloat(index) * evenDistributionBarWidth + xOffset
         let y: CGFloat
-        let dataValue = CGFloat(dataSource.yValue(chartView: cocoaView, index: index))
+        let dataValue = CGFloat(dataSource.yValue(identifier: chartIdentifier, index: index))
         if cocoaView.isAppKit {
             if dataValue > 0 {
                 y = yValueCalculated(for: 0) + parameters.yAxis.width / 2
@@ -339,14 +346,14 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     
     func barSize(index: Int) -> Sizeable {
         let width = evenDistributionBarWidth * parameters.barWidthFactor
-        let height = abs(yValueCalculated(for: CGFloat(dataSource.yValue(chartView: cocoaView, index: index))) - yValueCalculated(for: 0)) - parameters.xAxis.width / 2
+        let height = abs(yValueCalculated(for: CGFloat(dataSource.yValue(identifier: chartIdentifier, index: index))) - yValueCalculated(for: 0)) - parameters.xAxis.width / 2
         return Size(height: height, width: width)
     }
     
     //LINE
     
     func linePoint(index: Int) -> Originable {
-        return Origin(x: xValueCalculated(for: CGFloat(dataSource.xValue(chartView: cocoaView, index: index))), y: yValueCalculated(for: CGFloat(dataSource.yValue(chartView: cocoaView, index: index))))
+        return Origin(x: xValueCalculated(for: CGFloat(dataSource.xValue(identifier: chartIdentifier, index: index))), y: yValueCalculated(for: CGFloat(dataSource.yValue(identifier: chartIdentifier, index: index))))
     }
     
 }

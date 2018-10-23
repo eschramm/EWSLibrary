@@ -8,7 +8,7 @@
 
 import AppKit
 
-class BarChartView: NSView, AxisDrawable {
+public class BarChartView: NSView, AxisDrawable {
     
     //recall
     // ^
@@ -22,7 +22,8 @@ class BarChartView: NSView, AxisDrawable {
         let isAppKit = true
     }
     
-    var dataSource: ChartDataSource!
+    let dataSource: ChartDataSource
+    let chartIdentifier: String
     
     var cocoaView: CocoaView!
     var chartCalc: ChartCalculations!
@@ -31,18 +32,19 @@ class BarChartView: NSView, AxisDrawable {
     
     let labelsFont = NSFont.systemFont(ofSize: 14)
     
-    init(frame: NSRect, dataSource: ChartDataSource, parameters: ChartParameters?) {
-        super.init(frame: frame)
+    public init(frame: NSRect, dataSource: ChartDataSource, parameters: ChartParameters?, identifier: String) {
         self.dataSource = dataSource
-        self.chartCalc = ChartCalculations(dataSource: dataSource, cocoaView: CocoaView(frame: Frame(origin: Origin(x: frame.origin.x, y: frame.origin.y) , size: Size(height: frame.size.height, width: frame.size.width))), chartType: .bar, parameters: parameters)
+        self.chartIdentifier = identifier
+        super.init(frame: frame)
+        self.chartCalc = ChartCalculations(dataSource: dataSource, cocoaView: CocoaView(frame: Frame(origin: Origin(x: frame.origin.x, y: frame.origin.y) , size: Size(height: frame.size.height, width: frame.size.width))), chartType: .bar, parameters: parameters, identifier: identifier)
     }
     
     required init?(coder: NSCoder) {
-        //fatalError("init(coder:) has not been implemented")
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented")
+        //super.init(coder: coder)
     }
     
-    override func draw(_ dirtyRect: NSRect) {
+    public override func draw(_ dirtyRect: NSRect) {
         
         if dirtyRect == NSRect.zero {
             return
@@ -136,7 +138,7 @@ class BarChartView: NSView, AxisDrawable {
             barColor.setFill()
             barRect.fill()
             
-            if let labelText = dataSource.label(for: index) {
+            if let labelText = dataSource.label(identifier: chartIdentifier, index: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
                     
@@ -188,7 +190,7 @@ class BarChartView: NSView, AxisDrawable {
             
             let barRectCenterX = barRect.origin.x + (barSize.width / 2)
             
-            if let labelText = dataSource.label(for: index) {
+            if let labelText = dataSource.label(identifier: chartIdentifier, index: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
                     
@@ -260,7 +262,7 @@ class TestBarChartViewController : NSViewController {
         parameters.yAxis.xPadding = 20
         parameters.xAxis.xPadding = 20
         
-        barChart = BarChartView(frame: NSRect.zero, dataSource: self, parameters: parameters)
+        barChart = BarChartView(frame: NSRect.zero, dataSource: self, parameters: parameters, identifier: "testBarChart")
         barChart.translatesAutoresizingMaskIntoConstraints = false
         var constraints = [NSLayoutConstraint]()
         view.addSubview(barChart)
@@ -276,31 +278,30 @@ class TestBarChartViewController : NSViewController {
         
         //add this to force redraw on window resize
         /*NotificationCenter.default.addObserver(forName: NSWindow.didEndLiveResizeNotification, object: nil, queue: OperationQueue.main) { (notification: Notification) in
-            
-            //let strongSelf = weakself
-            
-            self.barChart.draw(self.barChart.frame)
-        }*/
+         
+         //let strongSelf = weakself
+         
+         self.barChart.draw(self.barChart.frame)
+         }*/
         
     }
     
 }
 
 extension TestBarChartViewController : ChartDataSource {
-    
-    func dataCount() -> Int {
+    func dataCount(identifier: String) -> Int {
         return elements.count
     }
     
-    func xValue(for index: Int) -> Double {
+    func xValue(identifier: String, index: Int) -> Double {
         return elements[index].xVal
     }
     
-    func yValue(for index: Int) -> Double {
+    func yValue(identifier: String, index: Int) -> Double {
         return elements[index].yVal
     }
     
-    func label(for index: Int) -> String? {
+    func label(identifier: String, index: Int) -> String? {
         return elements[index].label
     }
 }

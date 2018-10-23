@@ -22,7 +22,8 @@ public class LineChartView : NSView, AxisDrawable {
         let isAppKit = true
     }
     
-    var dataSource: ChartDataSource!
+    let dataSource: ChartDataSource
+    let chartIdentifier: String
     
     var cocoaView: CocoaView!
     var chartCalc: ChartCalculations!
@@ -31,15 +32,16 @@ public class LineChartView : NSView, AxisDrawable {
     
     let labelsFont = NSFont.systemFont(ofSize: 14)
     
-    public init(frame: NSRect, dataSource: ChartDataSource, parameters: ChartParameters?) {
-        super.init(frame: frame)
+    public init(frame: NSRect, dataSource: ChartDataSource, parameters: ChartParameters?, identifier: String) {
         self.dataSource = dataSource
-        self.chartCalc = ChartCalculations(dataSource: dataSource, cocoaView: CocoaView(frame: Frame(origin: Origin(x: frame.origin.x, y: frame.origin.y) , size: Size(height: frame.size.height, width: frame.size.width))), chartType: .bar, parameters: parameters)
+        self.chartIdentifier = identifier
+        super.init(frame: frame)
+        self.chartCalc = ChartCalculations(dataSource: dataSource, cocoaView: CocoaView(frame: Frame(origin: Origin(x: frame.origin.x, y: frame.origin.y) , size: Size(height: frame.size.height, width: frame.size.width))), chartType: .bar, parameters: parameters, identifier: identifier)
     }
     
     required init?(coder: NSCoder) {
-        //fatalError("init(coder:) has not been implemented")
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented")
+        //super.init(coder: coder)
     }
     
     public override func draw(_ dirtyRect: NSRect) {
@@ -137,11 +139,11 @@ public class LineChartView : NSView, AxisDrawable {
                 dataLine.line(to: dataPoint)
             }
             
-            dataLine.lineWidth = 4
+            dataLine.lineWidth = 1
             lineColor.setStroke()
             dataLine.stroke()
             
-            if let labelText = dataSource.label(chartView: cocoaView, index: index) {
+            if let labelText = dataSource.label(identifier: chartIdentifier, index: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
                     
@@ -185,7 +187,7 @@ public class LineChartView : NSView, AxisDrawable {
         var totalLabelsLength: CGFloat = 0
         var maxLabelHeight: CGFloat = 0
         
-        for index in 0...(chartCalc.dataCount - 1) {
+        for index in 0..<chartCalc.dataCount {
             
             let barOrigin = chartCalc.barOrigin(index: index)
             let barSize = chartCalc.barSize(index: index)
@@ -193,7 +195,7 @@ public class LineChartView : NSView, AxisDrawable {
             
             let barRectCenterX = barRect.origin.x + (barSize.width / 2)
             
-            if let labelText = dataSource.label(chartView: cocoaView, index: index) {
+            if let labelText = dataSource.label(identifier: chartIdentifier, index: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
                     
@@ -269,7 +271,7 @@ class TestLineChartViewController : NSViewController {
         parameters.xAxis.anchorAxisAt0unlessNegative = false
         parameters.yAxis.anchorAxisAt0unlessNegative = false
         
-        lineChart = LineChartView(frame: NSRect.zero, dataSource: self, parameters: parameters)
+        lineChart = LineChartView(frame: NSRect.zero, dataSource: self, parameters: parameters, identifier: "testLineChart")
         lineChart.translatesAutoresizingMaskIntoConstraints = false
         var constraints = [NSLayoutConstraint]()
         view.addSubview(lineChart)
@@ -296,19 +298,19 @@ class TestLineChartViewController : NSViewController {
 }
 
 extension TestLineChartViewController : ChartDataSource {
-    func dataCount(chartView: CocoaViewable) -> Int {
+    func dataCount(identifier: String) -> Int {
         return elements.count
     }
     
-    func xValue(chartView: CocoaViewable, index: Int) -> Double {
+    func xValue(identifier: String, index: Int) -> Double {
         return elements[index].xVal
     }
     
-    func yValue(chartView: CocoaViewable, index: Int) -> Double {
+    func yValue(identifier: String, index: Int) -> Double {
         return elements[index].yVal
     }
     
-    func label(chartView: CocoaViewable, index: Int) -> String? {
+    func label(identifier: String, index: Int) -> String? {
         return elements[index].label
     }
 }
