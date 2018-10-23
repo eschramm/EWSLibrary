@@ -9,26 +9,26 @@
 import Foundation
 import CoreGraphics
 
-protocol ChartDataSource {
-    func dataCount() -> Int
-    func xValue(for index: Int) -> Double
-    func yValue(for index: Int) -> Double
-    func label(for index: Int) -> String?
+public protocol ChartDataSource {
+    func dataCount(chartView: CocoaViewable) -> Int
+    func xValue(chartView: CocoaViewable, index: Int) -> Double
+    func yValue(chartView: CocoaViewable, index: Int) -> Double
+    func label(chartView: CocoaViewable, index: Int) -> String?
 }
 
-protocol CocoaViewable {
+public protocol CocoaViewable {
     var frame: Frameable { get set }
     var isAppKit: Bool { get }
 }
-protocol Frameable {
+public protocol Frameable {
     var origin: Originable { get set }
     var size: Sizeable { get set }
 }
-protocol Originable {
+public protocol Originable {
     var x: CGFloat { get set }
     var y: CGFloat { get set }
 }
-protocol Sizeable {
+public protocol Sizeable {
     var width: CGFloat { get set }
     var height: CGFloat { get set }
 }
@@ -51,20 +51,27 @@ struct Size: Sizeable {
     var width: CGFloat
 }
 
-struct ChartParameters {
-    var xAxis = Axis()
-    var yAxis = Axis()
-    var barWidthFactor: CGFloat = 0.75
-    var drawXaxisLabelsAtAngle = false
+public struct ChartParameters {
+    public var xAxis = Axis()
+    public var yAxis = Axis()
+    public var barWidthFactor: CGFloat = 0.75
+    public var drawXaxisLabelsAtAngle = false
+    
+    public init() {
+        self.xAxis = Axis()
+        self.yAxis = Axis()
+        barWidthFactor = 0.75
+        drawXaxisLabelsAtAngle = false
+    }
 }
 
-struct Axis {
-    var xPadding: CGFloat = 15
-    var yPadding: CGFloat = 15
-    var width: CGFloat = 6
-    var min: CGFloat!
-    var max: CGFloat!
-    var anchorAxisAt0unlessNegative = true
+public struct Axis {
+    public var xPadding: CGFloat = 15
+    public var yPadding: CGFloat = 15
+    public var width: CGFloat = 6
+    public var min: CGFloat!
+    public var max: CGFloat!
+    public var anchorAxisAt0unlessNegative = true
 }
 
 struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assume isAppKit to flip y-axis if needed
@@ -117,12 +124,12 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         var minYvalue: Double = Double.greatestFiniteMagnitude
         var maxYvalue: Double = Double.leastNormalMagnitude
         
-        self.dataCount = dataSource.dataCount()
+        self.dataCount = dataSource.dataCount(chartView: cocoaView)
         
         for index in 0...(dataCount - 1) {
             
-            let xValue = dataSource.xValue(for: index)
-            let yValue = dataSource.yValue(for: index)
+            let xValue = dataSource.xValue(chartView: cocoaView, index: index)
+            let yValue = dataSource.yValue(chartView: cocoaView, index: index)
             
             if xValue < minXvalue {
                 minXvalue = xValue
@@ -130,7 +137,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             if xValue > maxXvalue {
                 maxXvalue = xValue
             }
-
+            
             if yValue < minYvalue {
                 minYvalue = yValue
             }
@@ -313,7 +320,7 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
         let xOffset = evenDistributionBarWidth * ((1 - parameters.barWidthFactor) / 2)
         let x = parameters.yAxis.xPadding + parameters.yAxis.width + CGFloat(index) * evenDistributionBarWidth + xOffset
         let y: CGFloat
-        let dataValue = CGFloat(dataSource.yValue(for: index))
+        let dataValue = CGFloat(dataSource.yValue(chartView: cocoaView, index: index))
         if cocoaView.isAppKit {
             if dataValue > 0 {
                 y = yValueCalculated(for: 0) + parameters.yAxis.width / 2
@@ -332,14 +339,14 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
     
     func barSize(index: Int) -> Sizeable {
         let width = evenDistributionBarWidth * parameters.barWidthFactor
-        let height = abs(yValueCalculated(for: CGFloat(dataSource.yValue(for: index))) - yValueCalculated(for: 0)) - parameters.xAxis.width / 2
+        let height = abs(yValueCalculated(for: CGFloat(dataSource.yValue(chartView: cocoaView, index: index))) - yValueCalculated(for: 0)) - parameters.xAxis.width / 2
         return Size(height: height, width: width)
     }
     
     //LINE
     
     func linePoint(index: Int) -> Originable {
-        return Origin(x: xValueCalculated(for: CGFloat(dataSource.xValue(for: index))), y: yValueCalculated(for: CGFloat(dataSource.yValue(for: index))))
+        return Origin(x: xValueCalculated(for: CGFloat(dataSource.xValue(chartView: cocoaView, index: index))), y: yValueCalculated(for: CGFloat(dataSource.yValue(chartView: cocoaView, index: index))))
     }
     
 }

@@ -8,7 +8,7 @@
 
 import AppKit
 
-class LineChartView : NSView, AxisDrawable {
+public class LineChartView : NSView, AxisDrawable {
     
     //recall
     // ^
@@ -31,7 +31,7 @@ class LineChartView : NSView, AxisDrawable {
     
     let labelsFont = NSFont.systemFont(ofSize: 14)
     
-    init(frame: NSRect, dataSource: ChartDataSource, parameters: ChartParameters?) {
+    public init(frame: NSRect, dataSource: ChartDataSource, parameters: ChartParameters?) {
         super.init(frame: frame)
         self.dataSource = dataSource
         self.chartCalc = ChartCalculations(dataSource: dataSource, cocoaView: CocoaView(frame: Frame(origin: Origin(x: frame.origin.x, y: frame.origin.y) , size: Size(height: frame.size.height, width: frame.size.width))), chartType: .bar, parameters: parameters)
@@ -42,7 +42,7 @@ class LineChartView : NSView, AxisDrawable {
         super.init(coder: coder)
     }
     
-    override func draw(_ dirtyRect: NSRect) {
+    public override func draw(_ dirtyRect: NSRect) {
         
         if dirtyRect == NSRect.zero {
             return
@@ -141,7 +141,7 @@ class LineChartView : NSView, AxisDrawable {
             lineColor.setStroke()
             dataLine.stroke()
             
-            if let labelText = dataSource.label(for: index) {
+            if let labelText = dataSource.label(chartView: cocoaView, index: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
                     
@@ -193,7 +193,7 @@ class LineChartView : NSView, AxisDrawable {
             
             let barRectCenterX = barRect.origin.x + (barSize.width / 2)
             
-            if let labelText = dataSource.label(for: index) {
+            if let labelText = dataSource.label(chartView: cocoaView, index: index) {
                 
                 if chartCalc.parameters.drawXaxisLabelsAtAngle {
                     
@@ -296,20 +296,19 @@ class TestLineChartViewController : NSViewController {
 }
 
 extension TestLineChartViewController : ChartDataSource {
-    
-    func dataCount() -> Int {
+    func dataCount(chartView: CocoaViewable) -> Int {
         return elements.count
     }
     
-    func xValue(for index: Int) -> Double {
+    func xValue(chartView: CocoaViewable, index: Int) -> Double {
         return elements[index].xVal
     }
     
-    func yValue(for index: Int) -> Double {
+    func yValue(chartView: CocoaViewable, index: Int) -> Double {
         return elements[index].yVal
     }
     
-    func label(for index: Int) -> String? {
+    func label(chartView: CocoaViewable, index: Int) -> String? {
         return elements[index].label
     }
 }
