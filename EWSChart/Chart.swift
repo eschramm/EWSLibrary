@@ -148,8 +148,8 @@ struct ChartCalculations {  //should be reusable for UIKit and AppKit, can assum
             }
         }
         
-        let xSpanFactor = (maxXvalue - minXvalue) * 0.1
-        let ySpanFactor = (maxYvalue - minYvalue) * 0.1
+        let xSpanFactor = (maxXvalue - minXvalue) * 0.05
+        let ySpanFactor = (maxYvalue - minYvalue) * 0.05
         
         //auto-size axes max/mins
         
