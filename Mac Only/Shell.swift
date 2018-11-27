@@ -12,7 +12,9 @@ import Foundation
 
 public final class Shell
 {
-    func outputOf(commandName: String, arguments: [String] = []) -> String? {
+    public init() {}
+    
+    public func outputOf(commandName: String, arguments: [String] = []) -> String? {
         return bash(commandName: commandName, arguments:arguments)
     }
     
