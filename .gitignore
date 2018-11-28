@@ -1,6 +1,8 @@
 ## Build generated
 build/
 DerivedData/
+*.o
+*.pyc
 
 ## Various settings
 *.pbxuser
@@ -11,6 +13,8 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
+*.xcuserstate
+project.xcworkspace/
 xcuserdata/
 
 ## Other
@@ -25,3 +29,8 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+
+#Python modules
+MANIFEST
+dist/
+build/
