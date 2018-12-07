@@ -34,12 +34,21 @@ public class HelpVC : UIViewController {
         
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
-        NSLayoutConstraint.activate([
-            webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-            ])
+        if #available(iOS 11.0, *) {
+            NSLayoutConstraint.activate([
+                webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+                ])
+        } else {
+            NSLayoutConstraint.activate([
+                webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                webView.topAnchor.constraint(equalTo: view.topAnchor),
+                webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+                ])
+        }
         
         let url: URL?
         switch resource {
