@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */; };
+		DA96FCC621BA036000C0AAE4 /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = DA96FCC421BA036000C0AAE4 /* Cartfile */; };
+		DA96FCC721BA036000C0AAE4 /* Cartfile.resolved in Resources */ = {isa = PBXBuildFile; fileRef = DA96FCC521BA036000C0AAE4 /* Cartfile.resolved */; };
 		DA97B98521065F5800135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98621065F5900135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98721065F8000135BF1 /* EWSLibrary_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACDE83F21065EB50077A612 /* EWSLibrary_iOSTests.swift */; };
@@ -58,6 +61,55 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		DA96FCD221BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DD76FA10486AA7600D96B5E;
+			remoteInfo = fmdb;
+		};
+		DA96FCD421BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EE4290EF12B42F870088BD94;
+			remoteInfo = FMDB;
+		};
+		DA96FCD621BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BF5D041618416BB2008C5AA9;
+			remoteInfo = Tests;
+		};
+		DA96FCD821BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6290CBB5188FE836009790F8;
+			remoteInfo = "FMDB-IOS";
+		};
+		DA96FCDA21BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 83C73EFE1C326AB000FFC730;
+			remoteInfo = "FMDB iOS";
+		};
+		DA96FCDC21BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 83C73F0B1C326ADA00FFC730;
+			remoteInfo = "FMDB MacOS";
+		};
+		DA96FCDE21BA037400C0AAE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2CD2426D1FCC09CA00479FDE;
+			remoteInfo = "FMDB watchOS";
+		};
 		DA99A45D2171517D00E83EFC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
@@ -164,6 +216,10 @@
 
 /* Begin PBXFileReference section */
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
+		DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpVC.swift; sourceTree = "<group>"; };
+		DA96FCC421BA036000C0AAE4 /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
+		DA96FCC521BA036000C0AAE4 /* Cartfile.resolved */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = "<group>"; };
+		DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = fmdb.xcodeproj; path = Carthage/Checkouts/fmdb/fmdb.xcodeproj; sourceTree = "<group>"; };
 		DA97B9892106601700135BF1 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		DA995A51216E84A60082B3DD /* EWSDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EWSDB.h; sourceTree = "<group>"; };
 		DA995A52216E84A60082B3DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -370,6 +426,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DA96FCC021BA00B900C0AAE4 /* iOS Only */ = {
+			isa = PBXGroup;
+			children = (
+				DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */,
+			);
+			path = "iOS Only";
+			sourceTree = "<group>";
+		};
+		DA96FCC321BA033000C0AAE4 /* Carthage */ = {
+			isa = PBXGroup;
+			children = (
+				DA96FCC421BA036000C0AAE4 /* Cartfile */,
+				DA96FCC521BA036000C0AAE4 /* Cartfile.resolved */,
+				DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */,
+			);
+			name = Carthage;
+			sourceTree = "<group>";
+		};
+		DA96FCC921BA037300C0AAE4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DA96FCD321BA037400C0AAE4 /* fmdb */,
+				DA96FCD521BA037400C0AAE4 /* libFMDB.a */,
+				DA96FCD721BA037400C0AAE4 /* Tests.xctest */,
+				DA96FCD921BA037400C0AAE4 /* libFMDB-IOS.a */,
+				DA96FCDB21BA037400C0AAE4 /* FMDB.framework */,
+				DA96FCDD21BA037400C0AAE4 /* FMDB.framework */,
+				DA96FCDF21BA037400C0AAE4 /* FMDB.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		DA995A50216E84A60082B3DD /* EWSDB */ = {
 			isa = PBXGroup;
 			children = (
@@ -407,13 +495,14 @@
 			isa = PBXGroup;
 			children = (
 				DACDE83B21065EB50077A612 /* CommonSource */,
-				DADDA08A2106720800827123 /* iOS Only */,
+				DA96FCC021BA00B900C0AAE4 /* iOS Only */,
 				DADDA089210671FD00827123 /* Mac Only */,
 				DA995A50216E84A60082B3DD /* EWSDB */,
 				DAF8BADF2171746800EBF484 /* EWSChart */,
 				DACDE80621065D910077A612 /* Products */,
 				DACDE83E21065EB50077A612 /* CommonTests */,
 				DAB73DC621075D2600F94664 /* Frameworks */,
+				DA96FCC321BA033000C0AAE4 /* Carthage */,
 			);
 			sourceTree = "<group>";
 		};
@@ -467,13 +556,6 @@
 				DA97B9892106601700135BF1 /* Shell.swift */,
 			);
 			path = "Mac Only";
-			sourceTree = "<group>";
-		};
-		DADDA08A2106720800827123 /* iOS Only */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "iOS Only";
 			sourceTree = "<group>";
 		};
 		DAF8BADF2171746800EBF484 /* EWSChart */ = {
@@ -1036,6 +1118,12 @@
 			mainGroup = DACDE7FB21065D910077A612;
 			productRefGroup = DACDE80621065D910077A612 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DA96FCC921BA037300C0AAE4 /* Products */;
+					ProjectRef = DA96FCC821BA037300C0AAE4 /* fmdb.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				DACDE80421065D910077A612 /* EWSLibrary_iOS */,
@@ -1059,6 +1147,58 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		DA96FCD321BA037400C0AAE4 /* fmdb */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = fmdb;
+			remoteRef = DA96FCD221BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DA96FCD521BA037400C0AAE4 /* libFMDB.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFMDB.a;
+			remoteRef = DA96FCD421BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DA96FCD721BA037400C0AAE4 /* Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = Tests.xctest;
+			remoteRef = DA96FCD621BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DA96FCD921BA037400C0AAE4 /* libFMDB-IOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libFMDB-IOS.a";
+			remoteRef = DA96FCD821BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DA96FCDB21BA037400C0AAE4 /* FMDB.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = FMDB.framework;
+			remoteRef = DA96FCDA21BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DA96FCDD21BA037400C0AAE4 /* FMDB.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = FMDB.framework;
+			remoteRef = DA96FCDC21BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DA96FCDF21BA037400C0AAE4 /* FMDB.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = FMDB.framework;
+			remoteRef = DA96FCDE21BA037400C0AAE4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		DA995A55216E84A60082B3DD /* Resources */ = {
@@ -1094,6 +1234,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA96FCC621BA036000C0AAE4 /* Cartfile in Resources */,
+				DA96FCC721BA036000C0AAE4 /* Cartfile.resolved in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1235,6 +1377,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
+				DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
