@@ -7,7 +7,7 @@
 		<key>EWSChartSample_Mac.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>8</integer>
+			<integer>9</integer>
 		</dict>
 		<key>EWSChartSample_iOS.xcscheme</key>
 		<dict>
@@ -17,17 +17,17 @@
 		<key>EWSChartSample_iOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>9</integer>
+			<integer>15</integer>
 		</dict>
 		<key>EWSChart_Mac.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>7</integer>
+			<integer>8</integer>
 		</dict>
 		<key>EWSChart_iOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>6</integer>
+			<integer>7</integer>
 		</dict>
 		<key>EWSDB_Mac.xcscheme_^#shared#^_</key>
 		<dict>
@@ -73,6 +73,21 @@
 			<true/>
 		</dict>
 		<key>DAAA3105217022BA0083CE69</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DAF8BB1B2171756000EBF484</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DAF8BB2E2171756100EBF484</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>DAF8BB392171756100EBF484</key>
 		<dict>
 			<key>primary</key>
 			<true/>

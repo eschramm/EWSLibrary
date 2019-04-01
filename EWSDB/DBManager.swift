@@ -510,7 +510,7 @@ struct Networking {
 }
 
 public extension DBManager {
-    public static let didCompleteInitialization = Notification.Name("DBManagerDidCompleteInitialization")
+    static let didCompleteInitialization = Notification.Name("DBManagerDidCompleteInitialization")
 }
 
 public class DBManager {

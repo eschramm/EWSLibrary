@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1000"
+   LastUpgradeVersion = "1020"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -16,7 +16,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DAAA3105217022BA0083CE69"
+               BlueprintIdentifier = "DA99A4562171517D00E83EFC"
                BuildableName = "EWSDB_iOSTests.xctest"
                BlueprintName = "EWSDB_iOSTests"
                ReferencedContainer = "container:EWSLibrary.xcodeproj">
