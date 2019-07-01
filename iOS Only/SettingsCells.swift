@@ -11,9 +11,9 @@ import StoreKit
 
 let kLeadingPaddingToMatchSystemCellLabel: CGFloat = 20.0
 
-enum SettingsCellType {
+public enum SettingsCellType {
     
-    enum ButtonCellType {
+    public enum ButtonCellType {
         case centered(titleColor: UIColor, backgroundColor: UIColor)
         case leftDisplayViewController
     }
@@ -25,26 +25,30 @@ enum SettingsCellType {
     case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMinimumWidth: CGFloat?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
 }
 
-protocol PickerDelegate: class {
+public protocol PickerDelegate: class {
     func pickerDidSelect(picker: PickerDelegate, selectedTitle: String)
 }
 
-protocol PickerPresenterItem {
+public protocol PickerPresenterItem {
     func displayTitle() -> String
 }
 
-struct PickerPresenterSelectionHandler {
+public struct PickerPresenterSelectionHandler {
     let sortPriority: Int
     let itemSelectedHandler: (PickerPresenterItem?) -> ()
+    public init(sortPriority: Int, itemSelectedHandler: @escaping (PickerPresenterItem?) -> ()) {
+        self.sortPriority = sortPriority
+        self.itemSelectedHandler = itemSelectedHandler
+    }
 }
 
-protocol PickerPresenter {
+public protocol PickerPresenter {
     var handlers: [PickerPresenterSelectionHandler] { get set }
     func summonPicker(presentingViewController: UIViewController)
     func removeDefault()
 }
 
-extension PickerPresenter {
+public extension PickerPresenter {
     mutating func add(pickerPresenterSelectionHandler: PickerPresenterSelectionHandler) {
         handlers.append(pickerPresenterSelectionHandler)
     }
@@ -58,7 +62,7 @@ extension PickerPresenter {
     }
 }
 
-enum SettingsCellSelectionType {
+public enum SettingsCellSelectionType {
     
     case helpText(title: String, message: String)
     case helpTextPresentPicker(title: String, message: String, actionString: String, pickerPresenter: PickerPresenter, allowRemoveDefaultAction: Bool)
@@ -94,9 +98,13 @@ enum SettingsCellSelectionType {
     }
 }
 
-struct SettingsCellModel {
+public struct SettingsCellModel {
     let cellType: SettingsCellType
     let selectionType: SettingsCellSelectionType
+    public init(cellType: SettingsCellType, selectionType: SettingsCellSelectionType) {
+        self.cellType = cellType
+        self.selectionType = selectionType
+    }
 }
 
 protocol SettingsCell {
@@ -297,7 +305,7 @@ class ButtonCell: UITableViewCell, SettingsCell {
     }
 }
 
-class RatingCell : UITableViewCell, SettingsCell {
+public class RatingCell : UITableViewCell, SettingsCell {
     
     let initialText: String
     let ratingsTextColor: UIColor
@@ -352,7 +360,7 @@ class RatingCell : UITableViewCell, SettingsCell {
         }
     }
     
-    static func defaultSelectAction() -> SettingsCellSelectionType {
+    public static func defaultSelectAction() -> SettingsCellSelectionType {
         return .cellButtonAction(action: { (_) in
             SKStoreReviewController.requestReview()
         })
@@ -464,28 +472,32 @@ extension TextFieldCell : UITextFieldDelegate {
     }
 }
 
-struct SettingsSection {
+public struct SettingsSection {
     let title: String?
     let cellModels: [SettingsCellModel]
+    public init(title: String?, cellModels: [SettingsCellModel]) {
+        self.title = title
+        self.cellModels = cellModels
+    }
 }
 
-class SettingsTVC: UITableViewController {
+open class SettingsTVC: UITableViewController {
     
     var gestureRecognizer: UITapGestureRecognizer!
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
     
-    init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
+    public init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
         self.sections = sections
         super.init(style: .grouped)
         self.gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleGesture(gestureRecognizer:)))
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidLoad() {
+    open override func viewDidLoad() {
         tableView.rowHeight = 44
         gestureRecognizer.numberOfTapsRequired = 1
         gestureRecognizer.numberOfTouchesRequired = 1
@@ -494,15 +506,15 @@ class SettingsTVC: UITableViewController {
         super.viewDidLoad()
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    open override func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    open override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return sections[section].cellModels.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    open override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = sections[indexPath.section].cellModels[indexPath.row]
         let cellIdentifier = "\(indexPath.section)-\(indexPath.row)"
         if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
@@ -537,11 +549,11 @@ class SettingsTVC: UITableViewController {
         return UITableViewCell(style: .default, reuseIdentifier: "errorCase")
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    open override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return sections[section].title
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? SettingsCell {
             cell.selectAction(presentingViewController: self)
             tableView.deselectRow(at: indexPath, animated: true)
@@ -556,12 +568,12 @@ class SettingsTVC: UITableViewController {
     }
 }
 
-class AppInfo : NSObject {  // class from NSObject only for Obj-C compatibility for iQIF
+public class AppInfo : NSObject {  // class from NSObject only for Obj-C compatibility for iQIF
     
     let appID: String
     let session: URLSession
     
-    init(with appID: String) {
+    public init(with appID: String) {
         
         self.appID = appID
         
@@ -570,7 +582,7 @@ class AppInfo : NSObject {  // class from NSObject only for Obj-C compatibility 
         self.session = URLSession(configuration: sessionConfig)
     }
     
-    func getData(completion: @escaping (_ dataDict: [AnyHashable : Any]) -> Void) {
+    public func getData(completion: @escaping (_ dataDict: [AnyHashable : Any]) -> Void) {
         
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
