@@ -23,6 +23,7 @@
 		DA99A4622171518400E83EFC /* EWSDBTests_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDE21075A9B00F94664 /* EWSDBTests_iOSTests.swift */; };
 		DA99A4632171518900E83EFC /* EWSDBTests_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */; };
 		DAB73DCC21075D5A00F94664 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; };
+		DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC3E64722CA707700226217 /* SettingsCells.swift */; };
 		DACDE80F21065D920077A612 /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; };
 		DACDE82D21065E1D0077A612 /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE82421065E1D0077A612 /* EWSLibrary.framework */; };
 		DADDA08421066DB000827123 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA97B9892106601700135BF1 /* Shell.swift */; };
@@ -201,6 +202,7 @@
 		DAB73DC721075D2600F94664 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAB73DC921075D2C00F94664 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAB73DCB21075D5A00F94664 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAC3E64722CA707700226217 /* SettingsCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCells.swift; sourceTree = "<group>"; };
 		DACDE80521065D910077A612 /* EWSLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DACDE80E21065D920077A612 /* EWSLibrary_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSLibrary_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DACDE82421065E1D0077A612 /* EWSLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -365,6 +367,7 @@
 			isa = PBXGroup;
 			children = (
 				DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */,
+				DAC3E64722CA707700226217 /* SettingsCells.swift */,
 			);
 			path = "iOS Only";
 			sourceTree = "<group>";
@@ -1191,6 +1194,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
+				DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */,
 				DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
