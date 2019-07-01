@@ -471,7 +471,6 @@ struct SettingsSection {
 
 class SettingsTVC: UITableViewController {
     
-    let defaults = StandardUserDefaults()
     var gestureRecognizer: UITapGestureRecognizer!
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
@@ -557,3 +556,77 @@ class SettingsTVC: UITableViewController {
     }
 }
 
+class AppInfo : NSObject {  // class from NSObject only for Obj-C compatibility for iQIF
+    
+    let appID: String
+    let session: URLSession
+    
+    init(with appID: String) {
+        
+        self.appID = appID
+        
+        let sessionConfig = URLSessionConfiguration.ephemeral
+        sessionConfig.timeoutIntervalForRequest = 15.0
+        self.session = URLSession(configuration: sessionConfig)
+    }
+    
+    func getData(completion: @escaping (_ dataDict: [AnyHashable : Any]) -> Void) {
+        
+        var urlComponents = URLComponents()
+        urlComponents.scheme = "https"
+        urlComponents.host = "itunes.apple.com"
+        urlComponents.path = "/lookup"
+        urlComponents.queryItems = [URLQueryItem(name: "id", value: appID)]
+        
+        guard let storeURL = urlComponents.url else { return }
+        
+        let task = session.dataTask(with: storeURL) {
+            
+            (data, response, error) -> Void in
+            
+            guard error == nil else {
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+                return
+            }
+            
+            guard let data = data else { return }
+            
+            if let possibleDict = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [AnyHashable : Any]) as [AnyHashable : Any]??), let dict = possibleDict {
+                completion(dict)
+                //print(possibleDict)
+            }
+            
+        }
+        task.resume()
+    }
+}
+
+
+/*
+ 
+ AppInfo *appInfo = [[AppInfo alloc] initWith:@"386493543"];
+ [appInfo getDataWithCompletion:^(NSDictionary* _Nonnull dataDict) {
+ NSArray *dict = dataDict[@"results"];
+ if ([dict isKindOfClass:[NSArray class]]) {
+ NSDictionary *result = [dict firstObject];
+ if (result) {
+ NSString *totalReviewsCount = result[@"userRatingCount"];
+ NSString *versionReviewsCount = result[@"userRatingCountForCurrentVersion"];
+ NSString *totalUserRating = result[@"averageUserRating"];
+ NSLog(@"%@\n%@\n%@", totalReviewsCount, versionReviewsCount, totalUserRating);
+ }
+ }
+ }];
+ 
+ https://itunes.apple.com/lookup?id=386493543
+ {
+ "resultCount":1,
+ "results": [
+ {
+ "ipadScreenshotUrls":["http://a5.mzstatic.com/us/r30/Purple3/v4/e3/7a/ff/e37affe2-10d1-9e5b-c53e-52e224d3e5a0/screen480x480.jpeg", "http://a4.mzstatic.com/us/r30/Purple1/v4/9d/61/97/9d6197a4-ef52-3523-3851-18560391e1b9/screen480x480.jpeg", "http://a3.mzstatic.com/us/r30/Purple3/v4/a4/98/f9/a498f9c5-461c-79b8-9c4d-83be09abb0c2/screen480x480.jpeg", "http://a4.mzstatic.com/us/r30/Purple3/v4/91/ab/c2/91abc2d0-59c1-3e8d-18ef-90bd450c2362/screen480x480.jpeg"], "appletvScreenshotUrls":[], "artworkUrl512":"http://is5.mzstatic.com/image/thumb/Purple49/v4/be/78/8f/be788f6a-4fe1-0139-f651-b040d3d5fa88/source/512x512bb.jpg", "artistViewUrl":"https://itunes.apple.com/us/developer/eric-schramm/id386493546?uo=4", "artworkUrl60":"http://is5.mzstatic.com/image/thumb/Purple49/v4/be/78/8f/be788f6a-4fe1-0139-f651-b040d3d5fa88/source/60x60bb.jpg", "artworkUrl100":"http://is5.mzstatic.com/image/thumb/Purple49/v4/be/78/8f/be788f6a-4fe1-0139-f651-b040d3d5fa88/source/100x100bb.jpg", "kind":"software", "features":["iosUniversal"],
+ "supportedDevices":["iPad2Wifi", "iPad23G", "iPhone4S", "iPadThirdGen", "iPadThirdGen4G", "iPhone5", "iPodTouchFifthGen", "iPadFourthGen", "iPadFourthGen4G", "iPadMini", "iPadMini4G", "iPhone5c", "iPhone5s", "iPhone6", "iPhone6Plus", "iPodTouchSixthGen"], "advisories":[],
+ "screenshotUrls":["http://a1.mzstatic.com/us/r30/Purple3/v4/5d/ea/9a/5dea9a4f-80ba-7609-5b9f-13d9f56f2357/screen696x696.jpeg", "http://a4.mzstatic.com/us/r30/Purple3/v4/b1/c6/91/b1c691ec-9fde-6d4d-247f-5fb9ea6174cd/screen696x696.jpeg", "http://a3.mzstatic.com/us/r30/Purple3/v4/98/13/ef/9813efca-f3a9-7a7a-86ba-3b4d2dc65387/screen696x696.jpeg", "http://a2.mzstatic.com/us/r30/Purple3/v4/f5/a7/b6/f5a7b6e6-3932-e1cc-5d42-146c81593881/screen696x696.jpeg"], "isGameCenterEnabled":false, "averageUserRatingForCurrentVersion":1.0, "languageCodesISO2A":["EN"], "fileSizeBytes":"14227456", "sellerUrl":"http://www.iqif.info/", "userRatingCountForCurrentVersion":1, "trackContentRating":"4+", "trackCensoredName":"iQIF", "trackViewUrl":"https://itunes.apple.com/us/app/iqif/id386493543?mt=8&uo=4", "contentAdvisoryRating":"4+", "currency":"USD", "wrapperType":"software", "version":"3.2.2", "artistId":386493546, "artistName":"Eric Schramm", "genres":["Finance", "Productivity"], "price":0.99,
+ "description":"Dissatisfied with the official Quicken iOS apps and only need to enter receipts on-the-go?  Looking for a solution for entering GnuCash transactions on the go?  iQIF is perfect for you.\n\niQIF allows you to effortlessly create transactions on your  iOS device and when ready, export them via a QIF file which can be imported by Quicken, GnuCash or any other money managing application.  It is NOT a bloated pocket version of a money managing application, but simply a mobile transaction-creating interface (i.e. it does not sync both ways with Quicken).  Hopefully others will have found this as useful as I have.  Please note that your desktop finance application must be able to import QIF files.  \nKNOWN ISSUES:  \n- PLEASE VERIFY YOUR VERSION OF QUICKEN CAN IMPORT QIF FILES BEFORE PURCHASING.  There are some newer versions where Intuit has been trying to deprecate the use of the QIF format in favor of the proprietary OFX format. DOES NOT WORK WITH QUICKEN ESSENTIALS.\n\n*** PLEASE CONTACT ME PERSONALLY WITH PROBLEMS BEFORE GIVING UP ON iQIF - Unfortunately I cannot contact those who leave reviews expressing dissatisfaction, but in many cases I might have been able to remedy the issue and possibly help others having the same issue. ***", "releaseDate":"2010-08-18T02:57:49Z", "trackName":"iQIF", "bundleId":"com.eware.iqif", "trackId":386493543, "primaryGenreName":"Finance", "isVppDeviceBasedLicensingEnabled":true, "currentVersionReleaseDate":"2016-04-09T15:36:20Z", "releaseNotes":"• bugfix - swiping to delete a split no longer causes iQIF to crash", "sellerName":"Eric Schramm", "minimumOsVersion":"8.0", "primaryGenreId":6015, "formattedPrice":"$0.99", "genreIds":["6015", "6007"], "averageUserRating":4.0, "userRatingCount":70}]
+ }*/
