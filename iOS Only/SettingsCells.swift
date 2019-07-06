@@ -238,7 +238,7 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
     func updateSelection() {
         let (rightSelectionText, rightSelectionColor) = getStringHandler()
         rightSelectionLabel.text = rightSelectionText
-        rightSelectionLabel.textColor = rightSelectionColor ?? .blue
+        rightSelectionLabel.textColor = rightSelectionColor ?? .systemBlue
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -409,7 +409,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
         
         let (fieldText, fieldTextColor) = getStringHandler()
         textField.text = fieldText
-        textField.textColor = fieldTextColor ?? .blue
+        textField.textColor = fieldTextColor ?? .systemBlue
         
         if title.isEmpty {
             NSLayoutConstraint.activate([
