@@ -22,6 +22,7 @@ public enum SettingsCellType {
     case rightSelection(title: String, getStringHandler: () -> (String, UIColor?))
     case buttonCell(type: ButtonCellType, title: String)
     case ratingsCell(initialTitle: String, titleColor: UIColor, appStoreID: String, updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String))
+    case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
     case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMinimumWidth: CGFloat?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
 }
 
@@ -371,6 +372,85 @@ public class RatingCell : UITableViewCell, SettingsCell {
     }
 }
 
+public class IAPCell : UITableViewCell, SettingsCell {
+    
+    let initialTitle: String
+    let purchasedTitle: String
+    let iapKey: String
+    let selectAction: (_ presentingViewController: UIViewController) -> ()
+    let label = UILabel()
+    
+    init?(model: SettingsCellModel, identifier: String) {
+        if case .iapCell(let initialTitle, let purchasedTitle, let iapKey) = model.cellType.self,
+            case .cellButtonAction(action: let selectAction) = model.selectionType {
+            self.initialTitle = initialTitle
+            self.purchasedTitle = purchasedTitle
+            self.iapKey = iapKey
+            self.selectAction = selectAction
+            super.init(style: .default, reuseIdentifier: identifier)
+            buildCell()
+        } else {
+            return nil
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func buildCell() {
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 2
+        label.lineBreakMode = .byWordWrapping
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        contentView.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
+            label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
+            label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
+            label.heightAnchor.constraint(lessThanOrEqualToConstant: 44)
+            ])
+        
+        update()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(IAPCell.update),
+            name: NSNotification.Name("IAPHelperProductPurchasedNotification"),
+            object: nil)
+    }
+    
+    @objc func update() {
+        selectionStyle = UserDefaults.standard.bool(forKey: iapKey) ? .none : .default
+        label.text = UserDefaults.standard.bool(forKey: iapKey) ? purchasedTitle : initialTitle
+    }
+    
+    public static func defaultSelectAction(iapCoordinator: IAPCoordinator, productIdentifier: String) -> SettingsCellSelectionType {
+        return .cellButtonAction(action: { (presentingController) in
+            if UserDefaults.standard.bool(forKey: iapCoordinator.productPackage.identifier) {
+                // already purchased
+                return
+            }
+            let presentHandler: (UIViewController) -> () = { (viewController) in
+                let navigationController = UINavigationController(rootViewController: viewController)
+                presentingController.present(navigationController, animated: true, completion: nil)
+                viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: iapCoordinator, action: #selector(IAPCoordinator.dismiss))
+            }
+            let dismissHandler: (UIViewController) -> () = { _ in
+                presentingController.dismiss(animated: true, completion: nil)
+            }
+            iapCoordinator.present(for: productIdentifier, presentHandler: presentHandler, dismissHandler: dismissHandler)
+        })
+    }
+    
+    func selectAction(presentingViewController: UIViewController) {
+        selectAction(presentingViewController)
+    }
+}
+
 class TextFieldCell: UITableViewCell, SettingsCell {
     
     let title: String
@@ -535,6 +615,10 @@ open class SettingsTVC: UITableViewController {
             }
         case .ratingsCell(_,_,_,_):
             if let cell = RatingCell(model: model, identifier: cellIdentifier) {
+                return cell
+            }
+        case .iapCell(_,_,_):
+            if let cell = IAPCell(model: model, identifier: cellIdentifier) {
                 return cell
             }
         case .textFieldCell(_,_,_,_,_,_,_):
