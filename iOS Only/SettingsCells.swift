@@ -102,9 +102,11 @@ public enum SettingsCellSelectionType {
 public struct SettingsCellModel {
     let cellType: SettingsCellType
     let selectionType: SettingsCellSelectionType
-    public init(cellType: SettingsCellType, selectionType: SettingsCellSelectionType) {
+    let visibilityHandler: (() -> Bool)?
+    public init(cellType: SettingsCellType, selectionType: SettingsCellSelectionType, visibilityHandler: (() -> Bool)? = nil) {
         self.cellType = cellType
         self.selectionType = selectionType
+        self.visibilityHandler = visibilityHandler
     }
 }
 
@@ -584,6 +586,7 @@ open class SettingsTVC: UITableViewController {
     var gestureRecognizer: UITapGestureRecognizer!
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
+    var indexPathsForHidableCells = [IndexPath]()
     
     public init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
         self.sections = sections
@@ -616,39 +619,81 @@ open class SettingsTVC: UITableViewController {
         let model = sections[indexPath.section].cellModels[indexPath.row]
         let cellIdentifier = "\(indexPath.section)-\(indexPath.row)"
         if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+            configure(cell: cell, model: model)
             return cell
         }
         switch model.cellType {
         case .boolSwitch(_,_,_):
             if let cell = SwitchCell(model: model, identifier: cellIdentifier) {
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
                 return cell
             }
         case .rightSelection(_,_):
             if let cell = RightSelectionCell(model: model, identifier: cellIdentifier) {
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
                 return cell
             }
         case .buttonCell(_,_):
             if let cell = ButtonCell(model: model, identifier: cellIdentifier) {
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
                 return cell
             }
         case .ratingsCell(_,_,_,_):
             if let cell = RatingCell(model: model, identifier: cellIdentifier) {
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
                 return cell
             }
         case .iapCell(_,_,_):
             if let cell = IAPCell(model: model, identifier: cellIdentifier) {
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
                 return cell
             }
         case .textFieldCell(_,_,_,_,_,_,_):
             if let cell = TextFieldCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
                 cell.gestureRecognizer = gestureRecognizer
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
                 return cell
             }
         }
         // failed
         print("Failed to create a cell for \(model) at \(indexPath)")
         return UITableViewCell(style: .default, reuseIdentifier: "errorCase")
+    }
+    
+    func configure(cell: UITableViewCell, model: SettingsCellModel) {
+        var showCell = true
+        if let visibilityHandler = model.visibilityHandler {
+            showCell = visibilityHandler()
+        }
+        cell.isHidden = !showCell
+    }
+    
+    open override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let model = sections[indexPath.section].cellModels[indexPath.row]
+        var showCell = true
+        if let visibilityHandler = model.visibilityHandler {
+            showCell = visibilityHandler()
+        }
+        return showCell ? UITableView.automaticDimension : 0
     }
     
     open override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -667,6 +712,21 @@ open class SettingsTVC: UITableViewController {
             textField.resignFirstResponder()
         }
         gestureRecognizer.isEnabled = false
+    }
+    
+    open func checkVisibilityChanges() {
+        var indexPathsToReload = [IndexPath]()
+        for indexPath in indexPathsForHidableCells {
+            let model = sections[indexPath.section].cellModels[indexPath.row]
+            if let cell = tableView.cellForRow(at: indexPath), let visibilityHandler = model.visibilityHandler {
+                if cell.isHidden == visibilityHandler() {
+                    indexPathsToReload.append(indexPath)
+                }
+            }
+        }
+        if !indexPathsToReload.isEmpty {
+            tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+        }
     }
 }
 
