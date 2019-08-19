@@ -24,6 +24,25 @@ public enum SettingsCellType {
     case ratingsCell(initialTitle: String, titleColor: UIColor, appStoreID: String, updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String))
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
     case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMinimumWidth: CGFloat?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
+    case dateCell(attributes: DateCellAttributes)
+}
+
+public struct DateCellAttributes {
+    let title: String?
+    let fieldPlaceholder: String?
+    let datePickerMode: UIDatePicker.Mode
+    let dateFormatter: DateFormatter
+    let getDateHandler: () -> (Date?, UIColor?)
+    let setDateHandler: (Date?) -> ()
+    
+    public init(title: String?, fieldPlaceholder: String?, datePickerMode: UIDatePicker.Mode, dateFormatter: DateFormatter, getDateHandler: @escaping () -> (Date?, UIColor?), setDateHandler: @escaping (Date?) -> ()) {
+        self.title = title
+        self.fieldPlaceholder = fieldPlaceholder
+        self.datePickerMode = datePickerMode
+        self.dateFormatter = dateFormatter
+        self.getDateHandler = getDateHandler
+        self.setDateHandler = setDateHandler
+    }
 }
 
 public protocol PickerDelegate: class {
@@ -66,8 +85,10 @@ public extension PickerPresenter {
 public enum SettingsCellSelectionType {
     
     case helpText(title: String, message: String)
-    case helpTextPresentPicker(title: String, message: String, actionString: String, pickerPresenter: PickerPresenter, allowRemoveDefaultAction: Bool)
+    case helpTextPresentPicker(titleMessage: String, message: String, actionString: String, pickerPresenter: PickerPresenter, allowRemoveDefaultAction: Bool)
+    case presentPicker(pickerPresenter: PickerPresenter)
     case cellButtonAction(action: (_ presentingViewController: UIViewController)->())
+    case handledByCell
     
     func action() -> (_ presentingViewController: UIViewController) -> () {
         switch self {
@@ -91,10 +112,16 @@ public enum SettingsCellSelectionType {
                 }
                 presentingViewController.present(helpText, animated: true, completion: nil)
             }
+        case .presentPicker(let pickerPresenter):
+            return { (presentingViewController) in
+                pickerPresenter.summonPicker(presentingViewController: presentingViewController)
+            }
         case .cellButtonAction(let action):
             return { (presentingViewController) in
                 action(presentingViewController)
             }
+        case .handledByCell:
+            return { (_) in }
         }
     }
 }
@@ -184,18 +211,21 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
     
     init?(model: SettingsCellModel, identifier: String) {
         if case .rightSelection(let title, let getStringHandler) = model.cellType {
+            self.title = title
+            self.getStringHandler = getStringHandler
             if case SettingsCellSelectionType.helpTextPresentPicker(_,_,_, let pickerPresenter,_) = model.selectionType {
-                self.title = title
-                self.getStringHandler = getStringHandler
                 self.pickerPresenter = pickerPresenter
                 self.selectionAction = model.selectionType.action()
                 super.init(style: .default, reuseIdentifier: identifier)
                 buildCell()
             } else if case SettingsCellSelectionType.cellButtonAction(action: let selectionAction) = model.selectionType {
-                self.title = title
-                self.getStringHandler = getStringHandler
                 self.pickerPresenter = nil
                 self.selectionAction = selectionAction
+                super.init(style: .default, reuseIdentifier: identifier)
+                buildCell()
+            } else if case SettingsCellSelectionType.presentPicker(pickerPresenter: let pickerPresenter) = model.selectionType {
+                self.pickerPresenter = pickerPresenter
+                self.selectionAction = model.selectionType.action()
                 super.init(style: .default, reuseIdentifier: identifier)
                 buildCell()
             } else {
@@ -569,6 +599,165 @@ extension TextFieldCell : UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         setStringHandler(textField.text ?? "")
+        gestureRecognizer?.isEnabled = false
+    }
+}
+
+class DateCell: UITableViewCell, SettingsCell {
+    
+    let title: String
+    let dateFormatter: DateFormatter
+    let getDateHandler: () -> (Date?, UIColor?)
+    let setDateHandler: (Date?) -> ()
+    var noPickerVerticalConstraints = [NSLayoutConstraint]()
+    var pickerVerticalConstraints = [NSLayoutConstraint]()
+    
+    var datePicker = UIDatePicker()
+    let textField = UITextField()
+    
+    let fieldMinimumWidth: CGFloat = 100
+    
+    weak var gestureRecognizer: UITapGestureRecognizer?
+    
+    init?(model: SettingsCellModel, identifier: String) {
+        if case .dateCell(let attributes) = model.cellType {
+            self.title = attributes.title ?? ""
+            textField.placeholder = attributes.fieldPlaceholder
+            textField.keyboardType = .numbersAndPunctuation
+            self.dateFormatter = attributes.dateFormatter
+            self.getDateHandler = attributes.getDateHandler
+            self.setDateHandler = attributes.setDateHandler
+            datePicker.datePickerMode = attributes.datePickerMode
+            
+            super.init(style: .default, reuseIdentifier: identifier)
+            buildCell()
+        } else {
+            return nil
+        }
+    }
+    
+    func buildCell() {
+        
+        accessoryType = .disclosureIndicator
+        
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(textField)
+        textField.delegate = self
+        textField.textAlignment = .right
+        
+        let (date, fieldTextColor) = getDateHandler()
+        if let date = date {
+            textField.text = dateFormatter.string(from: date)
+            datePicker.date = date
+        }
+        
+        #if swift(>=5.1)
+            if #available(iOS 13, *) {
+                textField.textColor = fieldTextColor ?? .systemBlue
+            } else {
+                textField.textColor = fieldTextColor ?? .blue
+            }
+        #else
+            textField.textColor = fieldTextColor ?? .blue
+        #endif
+        
+        datePicker.addTarget(self, action: #selector(pickerChanged), for: .valueChanged)
+        
+        noPickerVerticalConstraints = [
+            textField.topAnchor.constraint(equalToSystemSpacingBelow: contentView.topAnchor, multiplier: 1),
+            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+        ]
+        let bottomConstraint = datePicker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 8)
+        bottomConstraint.priority = UILayoutPriority(rawValue: 999)
+        pickerVerticalConstraints = [
+            textField.topAnchor.constraint(greaterThanOrEqualToSystemSpacingBelow: contentView.topAnchor, multiplier: 1),
+            datePicker.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
+            datePicker.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 54),
+            bottomConstraint
+        ]
+        
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+        
+        var constraints = [NSLayoutConstraint]()
+        
+        if title.isEmpty {
+            constraints = [
+                textField.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
+                textField.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
+                textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+                textField.widthAnchor.constraint(greaterThanOrEqualToConstant: fieldMinimumWidth)
+                ]
+        } else {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.numberOfLines = 2
+            label.lineBreakMode = .byWordWrapping
+            label.text = title
+            label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+            contentView.addSubview(label)
+            noPickerVerticalConstraints.append(label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
+            pickerVerticalConstraints.append(label.topAnchor.constraint(equalToSystemSpacingBelow: contentView.topAnchor, multiplier: 1))
+            
+            constraints = [
+                label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
+                label.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
+                textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+                textField.widthAnchor.constraint(greaterThanOrEqualToConstant: fieldMinimumWidth),
+                textField.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8)
+            ]
+        }
+        
+        constraints.append(contentsOf: noPickerVerticalConstraints)
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func selectAction(presentingViewController: UIViewController) {
+        if let _ = datePicker.superview {
+            removePicker()
+        } else {
+            addPicker()
+        }
+    }
+    
+    func addPicker() {
+        guard datePicker.superview == nil else { return }
+        contentView.addSubview(datePicker)
+        NSLayoutConstraint.deactivate(noPickerVerticalConstraints)
+        NSLayoutConstraint.activate(pickerVerticalConstraints)
+        gestureRecognizer?.isEnabled = true
+    }
+    
+    func removePicker() {
+        guard let _ = datePicker.superview else { return }
+        NSLayoutConstraint.deactivate(pickerVerticalConstraints)
+        datePicker.removeFromSuperview()
+        NSLayoutConstraint.activate(noPickerVerticalConstraints)
+        gestureRecognizer?.isEnabled = false
+    }
+    
+    @objc func pickerChanged() {
+        textField.text = dateFormatter.string(from: datePicker.date)
+        textFieldDidEndEditing(textField)
+    }
+}
+
+extension DateCell : UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        gestureRecognizer?.isEnabled = true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        setDateHandler(dateFormatter.date(from: textField.text ?? ""))
+        gestureRecognizer?.isEnabled = false
     }
 }
 
@@ -586,6 +775,7 @@ open class SettingsTVC: UITableViewController {
     var gestureRecognizer: UITapGestureRecognizer!
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
+    var pickerCells = [DateCell]()
     var indexPathsForHidableCells = [IndexPath]()
     
     public init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
@@ -673,6 +863,17 @@ open class SettingsTVC: UITableViewController {
                 }
                 return cell
             }
+        case .dateCell(_):
+            if let cell = DateCell(model: model, identifier: cellIdentifier) {
+                textFields.append(cell.textField)
+                pickerCells.append(cell)
+                cell.gestureRecognizer = gestureRecognizer
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
+                return cell
+            }
         }
         // failed
         print("Failed to create a cell for \(model) at \(indexPath)")
@@ -702,7 +903,13 @@ open class SettingsTVC: UITableViewController {
     
     open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? SettingsCell {
-            cell.selectAction(presentingViewController: self)
+            if let cell = cell as? DateCell {
+                tableView.beginUpdates()
+                cell.selectAction(presentingViewController: self)
+                tableView.endUpdates()
+            } else {
+                cell.selectAction(presentingViewController: self)
+            }
             tableView.deselectRow(at: indexPath, animated: true)
         }
     }
@@ -711,6 +918,11 @@ open class SettingsTVC: UITableViewController {
         for textField in textFields {
             textField.resignFirstResponder()
         }
+        tableView.beginUpdates()
+        for pickerCell in pickerCells {
+            pickerCell.removePicker()
+        }
+        tableView.endUpdates()
         gestureRecognizer.isEnabled = false
     }
     
