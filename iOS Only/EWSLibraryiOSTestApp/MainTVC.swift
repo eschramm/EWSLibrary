@@ -184,7 +184,7 @@ class TagCloudCell : UITableViewCell {
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
         contentView.backgroundColor = .orange
         
         var constraints = [
@@ -299,27 +299,10 @@ extension TagCloudCell : UICollectionViewDataSource, TagCloudController, UIColle
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        guard let tagCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else { fatalError("Could not return a TagCollectionViewCell") }
         let tag = tagDelegate!.tag(tagController: self, context: cellContext(), for: indexPath.row)
-        
-        let tagLabel = UILabel()
-        tagLabel.backgroundColor = tagColor
-        tagLabel.layer.cornerRadius = 5
-        tagLabel.clipsToBounds = true
-        tagLabel.text = tag.title
-        tagLabel.textAlignment = .center
-        tagLabel.font = tagTitleFont
-        tagLabel.textColor = tagTitleColor
-        
-        cell.addSubview(tagLabel)
-        tagLabel.translatesAutoresizingMaskIntoConstraints = false
-        let viewsDict = ["tagLabel" : tagLabel]
-        var constraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|[tagLabel]|", options: .alignmentMask, metrics: nil, views: viewsDict)
-        constraints.append(contentsOf: NSLayoutConstraint.constraints(withVisualFormat: "H:|[tagLabel]|", options: .alignmentMask, metrics: nil, views: viewsDict))
-        
-        NSLayoutConstraint.activate(constraints)
-        
-        return cell
+        tagCell.tagLabel.text = tag.title
+        return tagCell
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -339,7 +322,7 @@ extension TagCloudCell : UICollectionViewDataSource, TagCloudController, UIColle
         }
     }
 }
-/*
+
 class TagCollectionViewCell : UICollectionViewCell {
     
     let tagColor = UIColor.green
@@ -348,11 +331,10 @@ class TagCollectionViewCell : UICollectionViewCell {
     let verticalPadding: CGFloat = 10
     let horizontalPadding: CGFloat = 10
     
-    let tagCloudTag: Tag
+    let tagLabel = UILabel()
     
-    init(tag: Tag) {
-        self.tagCloudTag = tag
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         buildCell()
     }
     
@@ -361,16 +343,14 @@ class TagCollectionViewCell : UICollectionViewCell {
     }
     
     func buildCell() {
-        let tagLabel = UILabel()
         tagLabel.backgroundColor = tagColor
         tagLabel.layer.cornerRadius = 5
         tagLabel.clipsToBounds = true
-        tagLabel.text = tagCloudTag.title
         tagLabel.textAlignment = .center
         tagLabel.font = tagTitleFont
         tagLabel.textColor = tagTitleColor
         
-        addSubview(tagLabel)
+        contentView.addSubview(tagLabel)
         tagLabel.translatesAutoresizingMaskIntoConstraints = false
         let viewsDict = ["tagLabel" : tagLabel]
         var constraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|[tagLabel]|", options: .alignmentMask, metrics: nil, views: viewsDict)
@@ -378,7 +358,7 @@ class TagCollectionViewCell : UICollectionViewCell {
         
         NSLayoutConstraint.activate(constraints)
     }
-}*/
+}
 
 class TagAddingTVC : UITableViewController {
     
