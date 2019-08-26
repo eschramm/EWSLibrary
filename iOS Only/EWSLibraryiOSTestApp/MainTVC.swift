@@ -189,7 +189,13 @@ class TagCloudCell : UITableViewCell, TagCloudController {
     }
 
     func buildDataSource() {
-        self.tagCloudDataSource = TagCloudDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext())
+        self.tagCloudDataSource = TagCloudDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext(), resizeCellHandler: {
+            // HACK: this allows for updating cell sizing inside tableview
+            if let tableView = self.superview as? UITableView {
+                tableView.beginUpdates()
+                tableView.endUpdates()
+            }
+        })
     }
     
     @objc func addTag() {
@@ -378,7 +384,6 @@ class AddCell : UITableViewCell {
             addButton.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -8),
             addButton.centerYAnchor.constraint(equalTo: searchAddField.centerYAnchor),
             searchAddField.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-            searchAddField.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
             searchAddField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             searchAddField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ])
@@ -399,15 +404,17 @@ class TagCloudDataSource : NSObject, UICollectionViewDataSource {
     weak var tagCloudDelegate: TagCloudDelegate?
     let tagCloudID: String
     let context: TagContext
+    let resizeCellHandler: () -> ()
     
     var allTagPointers = [TagPointer]()
     var filteredTagPointers = [TagPointer]()
     var lastSearchString = ""
     
-    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, context: TagContext) {
+    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, context: TagContext, resizeCellHandler: @escaping () -> ()) {
         self.tagCloudDelegate = tagCloudDelegate
         self.tagCloudID = tagCloudID
         self.context = context
+        self.resizeCellHandler = resizeCellHandler
         super.init()
         rebuildCache()
     }
@@ -498,6 +505,7 @@ extension TagCloudDataSource : UITextFieldDelegate {
         }
         lastSearchString = searchString
         dataSource.apply(snapshotForCurrentState())
+        resizeCellHandler()
         return true
     }
 }
