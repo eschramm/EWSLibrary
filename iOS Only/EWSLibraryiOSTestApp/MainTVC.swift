@@ -14,16 +14,18 @@ public protocol Tag {
     var title: String { get }
 }
 
-public protocol TagCloudController { }
+public protocol TagCloudController {
+    var cloudID: String { get }
+}
 
 public enum TagContext {
     case item
     case all
 }
 
-public protocol TagDelegate : class {
-    func tagCount(tagController: TagCloudController, context: TagContext) -> Int
-    func tag(tagController: TagCloudController, context: TagContext, for index: Int) -> Tag
+public protocol TagCloudDelegate : class {
+    func tagCount(cloudID: String, context: TagContext) -> Int
+    func tag(cloudID: String, context: TagContext, for index: Int) -> Tag
     func presentTagAddingViewController(tagAddingViewController: UIViewController)
     func dismissTagAddingViewController()
 }
@@ -56,7 +58,7 @@ class MainTVC: UITableViewController {
                     return false
                 }
             }
-            cell = TagCloudCell(tagDelegate: self, reuseIdentifier: "TagCloudCell", removeAtIndexHandler: removeAtIndexHandler, addFromIndexAllowHandler: addFromIndexAllowHandler)
+            cell = TagCloudCell(cloudID: "TagCloud", tagCloudDelegate: self, reuseIdentifier: "TagCloudCell", removeAtIndexHandler: removeAtIndexHandler, addFromIndexAllowHandler: addFromIndexAllowHandler)
         }
         return cell!
     }
@@ -68,9 +70,8 @@ extension String: Tag {
     }
 }
 
-extension MainTVC: TagDelegate {
-    
-    func tagCount(tagController: TagCloudController, context: TagContext) -> Int {
+extension MainTVC: TagCloudDelegate {
+    func tagCount(cloudID: String, context: TagContext) -> Int {
         switch context {
         case .item:
             return addedTags.count
@@ -79,12 +80,12 @@ extension MainTVC: TagDelegate {
         }
     }
     
-    func tag<String>(tagController: TagCloudController, context: TagContext, for index: Int) -> String {
+    func tag(cloudID: String, context: TagContext, for index: Int) -> Tag {
         switch context {
         case .item:
-            return addedTags[index] as! String
+            return addedTags[index]
         case .all:
-            return allTags[index] as! String
+            return allTags[index]
         }
     }
     
@@ -97,71 +98,44 @@ extension MainTVC: TagDelegate {
     }
 }
 
-class TagCloudCell : UITableViewCell {
-    // https://stackoverflow.com/questions/55061353/non-scrolling-uicollectionview-inside-uitableviewcell-dynamic-height
+class TagCloudCell : UITableViewCell, TagCloudController {
     
-    /*enum Section {
-        case main
-    }*/
+    // https://stackoverflow.com/questions/55061353/non-scrolling-uicollectionview-inside-uitableviewcell-dynamic-height
     
     let tagColor = UIColor.green
     let tagTitleColor = UIColor.black
     let tagTitleFont = UIFont.systemFont(ofSize: 14)
     let verticalPadding: CGFloat = 10
     let horizontalPadding: CGFloat = 10
-
-    /*
-    class OutlineItem: Hashable {
-        let title: String
-        let indentLevel: Int
-        let subitems: [OutlineItem]
-        let outlineViewController: UIViewController.Type?
-
-        var isExpanded = false
-
-        init(title: String,
-             indentLevel: Int = 0,
-             viewController: UIViewController.Type? = nil,
-             subitems: [OutlineItem] = []) {
-            self.title = title
-            self.indentLevel = indentLevel
-            self.subitems = subitems
-            self.outlineViewController = viewController
-        }
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(identifier)
-        }
-        static func == (lhs: OutlineItem, rhs: OutlineItem) -> Bool {
-            return lhs.identifier == rhs.identifier
-        }
-        var isGroup: Bool {
-            return self.outlineViewController == nil
-        }
-        private let identifier = UUID()
-    }*/
     
-    weak var tagDelegate: TagDelegate?
-    //var dataSource: UICollectionViewDiffableDataSource<Section, String>! = nil
+    weak var tagCloudDelegate: TagCloudDelegate?
+    let cloudID: String
     
     let removeAtIndexHandler: ((Int) -> ())?
     let addFromIndexAllowHandler: (Int) -> (Bool)
     
+    var tagCloudDataSource: TagCloudDataSource!
+    
     var collectionView: UICollectionView!
     
-    public init(tagDelegate: TagDelegate, reuseIdentifier: String, removeAtIndexHandler: @escaping (Int) -> (), addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
-        self.tagDelegate = tagDelegate
+    public init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, removeAtIndexHandler: @escaping (Int) -> (), addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
+        self.cloudID = cloudID
+        self.tagCloudDelegate = tagCloudDelegate
         self.removeAtIndexHandler = removeAtIndexHandler
         self.addFromIndexAllowHandler = addFromIndexAllowHandler
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildCell()
+        buildDataSource()
     }
     
-    init(tagDelegate: TagDelegate, reuseIdentifier: String, addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
-        self.tagDelegate = tagDelegate
+    init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
+        self.cloudID = cloudID
+        self.tagCloudDelegate = tagCloudDelegate
         self.removeAtIndexHandler = nil
         self.addFromIndexAllowHandler = addFromIndexAllowHandler
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildCell()
+        buildDataSource()
     }
     
     required init?(coder: NSCoder) {
@@ -181,7 +155,7 @@ class TagCloudCell : UITableViewCell {
         collectionView = UICollectionView(frame: contentView.frame, collectionViewLayout: flowLayout)
         contentView.addSubview(collectionView)
         collectionView.delegate = self
-        collectionView.dataSource = self
+        //collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
@@ -211,48 +185,18 @@ class TagCloudCell : UITableViewCell {
         }
         NSLayoutConstraint.activate(constraints)
     }
-    /*
-    func configureDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, tag: String) -> UICollectionViewCell? in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCell", for: indexPath)
-            cell.label.text = menuItem.title
-            cell.indentLevel = menuItem.indentLevel
-            cell.isGroup = menuItem.isGroup
-            cell.isExpanded = menuItem.isExpanded
-            return cell
-        }
 
-        // load our initial data
-        let snapshot = snapshotForCurrentState()
-        self.dataSource.apply(snapshot, animatingDifferences: false)
+    func buildDataSource() {
+        self.tagCloudDataSource = TagCloudDataSource(tagCloudDelegate: tagCloudDelegate!, collectionView: collectionView, tagCloudID: cloudID, context: cellContext())
     }
-    
-    func snapshotForCurrentState() -> NSDiffableDataSourceSnapshot<Section, OutlineItem> {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, OutlineItem>()
-        snapshot.appendSections([Section.main])
-        func addItems(_ menuItem: OutlineItem) {
-            snapshot.appendItems([menuItem])
-            if menuItem.isExpanded {
-                menuItem.subitems.forEach { addItems($0) }
-            }
-        }
-        menuItems.forEach { addItems($0) }
-        return snapshot
-    }
-
-    func updateUI() {
-        let snapshot = snapshotForCurrentState()
-        dataSource.apply(snapshot, animatingDifferences: true)
-    }*/
     
     @objc func addTag() {
-        guard let tagDelegate = tagDelegate else { return }
+        guard let tagCloudDelegate = tagCloudDelegate else { return }
         let updatedAddFromIndexAllowHandler: (Int) -> (Bool) = { index in
             let allowAdd = self.addFromIndexAllowHandler(index)
             if allowAdd {
-                self.collectionView.insertItems(at: [IndexPath(row: tagDelegate.tagCount(tagController: self, context: .item) - 1, section: 0)])
-                //self.collectionView.reloadData()
+                //self.collectionView.insertItems(at: [IndexPath(row: tagDelegate.tagCount(tagController: self, context: .item) - 1, section: 0)])
+                self.tagCloudDataSource.rebuildCacheAndUpdateSnapshot()
                 
                 // HACK: this allows for updating cell sizing inside tableview
                 
@@ -261,11 +205,11 @@ class TagCloudCell : UITableViewCell {
                     tableView.endUpdates()
                 }
             }
-            self.tagDelegate?.dismissTagAddingViewController()
+            tagCloudDelegate.dismissTagAddingViewController()
             return allowAdd
         }
-        let tagAddingTVC = TagAddingTVC(tagDelegate: tagDelegate, addFromIndexAllowHandler: updatedAddFromIndexAllowHandler)
-        tagDelegate.presentTagAddingViewController(tagAddingViewController: tagAddingTVC)
+        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, addFromIndexAllowHandler: updatedAddFromIndexAllowHandler)
+        tagCloudDelegate.presentTagAddingViewController(tagAddingViewController: tagAddingTVC)
     }
     
     override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
@@ -277,33 +221,33 @@ class TagCloudCell : UITableViewCell {
     }
 }
 
-extension TagCloudCell : UICollectionViewDataSource, TagCloudController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     // MARK: - UICollectionViewDataSource
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
-    
+    /*
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return tagDelegate?.tagCount(tagController: self, context: cellContext()) ?? 0
-    }
-    
+    }*/
+
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let tagDelegate = tagDelegate else { return .zero }
-        let title = tagDelegate.tag(tagController: self, context: cellContext(), for: indexPath.row).title as NSString
+        guard let tagCloudDelegate = tagCloudDelegate else { return .zero }
+        let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext(), for: indexPath.row).title as NSString
         let titleSize = title.size(withAttributes: [.font : tagTitleFont])
         return CGSize(width: titleSize.width + horizontalPadding, height: titleSize.height + verticalPadding)
     }
     
     // MARK: - UICollectionViewDelegate
-    
+    /*
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         guard let tagCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else { fatalError("Could not return a TagCollectionViewCell") }
         let tag = tagDelegate!.tag(tagController: self, context: cellContext(), for: indexPath.row)
         tagCell.tagLabel.text = tag.title
         return tagCell
-    }
+    }*/
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch cellContext() {
@@ -311,7 +255,8 @@ extension TagCloudCell : UICollectionViewDataSource, TagCloudController, UIColle
             _ = addFromIndexAllowHandler(indexPath.row)
         case .item:
             removeAtIndexHandler?(indexPath.row)
-            collectionView.deleteItems(at: [indexPath])
+            //collectionView.deleteItems(at: [indexPath])
+            tagCloudDataSource.rebuildCacheAndUpdateSnapshot()
             
             // HACK: this allows for updating cell sizing inside tableview
             
@@ -362,12 +307,10 @@ class TagCollectionViewCell : UICollectionViewCell {
 
 class TagAddingTVC : UITableViewController {
     
-    weak var tagDelegate: TagDelegate!
-    let addFromIndexAllowHandler: (Int) -> (Bool)
+    let allTagsCell: TagCloudCell
     
-    init(tagDelegate: TagDelegate, addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
-        self.tagDelegate = tagDelegate
-        self.addFromIndexAllowHandler = addFromIndexAllowHandler
+    init(tagCloudDelegate: TagCloudDelegate, cloudID: String, addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
+        self.allTagsCell = TagCloudCell(cloudID: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", addFromIndexAllowHandler: addFromIndexAllowHandler)
         super.init(style: .grouped)
     }
     
@@ -389,26 +332,19 @@ class TagAddingTVC : UITableViewController {
             var cell = tableView.dequeueReusableCell(withIdentifier: "AddCell")
             if cell == nil {
                 let searchAddCell = AddCell(reuseIdentifier: "AddCell")
-                searchAddCell.searchAddField.delegate = self
+                searchAddCell.searchAddField.delegate = allTagsCell.tagCloudDataSource
                 cell = searchAddCell
             }
             return cell!
         case 1:
             var cell = tableView.dequeueReusableCell(withIdentifier: "ExistingTagsCell")
             if cell == nil {
-                cell = TagCloudCell(tagDelegate: tagDelegate, reuseIdentifier: "ExistingTagsCell", addFromIndexAllowHandler: addFromIndexAllowHandler)
+                cell = allTagsCell
             }
             return cell!
         default:
             fatalError("Should not ever reach")
         }
-    }
-}
-
-extension TagAddingTVC : UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        print(string)
-        return true
     }
 }
 
@@ -443,6 +379,112 @@ class AddCell : UITableViewCell {
             searchAddField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             searchAddField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ])
-        
+    }
+}
+
+class TagCloudDataSource : NSObject, UICollectionViewDataSource {
+    
+    struct TagPointer {
+        let title: String
+        let originalIndex: Int
+    }
+    
+    enum Section {
+        case main
+    }
+    
+    weak var tagCloudDelegate: TagCloudDelegate?
+    let tagCloudID: String
+    let context: TagContext
+    let collectionView: UICollectionView
+    
+    var allTagPointers = [TagPointer]()
+    var filteredTagPointers = [TagPointer]()
+    var lastSearchString = ""
+    
+    init(tagCloudDelegate: TagCloudDelegate, collectionView: UICollectionView, tagCloudID: String, context: TagContext) {
+        self.tagCloudDelegate = tagCloudDelegate
+        self.collectionView = collectionView
+        self.tagCloudID = tagCloudID
+        self.context = context
+        super.init()
+        rebuildCache()
+        configureDataSource()
+    }
+    
+    func rebuildCache() {
+        allTagPointers.removeAll()
+        guard let tagCloudDelegate = tagCloudDelegate else { return }
+        for originalIndex in 0..<tagCloudDelegate.tagCount(cloudID: tagCloudID, context: context) {
+            allTagPointers.append(TagPointer(title: tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: originalIndex).title, originalIndex: originalIndex))
+        }
+        filteredTagPointers = allTagPointers
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filteredTagPointers.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let tagCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else {
+            fatalError("Could not return a TagCollectionViewCell")
+        }
+        guard let tagCloudDelegate = tagCloudDelegate else {
+            return tagCell
+        }
+        let tag = tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: indexPath.row)
+        tagCell.tagLabel.text = tag.title
+        return tagCell
+    }
+    
+    // MARK - iOS 13 - UIDiffable
+    
+    var dataSource: UICollectionViewDiffableDataSource<Section, String>! = nil
+    
+    func rebuildCacheAndUpdateSnapshot() {
+        rebuildCache()
+        dataSource.apply(snapshotForCurrentState(), animatingDifferences: true)
+    }
+    
+    func configureDataSource() {
+        self.dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, tag: String) -> UICollectionViewCell? in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else { fatalError("Could not return TagCollectionViewCell") }
+            cell.tagLabel.text = tag
+            return cell
+        }
+
+        // load our initial data
+        let snapshot = snapshotForCurrentState()
+        self.dataSource.apply(snapshot, animatingDifferences: false)
+        collectionView.dataSource = dataSource
+    }
+    
+    func snapshotForCurrentState() -> NSDiffableDataSourceSnapshot<Section, String> {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+        snapshot.appendSections([Section.main])
+        for tagPointer in filteredTagPointers {
+            snapshot.appendItems([tagPointer.title])
+        }
+        return snapshot
+    }
+}
+
+extension TagCloudDataSource : UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let fieldText = textField.text else { return true }
+        let searchString = fieldText + string
+        if searchString.count < lastSearchString.count {
+            filteredTagPointers = allTagPointers
+        }
+        if !searchString.isEmpty {
+            let lowerCasedSearchString = searchString.lowercased()
+            filteredTagPointers = filteredTagPointers.filter { (tagPointer) -> Bool in
+                tagPointer.title.lowercased().contains(lowerCasedSearchString)
+            }
+        }
+        lastSearchString = searchString
+        dataSource.apply(snapshotForCurrentState())
+        return true
     }
 }
