@@ -126,6 +126,7 @@ class TagCloudCell : UITableViewCell, TagCloudController {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildCell()
         buildDataSource()
+        tagCloudDataSource.injectCollectionView(collectionView: collectionView)
     }
     
     init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, addFromIndexAllowHandler: @escaping (Int) -> (Bool)) {
@@ -134,8 +135,9 @@ class TagCloudCell : UITableViewCell, TagCloudController {
         self.removeAtIndexHandler = nil
         self.addFromIndexAllowHandler = addFromIndexAllowHandler
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        buildCell()
         buildDataSource()
+        buildCell()
+        tagCloudDataSource.injectCollectionView(collectionView: collectionView)
     }
     
     required init?(coder: NSCoder) {
@@ -187,7 +189,7 @@ class TagCloudCell : UITableViewCell, TagCloudController {
     }
 
     func buildDataSource() {
-        self.tagCloudDataSource = TagCloudDataSource(tagCloudDelegate: tagCloudDelegate!, collectionView: collectionView, tagCloudID: cloudID, context: cellContext())
+        self.tagCloudDataSource = TagCloudDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext())
     }
     
     @objc func addTag() {
@@ -233,8 +235,9 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     }*/
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let tagCloudDelegate = tagCloudDelegate else { return .zero }
-        let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext(), for: indexPath.row).title as NSString
+        guard let tagCloudDelegate = tagCloudDelegate, let tagCloudDataSource = tagCloudDataSource else { return .zero }
+        let originalIndex = tagCloudDataSource.originalIndex(for: indexPath.row)
+        let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext(), for: originalIndex).title as NSString
         let titleSize = title.size(withAttributes: [.font : tagTitleFont])
         return CGSize(width: titleSize.width + horizontalPadding, height: titleSize.height + verticalPadding)
     }
@@ -252,7 +255,7 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch cellContext() {
         case .all:
-            _ = addFromIndexAllowHandler(indexPath.row)
+            _ = addFromIndexAllowHandler(tagCloudDataSource.originalIndex(for: indexPath.row))
         case .item:
             removeAtIndexHandler?(indexPath.row)
             //collectionView.deleteItems(at: [indexPath])
@@ -396,20 +399,21 @@ class TagCloudDataSource : NSObject, UICollectionViewDataSource {
     weak var tagCloudDelegate: TagCloudDelegate?
     let tagCloudID: String
     let context: TagContext
-    let collectionView: UICollectionView
     
     var allTagPointers = [TagPointer]()
     var filteredTagPointers = [TagPointer]()
     var lastSearchString = ""
     
-    init(tagCloudDelegate: TagCloudDelegate, collectionView: UICollectionView, tagCloudID: String, context: TagContext) {
+    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, context: TagContext) {
         self.tagCloudDelegate = tagCloudDelegate
-        self.collectionView = collectionView
         self.tagCloudID = tagCloudID
         self.context = context
         super.init()
         rebuildCache()
-        configureDataSource()
+    }
+    
+    func injectCollectionView(collectionView: UICollectionView) {
+        configureDataSource(collectionView: collectionView)
     }
     
     func rebuildCache() {
@@ -437,6 +441,10 @@ class TagCloudDataSource : NSObject, UICollectionViewDataSource {
         return tagCell
     }
     
+    func originalIndex(for filteredIndex: Int) -> Int {
+        return filteredTagPointers[filteredIndex].originalIndex
+    }
+    
     // MARK - iOS 13 - UIDiffable
     
     var dataSource: UICollectionViewDiffableDataSource<Section, String>! = nil
@@ -446,7 +454,7 @@ class TagCloudDataSource : NSObject, UICollectionViewDataSource {
         dataSource.apply(snapshotForCurrentState(), animatingDifferences: true)
     }
     
-    func configureDataSource() {
+    func configureDataSource(collectionView: UICollectionView) {
         self.dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: collectionView) {
             (collectionView: UICollectionView, indexPath: IndexPath, tag: String) -> UICollectionViewCell? in
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else { fatalError("Could not return TagCollectionViewCell") }
@@ -473,7 +481,12 @@ class TagCloudDataSource : NSObject, UICollectionViewDataSource {
 extension TagCloudDataSource : UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let fieldText = textField.text else { return true }
-        let searchString = fieldText + string
+        let searchString: String
+        if string.isEmpty {
+            searchString = String(fieldText.prefix(upTo: fieldText.index(fieldText.endIndex, offsetBy: -1)))
+        } else {
+            searchString = fieldText + string
+        }
         if searchString.count < lastSearchString.count {
             filteredTagPointers = allTagPointers
         }
