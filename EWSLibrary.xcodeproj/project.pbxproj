@@ -10,6 +10,7 @@
 		DA39DD0422E542D9007976EF /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA39DCFB22E53729007976EF /* IAPController.swift */; };
 		DA532D2C230DF40800EEFAAE /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; };
 		DA532D2D230DF40800EEFAAE /* EWSLibrary.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */; };
 		DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */; };
 		DA96FCC621BA036000C0AAE4 /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = DA96FCC421BA036000C0AAE4 /* Cartfile */; };
 		DA96FCC721BA036000C0AAE4 /* Cartfile.resolved in Resources */ = {isa = PBXBuildFile; fileRef = DA96FCC521BA036000C0AAE4 /* Cartfile.resolved */; };
@@ -1303,6 +1304,7 @@
 				DA39DD0422E542D9007976EF /* IAPController.swift in Sources */,
 				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
 				DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */,
+				DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */,
 				DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
