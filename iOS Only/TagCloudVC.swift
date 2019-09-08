@@ -8,6 +8,8 @@
 
 import UIKit
 
+#warning("TODO: put searchbar into tableview header")
+
 public protocol Tag {
     var title: String { get }
 }
@@ -59,9 +61,10 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildDataSource()
         buildCell()
-        if #available(iOS 13.0, *) {
-            //tagCloudDataSource.injectCollectionView(collectionView: collectionView)
+        if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
+            tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
         }
+        isAccessibilityElement = false
     }
     
     init(allCell cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, updateItemTagCellHandler: @escaping (Int) -> ()) {
@@ -72,9 +75,10 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildDataSource()
         buildCell()
-        if #available(iOS 13.0, *) {
-            //tagCloudDataSource.injectCollectionView(collectionView: collectionView)
+        if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
+            tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
         }
+        isAccessibilityElement = false
     }
     
     required init?(coder: NSCoder) {
@@ -89,11 +93,13 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         flowLayout.footerReferenceSize = CGSize.zero
         collectionView = UICollectionView(frame: contentView.frame, collectionViewLayout: flowLayout)
         contentView.addSubview(collectionView)
+        accessibilityElements = [collectionView!]  // enables accessibility for collection view elements (and UI testing)
         collectionView.delegate = self
-        //if #available(iOS 13.0, *) {
-        //} else {
+        if #available(iOS 13.0, *) {
+            // nothing
+        } else {
             collectionView.dataSource = tagCloudDataSource
-        //}
+        }
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
@@ -128,13 +134,23 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
     }
     
     func buildDataSource() {
-        self.tagCloudDataSource = TagCloudDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext, resizeCellHandler: {
-            // HACK: this allows for updating cell sizing inside tableview
-            if let tableView = self.superview as? UITableView {
-                tableView.beginUpdates()
-                tableView.endUpdates()
-            }
-        })
+        if #available(iOS 13.0, *) {
+            self.tagCloudDataSource = TagCloudDiffDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext, resizeCellHandler: {
+                // HACK: this allows for updating cell sizing inside tableview
+                if let tableView = self.superview as? UITableView {
+                    tableView.beginUpdates()
+                    tableView.endUpdates()
+                }
+            })
+        } else {
+            self.tagCloudDataSource = TagCloudTraditionalDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext, resizeCellHandler: {
+                // HACK: this allows for updating cell sizing inside tableview
+                if let tableView = self.superview as? UITableView {
+                    tableView.beginUpdates()
+                    tableView.endUpdates()
+                }
+            })
+        }
     }
     
     @objc func addTag() {
@@ -142,9 +158,16 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         let updateItemTagCellHandler: (Int) -> () = { [weak self] index in
             let allowAdd = tagCloudDelegate.didAddTag(from: index)
             if allowAdd {
-                self?.tagCloudDataSource.rebuildCache()
-                self?.collectionView.reloadData()
-                //self?.collectionView.insertItems(at: [IndexPath(row: tagCloudDelegate.tagCount(cloudID: self?.cloudID ?? "", context: .item) - 1, section: 0)])
+                if #available(iOS 13.0, *), let tagCloudDiffDataSource = self?.tagCloudDataSource as? TagCloudDiffDataSource {
+                    tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+                } else {
+                    self?.tagCloudDataSource.updateCache()
+                    // assumes add to end, but check if already handled
+                    if self?.collectionView.numberOfItems(inSection: 0) ?? 0 < tagCloudDelegate.tagCount(cloudID: self?.cloudID ?? "", context: .item) {
+                        self?.collectionView.insertItems(at: [IndexPath(row: tagCloudDelegate.tagCount(cloudID: self?.cloudID ?? "", context: .item) - 1, section: 0)])
+                    }
+                    //self?.collectionView.reloadData()
+                }
                 
                 // HACK: this allows for updating cell sizing inside tableview
                 
@@ -156,7 +179,14 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
             tagCloudDelegate.dismissTagAddingViewController()
         }
         let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, updateItemTagCellHandler: updateItemTagCellHandler)
-        tagCloudDelegate.presentTagAddingViewController(tagAddingViewController: tagAddingTVC)
+        let navController = UINavigationController(rootViewController: tagAddingTVC)
+        let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelAdd))
+        tagAddingTVC.navigationItem.rightBarButtonItem = cancelButton
+        tagCloudDelegate.presentTagAddingViewController(tagAddingViewController: navController)
+    }
+    
+    @objc func cancelAdd() {
+        tagCloudDelegate?.dismissTagAddingViewController()
     }
     
     override public func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
@@ -177,8 +207,9 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard let tagCloudDelegate = tagCloudDelegate, let tagCloudDataSource = tagCloudDataSource else { return .zero }
-        let originalIndex = tagCloudDataSource.originalIndex(for: indexPath.row)
-        let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext, for: originalIndex).title as NSString
+        //let originalIndex = tagCloudDataSource.originalIndex(for: indexPath.row)
+        let title = tagCloudDataSource.filteredTagPointers[indexPath.row].title
+        //let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext, for: originalIndex).title as NSString
         let titleSize = title.size(withAttributes: [.font : tagTitleFont])
         return CGSize(width: titleSize.width + horizontalPadding, height: titleSize.height + verticalPadding)
     }
@@ -189,9 +220,12 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
             _ = updateItemTagCellHandler?(tagCloudDataSource.originalIndex(for: indexPath.row))
         case .item:
             tagCloudDelegate?.removeTag(at: indexPath.row)
-            //collectionView.deleteItems(at: [indexPath])
-            tagCloudDataSource.rebuildCache()
-            collectionView.reloadData()
+            if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
+                tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+            } else {
+                tagCloudDataSource.updateCache()
+                collectionView.deleteItems(at: [indexPath])
+            }
             
             // HACK: this allows for updating cell sizing inside tableview
             
@@ -257,16 +291,21 @@ class TagAddingTVC : UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+    override func viewDidAppear(_ animated: Bool) {
+        tableView.contentOffset = CGPoint(x: 0, y: -15)
+        super.viewDidAppear(animated)
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 2
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section {
+        switch indexPath.row {
         case 0:
             var cell = tableView.dequeueReusableCell(withIdentifier: "AddCell")
             if cell == nil {
@@ -278,7 +317,7 @@ class TagAddingTVC : UITableViewController {
                         }
                     }
                 }
-                searchAddCell.searchAddField.delegate = allTagsCell.tagCloudDataSource
+                searchAddCell.searchBar.delegate = allTagsCell.tagCloudDataSource
                 cell = searchAddCell
             }
             return cell!
@@ -296,7 +335,7 @@ class TagAddingTVC : UITableViewController {
 
 class AddCell : UITableViewCell {
     
-    let searchAddField = UITextField()
+    let searchBar = UISearchBar() // UITextField()
     
     let addTagHandler: (String) -> ()
     
@@ -311,33 +350,38 @@ class AddCell : UITableViewCell {
     }
     
     func buildCell() {
-        searchAddField.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(searchAddField)
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(searchBar)
         
-        let addButton = UIButton(type: .contactAdd)
+        let addButton = UIButton(type: .system)
+        addButton.setTitle("Add", for: .normal)
+        addButton.isHidden = true
         addButton.translatesAutoresizingMaskIntoConstraints = false
         addButton.addTarget(self, action: #selector(addTag), for: .touchUpInside)
-        contentView.addSubview(addButton)
         
-        NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: searchAddField, queue: .main) { (notification) in
-            if let userInfo = notification.userInfo, let isUnique = userInfo[TagCloudDataSource.TagFieldTextIsUnique] as? Bool {
-                addButton.isHidden = !isUnique
+        searchBar.inputAccessoryView = addButton
+        
+        NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: searchBar, queue: .main) { [weak self] (notification) in
+            if let userInfo = notification.userInfo, let isUnique = userInfo[TagCloudTraditionalDataSource.TagFieldTextIsUnique] as? Bool {
+                if isUnique, let searchText = self?.searchBar.text, !searchText.isEmpty {
+                    addButton.setTitle("Add \"\(searchText)\"", for: .normal)
+                    addButton.isHidden = false
+                } else {
+                    addButton.isHidden = true
+                }
             }
         }
         
         NSLayoutConstraint.activate([
-            searchAddField.leadingAnchor.constraint(equalToSystemSpacingAfter: contentView.safeAreaLayoutGuide.leadingAnchor, multiplier: 1),
-            addButton.leadingAnchor.constraint(equalToSystemSpacingAfter: searchAddField.trailingAnchor, multiplier: 1),
-            addButton.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -8),
-            addButton.centerYAnchor.constraint(equalTo: searchAddField.centerYAnchor),
-            searchAddField.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-            searchAddField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            searchAddField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+            searchBar.leadingAnchor.constraint(equalToSystemSpacingAfter: contentView.safeAreaLayoutGuide.leadingAnchor, multiplier: 1),
+            searchBar.trailingAnchor.constraint(equalToSystemSpacingAfter: contentView.safeAreaLayoutGuide.trailingAnchor, multiplier: -1),
+            searchBar.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            searchBar.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ])
     }
     
     @objc func addTag() {
-        guard let addText = searchAddField.text, !addText.isEmpty else { return }
+        guard let addText = searchBar.text, !addText.isEmpty else { return }
         addTagHandler(addText)
     }
 }
@@ -346,17 +390,93 @@ extension Notification.Name {
     static let TagTextFieldChanged = Notification.Name(rawValue: "TagTextFieldChanged")
 }
 
-class TagCloudDataSource : NSObject {
+struct TagPointer {
+    let title: String
+    let originalIndex: Int
+}
+
+enum Section {
+    case main
+}
+
+protocol TagCloudDataSource: UICollectionViewDataSource, UISearchBarDelegate {
     
-    struct TagPointer {
-        let title: String
-        let originalIndex: Int
+    var tagCloudDelegate: TagCloudDelegate? { get }
+    var tagCloudID: String { get }
+    var context: TagContext { get }
+    var lastSearchString: String { get set }
+    var resizeCellHandler: () -> () { get }
+    
+    var allTagPointers: [TagPointer] { get set }
+    var filteredTagPointers: [TagPointer] { get set }
+    
+    func updateCache()
+    func updatedCache() -> [TagPointer]
+    func originalIndex(for filteredIndex: Int) -> Int
+    
+    func internalCollectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
+    func internalCollectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
+    
+    func internalSearchBar(_ searchBar: UISearchBar, textDidChange searchText: String, dataModelCommit: (()->())?)
+}
+
+extension TagCloudDataSource {
+    
+    func updatedCache() -> [TagPointer] {
+        guard let tagCloudDelegate = tagCloudDelegate else { return [] }
+        var allTagPointers = [TagPointer]()
+        for originalIndex in 0..<tagCloudDelegate.tagCount(cloudID: tagCloudID, context: context) {
+            allTagPointers.append(TagPointer(title: tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: originalIndex).title, originalIndex: originalIndex))
+        }
+        return allTagPointers
     }
     
-    enum Section {
-        case main
+    func originalIndex(for filteredIndex: Int) -> Int {
+        return filteredTagPointers[filteredIndex].originalIndex
     }
     
+    func internalCollectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filteredTagPointers.count
+    }
+    
+    func internalCollectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let tagCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else {
+            fatalError("Could not return a TagCollectionViewCell")
+        }
+        let tagPointer = filteredTagPointers[indexPath.row]
+        tagCell.tagLabel.text = tagPointer.title
+        //tagCell.accessibilityLabel = tagPointer.title
+        //print("set accessibilityLabel to \(tagCell.accessibilityLabel)")
+        return tagCell
+    }
+    
+    func internalSearchBar(_ searchBar: UISearchBar, textDidChange searchText: String, dataModelCommit: (()->())?) {
+        if searchText.count < lastSearchString.count {
+            filteredTagPointers = allTagPointers
+        } else if !searchText.isEmpty {
+            let lowerCasedSearchString = searchText.lowercased()
+            self.filteredTagPointers = filteredTagPointers.filter { (tagPointer) -> Bool in
+                tagPointer.title.lowercased().contains(lowerCasedSearchString)
+            }
+        }
+        
+        let isUnique = (filteredTagPointers.first { (tagPointer) -> Bool in
+                tagPointer.title == searchText
+            } == nil)
+        
+        lastSearchString = searchText
+        
+        let userInfo: [AnyHashable : Any] = [TagCloudTraditionalDataSource.TagFieldTextIsUnique : isUnique]
+        let notification = Notification.init(name: .TagTextFieldChanged, object: searchBar, userInfo: userInfo)
+        dataModelCommit?()
+        NotificationCenter.default.post(notification)
+        resizeCellHandler()
+    }
+}
+
+
+class TagCloudTraditionalDataSource : NSObject, TagCloudDataSource {
+
     static let TagFieldTextIsUnique = "TagFieldTextIsUnique"
     
     weak var tagCloudDelegate: TagCloudDelegate?
@@ -374,80 +494,45 @@ class TagCloudDataSource : NSObject {
         self.context = context
         self.resizeCellHandler = resizeCellHandler
         super.init()
-        rebuildCache()
+        updateCache()
     }
     
-    func rebuildCache() {
-        allTagPointers.removeAll()
-        guard let tagCloudDelegate = tagCloudDelegate else { return }
-        for originalIndex in 0..<tagCloudDelegate.tagCount(cloudID: tagCloudID, context: context) {
-            allTagPointers.append(TagPointer(title: tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: originalIndex).title, originalIndex: originalIndex))
-        }
-        filteredTagPointers = allTagPointers
-    }
-    
-    func originalIndex(for filteredIndex: Int) -> Int {
-        return filteredTagPointers[filteredIndex].originalIndex
+    func updateCache() {
+        let allTagPointers = updatedCache()
+        self.allTagPointers = allTagPointers
+        self.filteredTagPointers = allTagPointers
     }
 }
 
-extension TagCloudDataSource : UICollectionViewDataSource {
+extension TagCloudTraditionalDataSource : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filteredTagPointers.count
+        return internalCollectionView(collectionView, numberOfItemsInSection: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let tagCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else {
-            fatalError("Could not return a TagCollectionViewCell")
-        }
-        guard let tagCloudDelegate = tagCloudDelegate else {
-            return tagCell
-        }
-        let tag = tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: indexPath.row)
-        tagCell.tagLabel.text = tag.title
-        return tagCell
+        return internalCollectionView(collectionView, cellForItemAt: indexPath)
     }
 }
 
-extension TagCloudDataSource : UITextFieldDelegate {
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let fieldText = textField.text else { return true }
-        let searchString: String
-        if string.isEmpty {
-            searchString = String(fieldText.prefix(upTo: fieldText.index(fieldText.endIndex, offsetBy: -1)))
-        } else {
-            searchString = fieldText + string
-        }
-        if searchString.count < lastSearchString.count {
-            filteredTagPointers = allTagPointers
-        }
-        if !searchString.isEmpty {
-            let lowerCasedSearchString = searchString.lowercased()
-            filteredTagPointers = filteredTagPointers.filter { (tagPointer) -> Bool in
-                tagPointer.title.lowercased().contains(lowerCasedSearchString)
-            }
-        }
-        
-        let isUnique = (filteredTagPointers.first { (tagPointer) -> Bool in
-                tagPointer.title == searchString
-            } == nil)
-        
-        lastSearchString = searchString
-        rebuildCache()
-        resizeCellHandler()
-        
-        let userInfo: [AnyHashable : Any] = [TagCloudDataSource.TagFieldTextIsUnique : isUnique]
-        let notification = Notification.init(name: .TagTextFieldChanged, object: textField, userInfo: userInfo)
-        NotificationCenter.default.post(notification)
-        
-        return true
+extension TagCloudTraditionalDataSource : UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        internalSearchBar(searchBar, textDidChange: searchText, dataModelCommit: nil)
     }
 }
 
-/*
 @available(iOS 13.0, *)
-class TagCloudDiffDataSource : TagCloudDataSource {
+class TagCloudDiffDataSource : NSObject, TagCloudDataSource {
+    
+    weak var tagCloudDelegate: TagCloudDelegate?
+    let tagCloudID: String
+    let context: TagContext
+    let resizeCellHandler: () -> ()
+    
+    var allTagPointers = [TagPointer]()
+    var filteredTagPointers = [TagPointer]()
+    var lastSearchString = ""
+    
+    var dataSource: UICollectionViewDiffableDataSource<Section, String>! = nil
     
     init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, context: TagContext, resizeCellHandler: @escaping () -> ()) {
         self.tagCloudDelegate = tagCloudDelegate
@@ -455,48 +540,21 @@ class TagCloudDiffDataSource : TagCloudDataSource {
         self.context = context
         self.resizeCellHandler = resizeCellHandler
         super.init()
-        rebuildCache()
+        updateCache()
+    }
+    
+    func updateCache() {
+        let allTagPointers = updatedCache()
+        self.allTagPointers = allTagPointers
+        self.filteredTagPointers = allTagPointers
     }
     
     func injectCollectionView(collectionView: UICollectionView) {
         configureDataSource(collectionView: collectionView)
     }
-    
-    func rebuildCache() {
-        allTagPointers.removeAll()
-        guard let tagCloudDelegate = tagCloudDelegate else { return }
-        for originalIndex in 0..<tagCloudDelegate.tagCount(cloudID: tagCloudID, context: context) {
-            allTagPointers.append(TagPointer(title: tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: originalIndex).title, originalIndex: originalIndex))
-        }
-        filteredTagPointers = allTagPointers
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return filteredTagPointers.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let tagCell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else {
-            fatalError("Could not return a TagCollectionViewCell")
-        }
-        guard let tagCloudDelegate = tagCloudDelegate else {
-            return tagCell
-        }
-        let tag = tagCloudDelegate.tag(cloudID: tagCloudID, context: context, for: indexPath.row)
-        tagCell.tagLabel.text = tag.title
-        return tagCell
-    }
-    
-    func originalIndex(for filteredIndex: Int) -> Int {
-        return filteredTagPointers[filteredIndex].originalIndex
-    }
-    
-    // MARK - iOS 13 - UIDiffable
-    
-    var dataSource: UICollectionViewDiffableDataSource<Section, String>! = nil
-    
+
     func rebuildCacheAndUpdateSnapshot() {
-        rebuildCache()
+        updateCache()
         dataSource.apply(snapshotForCurrentState(), animatingDifferences: true)
     }
     
@@ -524,39 +582,22 @@ class TagCloudDiffDataSource : TagCloudDataSource {
     }
 }
 
-extension TagCloudDataSource : UITextFieldDelegate {
+@available(iOS 13.0, *)
+extension TagCloudDiffDataSource : UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return internalCollectionView(collectionView, numberOfItemsInSection: section)
+    }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let fieldText = textField.text else { return true }
-        let searchString: String
-        if string.isEmpty {
-            searchString = String(fieldText.prefix(upTo: fieldText.index(fieldText.endIndex, offsetBy: -1)))
-        } else {
-            searchString = fieldText + string
-        }
-        if searchString.count < lastSearchString.count {
-            filteredTagPointers = allTagPointers
-        }
-        if !searchString.isEmpty {
-            let lowerCasedSearchString = searchString.lowercased()
-            filteredTagPointers = filteredTagPointers.filter { (tagPointer) -> Bool in
-                tagPointer.title.lowercased().contains(lowerCasedSearchString)
-            }
-        }
-        
-        let isUnique = (filteredTagPointers.first { (tagPointer) -> Bool in
-            tagPointer.title == searchString
-            } == nil)
-        
-        lastSearchString = searchString
-        dataSource.apply(snapshotForCurrentState())
-        resizeCellHandler()
-        
-        let userInfo: [AnyHashable : Any] = [TagCloudDataSource.TagFieldTextIsUnique : isUnique]
-        let notification = Notification.init(name: .TagTextFieldChanged, object: textField, userInfo: userInfo)
-        NotificationCenter.default.post(notification)
-        
-        return true
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        return internalCollectionView(collectionView, cellForItemAt: indexPath)
     }
 }
-*/
+
+@available(iOS 13.0, *)
+extension TagCloudDiffDataSource : UITextFieldDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        internalSearchBar(searchBar, textDidChange: searchText) {
+            self.dataSource.apply(self.snapshotForCurrentState())
+        }
+    }
+}
