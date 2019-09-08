@@ -67,7 +67,12 @@ class EWSLibraryiOSTestAppUITests: XCTestCase {
         XCTAssertEqual(sevenMillionButton.exists, true)
         XCTAssertEqual(eightyMillionButton.exists, true)
         
-        let searchField = tablesQuery.cells.children(matching: .searchField).element
+        let searchField: XCUIElement
+        if #available(iOS 13.0, *) {
+            searchField = tablesQuery.children(matching: .other).element.children(matching: .other).element.children(matching: .searchField).element
+        } else {
+            searchField = tablesQuery.children(matching: .other).element.children(matching: .searchField).element
+        }
         searchField.tap()
         searchField.typeText("th")
         

@@ -8,8 +8,6 @@
 
 import UIKit
 
-#warning("TODO: put searchbar into tableview header")
-
 public protocol Tag {
     var title: String { get }
 }
@@ -206,7 +204,6 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let tagCloudDelegate = tagCloudDelegate, let tagCloudDataSource = tagCloudDataSource else { return .zero }
         //let originalIndex = tagCloudDataSource.originalIndex(for: indexPath.row)
         let title = tagCloudDataSource.filteredTagPointers[indexPath.row].title
         //let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext, for: originalIndex).title as NSString
@@ -291,9 +288,32 @@ class TagAddingTVC : UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        tableView.contentOffset = CGPoint(x: 0, y: -15)
-        super.viewDidAppear(animated)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureTableviewHeader()
+    }
+    
+    func configureTableviewHeader() {
+        let headerView = AddView(addTagHandler: { (newTagTitle) in
+            if let delegate = self.tagCloudDelegate {
+                if delegate.shouldCreateTag(with: newTagTitle) {
+                    let createdIndex = delegate.indexForCreatedTag(with: newTagTitle)
+                    self.updateItemTagCellHandler(createdIndex)
+                }
+            }
+        })
+        headerView.searchBar.delegate = allTagsCell.tagCloudDataSource
+       
+        // see https://stackoverflow.com/questions/16471846/is-it-possible-to-use-autolayout-with-uitableviews-tableheaderview
+        // autoLayout doesn't really work here so need to get height and set explicitly
+    
+        headerView.setNeedsLayout()
+        headerView.layoutIfNeeded()
+        let height = headerView.systemLayoutSizeFitting(CGSize(width: tableView.frame.width, height: 100), withHorizontalFittingPriority: .defaultHigh, verticalFittingPriority: .defaultHigh).height
+        var headerFrame = headerView.frame
+        headerFrame.size.height = height
+        headerView.frame = headerFrame
+         tableView.tableHeaderView = headerView
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -301,47 +321,27 @@ class TagAddingTVC : UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.row {
-        case 0:
-            var cell = tableView.dequeueReusableCell(withIdentifier: "AddCell")
-            if cell == nil {
-                let searchAddCell = AddCell(reuseIdentifier: "AddCell") { newTagTitle in
-                    if let delegate = self.tagCloudDelegate {
-                        if delegate.shouldCreateTag(with: newTagTitle) {
-                            let createdIndex = delegate.indexForCreatedTag(with: newTagTitle)
-                            self.updateItemTagCellHandler(createdIndex)
-                        }
-                    }
-                }
-                searchAddCell.searchBar.delegate = allTagsCell.tagCloudDataSource
-                cell = searchAddCell
-            }
-            return cell!
-        case 1:
-            var cell = tableView.dequeueReusableCell(withIdentifier: "ExistingTagsCell")
-            if cell == nil {
-                cell = allTagsCell
-            }
-            return cell!
-        default:
-            fatalError("Should not ever reach")
+        var cell = tableView.dequeueReusableCell(withIdentifier: "ExistingTagsCell")
+        if cell == nil {
+            cell = allTagsCell
         }
+        return cell!
     }
 }
 
-class AddCell : UITableViewCell {
+class AddView : UIView {
     
-    let searchBar = UISearchBar() // UITextField()
+    let searchBar = UISearchBar()
     
     let addTagHandler: (String) -> ()
     
-    init(reuseIdentifier: String, addTagHandler: @escaping (String) -> ()) {
+    init(addTagHandler: @escaping (String) -> ()) {
         self.addTagHandler = addTagHandler
-        super.init(style: .default, reuseIdentifier: reuseIdentifier)
+        super.init(frame: .zero)
         buildCell()
     }
     
@@ -351,7 +351,7 @@ class AddCell : UITableViewCell {
     
     func buildCell() {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(searchBar)
+        addSubview(searchBar)
         
         let addButton = UIButton(type: .system)
         addButton.setTitle("Add", for: .normal)
@@ -373,10 +373,10 @@ class AddCell : UITableViewCell {
         }
         
         NSLayoutConstraint.activate([
-            searchBar.leadingAnchor.constraint(equalToSystemSpacingAfter: contentView.safeAreaLayoutGuide.leadingAnchor, multiplier: 1),
-            searchBar.trailingAnchor.constraint(equalToSystemSpacingAfter: contentView.safeAreaLayoutGuide.trailingAnchor, multiplier: -1),
-            searchBar.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            searchBar.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+            searchBar.leadingAnchor.constraint(equalToSystemSpacingAfter: safeAreaLayoutGuide.leadingAnchor, multiplier: 1),
+            searchBar.trailingAnchor.constraint(equalToSystemSpacingAfter: safeAreaLayoutGuide.trailingAnchor, multiplier: -1),
+            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            searchBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
         ])
     }
     
