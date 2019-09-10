@@ -13,6 +13,9 @@
 		DA4A1683231D705900AEE426 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA532D2C230DF40800EEFAAE /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; };
 		DA532D2D230DF40800EEFAAE /* EWSLibrary.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DA57CE152325B66700B1B397 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; };
+		DA57CE162325B66700B1B397 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DA57CE1A2327EE6E00B1B397 /* DarkMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA57CE192327EE6E00B1B397 /* DarkMode.swift */; };
 		DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */; };
 		DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */; };
 		DA97B98521065F5800135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -21,13 +24,11 @@
 		DA995A69216E85CA0082B3DD /* EWSDBTests_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CE021075AAD00F94664 /* EWSDBTests_MacTests.swift */; };
 		DA995A6A216E85CA0082B3DD /* EWSDBTests_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */; };
 		DA995ABC216E8D6D0082B3DD /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE756CB21079880002C5DFA /* FMDB.framework */; };
-		DA995ABD216E8D720082B3DD /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; };
 		DA995ABE216E8D950082B3DD /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDC21075A5A00F94664 /* DBManager.swift */; };
 		DA995ABF216E8D960082B3DD /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDC21075A5A00F94664 /* DBManager.swift */; };
 		DA99A45C2171517D00E83EFC /* EWSDB_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */; };
 		DA99A4622171518400E83EFC /* EWSDBTests_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDE21075A9B00F94664 /* EWSDBTests_iOSTests.swift */; };
 		DA99A4632171518900E83EFC /* EWSDBTests_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */; };
-		DAB73DCC21075D5A00F94664 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; };
 		DAC2BEB2230B489400AF3567 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BEB1230B489400AF3567 /* AppDelegate.swift */; };
 		DAC2BEB6230B489400AF3567 /* MainTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BEB5230B489400AF3567 /* MainTVC.swift */; };
 		DAC2BEB9230B489400AF3567 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAC2BEB7230B489400AF3567 /* Main.storyboard */; };
@@ -145,6 +146,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DA57CE172325B66700B1B397 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DA57CE162325B66700B1B397 /* FMDB.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DAF8BB882171971300EBF484 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -176,6 +188,7 @@
 		DA4A1672231D6BD000AEE426 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA4A1681231D705000AEE426 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
+		DA57CE192327EE6E00B1B397 /* DarkMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkMode.swift; sourceTree = "<group>"; };
 		DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpVC.swift; sourceTree = "<group>"; };
 		DA97B9892106601700135BF1 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		DA995A51216E84A60082B3DD /* EWSDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EWSDB.h; sourceTree = "<group>"; };
@@ -266,7 +279,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA995ABD216E8D720082B3DD /* FMDB.framework in Frameworks */,
+				DA57CE152325B66700B1B397 /* FMDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,7 +312,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAB73DCC21075D5A00F94664 /* FMDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +406,7 @@
 				DAC3E64722CA707700226217 /* SettingsCells.swift */,
 				DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */,
 				DA39DCFB22E53729007976EF /* IAPController.swift */,
+				DA57CE192327EE6E00B1B397 /* DarkMode.swift */,
 			);
 			path = "iOS Only";
 			sourceTree = "<group>";
@@ -703,6 +716,7 @@
 				DA995A84216E8CB00082B3DD /* Sources */,
 				DA995A85216E8CB00082B3DD /* Frameworks */,
 				DA995A86216E8CB00082B3DD /* Resources */,
+				DA57CE172325B66700B1B397 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1231,6 +1245,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA57CE1A2327EE6E00B1B397 /* DarkMode.swift in Sources */,
 				DA39DD0422E542D9007976EF /* IAPController.swift in Sources */,
 				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
 				DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */,
