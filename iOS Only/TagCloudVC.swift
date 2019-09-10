@@ -32,18 +32,41 @@ public protocol TagCloudDelegate : class {
     func didAddTag(from index: Int) -> Bool
 }
 
+public struct TagCloudParameters {
+    let tagColor: UIColor
+    let tagCornerRadius: CGFloat
+    let tagTitleColor: UIColor
+    let tagTitleFont: UIFont
+    let backgroundColor: UIColor
+    let verticalPadding: CGFloat
+    let horizontalPadding: CGFloat
+    
+    public init(
+        tagColor: UIColor = .systemGreen,
+        tagCornerRadius: CGFloat = 5,
+        tagTitleColor: UIColor = UIColor.dynamicLabel(),
+        tagTitleFont: UIFont = UIFont.systemFont(ofSize: 14),
+        backgroundColor: UIColor = .clear,
+        verticalPadding: CGFloat = 10,
+        horizontalPadding: CGFloat = 10)
+    {
+        self.tagColor = tagColor
+        self.tagCornerRadius = tagCornerRadius
+        self.tagTitleColor = tagTitleColor
+        self.tagTitleFont = tagTitleFont
+        self.backgroundColor = backgroundColor
+        self.verticalPadding = verticalPadding
+        self.horizontalPadding = horizontalPadding
+    }
+}
+
 public class TagCloudCell : UITableViewCell, TagCloudController {
     
     // https://stackoverflow.com/questions/55061353/non-scrolling-uicollectionview-inside-uitableviewcell-dynamic-height
-    
-    public var tagColor = UIColor.green
-    public var tagTitleColor = UIColor.black
-    public var tagTitleFont = UIFont.systemFont(ofSize: 14)
-    public var verticalPadding: CGFloat = 10
-    public var horizontalPadding: CGFloat = 10
-    
-    weak var tagCloudDelegate: TagCloudDelegate?
+
     public let cloudID: String
+    weak var tagCloudDelegate: TagCloudDelegate?
+    let parameters: TagCloudParameters
     let cellContext: TagContext
     let updateItemTagCellHandler: ((Int) -> ())?
     
@@ -51,9 +74,10 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
     
     var collectionView: UICollectionView!
     
-    public init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String) {
+    public init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, parameters: TagCloudParameters = TagCloudParameters()) {
         self.cloudID = cloudID
         self.tagCloudDelegate = tagCloudDelegate
+        self.parameters = parameters
         self.cellContext = .item
         self.updateItemTagCellHandler = nil
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
@@ -65,9 +89,10 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         isAccessibilityElement = false
     }
     
-    init(allCell cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, updateItemTagCellHandler: @escaping (Int) -> ()) {
+    init(allCell cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
         self.cloudID = cloudID
         self.tagCloudDelegate = tagCloudDelegate
+        self.parameters = parameters
         self.cellContext = .all
         self.updateItemTagCellHandler = updateItemTagCellHandler
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
@@ -101,7 +126,7 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
-        contentView.backgroundColor = .orange
+        contentView.backgroundColor = parameters.backgroundColor
         
         var constraints = [
             collectionView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 8),
@@ -133,7 +158,7 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
     
     func buildDataSource() {
         if #available(iOS 13.0, *) {
-            self.tagCloudDataSource = TagCloudDiffDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext, resizeCellHandler: {
+            self.tagCloudDataSource = TagCloudDiffDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: cellContext, resizeCellHandler: {
                 // HACK: this allows for updating cell sizing inside tableview
                 if let tableView = self.superview as? UITableView {
                     tableView.beginUpdates()
@@ -141,7 +166,7 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
                 }
             })
         } else {
-            self.tagCloudDataSource = TagCloudTraditionalDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, context: cellContext, resizeCellHandler: {
+            self.tagCloudDataSource = TagCloudTraditionalDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: cellContext, resizeCellHandler: {
                 // HACK: this allows for updating cell sizing inside tableview
                 if let tableView = self.superview as? UITableView {
                     tableView.beginUpdates()
@@ -176,7 +201,7 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
             }
             tagCloudDelegate.dismissTagAddingViewController()
         }
-        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, updateItemTagCellHandler: updateItemTagCellHandler)
+        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
         let navController = UINavigationController(rootViewController: tagAddingTVC)
         let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelAdd))
         tagAddingTVC.navigationItem.rightBarButtonItem = cancelButton
@@ -192,7 +217,7 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
         let contentSize = self.collectionView.collectionViewLayout.collectionViewContentSize
         let calculatedHeight = contentSize.height + 20
         let minHeight: CGFloat = 58
-        return CGSize(width: contentSize.width, height: calculatedHeight > minHeight ? calculatedHeight : minHeight) // 20 is the margin of the collectinview with top and bottom
+        return CGSize(width: contentSize.width, height: calculatedHeight > minHeight ? calculatedHeight : minHeight) // 20 is the margin of the collectionview with top and bottom
     }
 }
 
@@ -204,11 +229,9 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        //let originalIndex = tagCloudDataSource.originalIndex(for: indexPath.row)
         let title = tagCloudDataSource.filteredTagPointers[indexPath.row].title
-        //let title = tagCloudDelegate.tag(cloudID: cloudID, context: cellContext, for: originalIndex).title as NSString
-        let titleSize = title.size(withAttributes: [.font : tagTitleFont])
-        return CGSize(width: titleSize.width + horizontalPadding, height: titleSize.height + verticalPadding)
+        let titleSize = title.size(withAttributes: [.font : parameters.tagTitleFont])
+        return CGSize(width: titleSize.width + parameters.horizontalPadding, height: titleSize.height + parameters.verticalPadding)
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -234,13 +257,13 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     }
 }
 
+extension TagCloudCell : SettingsCell {
+    func selectAction(presentingViewController: UIViewController) {
+        // nothing
+    }
+}
+
 class TagCollectionViewCell : UICollectionViewCell {
-    
-    let tagColor = UIColor.green
-    let tagTitleColor = UIColor.black
-    let tagTitleFont = UIFont.systemFont(ofSize: 14)
-    let verticalPadding: CGFloat = 10
-    let horizontalPadding: CGFloat = 10
     
     let tagLabel = UILabel()
     
@@ -254,13 +277,7 @@ class TagCollectionViewCell : UICollectionViewCell {
     }
     
     func buildCell() {
-        tagLabel.backgroundColor = tagColor
-        tagLabel.layer.cornerRadius = 5
-        tagLabel.clipsToBounds = true
-        tagLabel.textAlignment = .center
-        tagLabel.font = tagTitleFont
-        tagLabel.textColor = tagTitleColor
-        
+        apply(parameters: TagCloudParameters())
         contentView.addSubview(tagLabel)
         tagLabel.translatesAutoresizingMaskIntoConstraints = false
         let viewsDict = ["tagLabel" : tagLabel]
@@ -268,6 +285,15 @@ class TagCollectionViewCell : UICollectionViewCell {
         constraints.append(contentsOf: NSLayoutConstraint.constraints(withVisualFormat: "H:|[tagLabel]|", options: .alignmentMask, metrics: nil, views: viewsDict))
         
         NSLayoutConstraint.activate(constraints)
+    }
+    
+    func apply(parameters: TagCloudParameters) {
+        tagLabel.backgroundColor = parameters.tagColor
+        tagLabel.layer.cornerRadius = parameters.tagCornerRadius
+        tagLabel.clipsToBounds = true
+        tagLabel.textAlignment = .center
+        tagLabel.font = parameters.tagTitleFont
+        tagLabel.textColor = parameters.tagTitleColor
     }
 }
 
@@ -277,8 +303,8 @@ class TagAddingTVC : UITableViewController {
     weak var tagCloudDelegate: TagCloudDelegate?
     let updateItemTagCellHandler: (Int) -> ()
     
-    init(tagCloudDelegate: TagCloudDelegate, cloudID: String, updateItemTagCellHandler: @escaping (Int) -> ()) {
-        self.allTagsCell = TagCloudCell(allCell: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", updateItemTagCellHandler: updateItemTagCellHandler)
+    init(tagCloudDelegate: TagCloudDelegate, cloudID: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
+        self.allTagsCell = TagCloudCell(allCell: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
         self.tagCloudDelegate = tagCloudDelegate
         self.updateItemTagCellHandler = updateItemTagCellHandler
         super.init(style: .grouped)
@@ -403,6 +429,7 @@ protocol TagCloudDataSource: UICollectionViewDataSource, UISearchBarDelegate {
     
     var tagCloudDelegate: TagCloudDelegate? { get }
     var tagCloudID: String { get }
+    var parameters: TagCloudParameters { get }
     var context: TagContext { get }
     var lastSearchString: String { get set }
     var resizeCellHandler: () -> () { get }
@@ -445,8 +472,7 @@ extension TagCloudDataSource {
         }
         let tagPointer = filteredTagPointers[indexPath.row]
         tagCell.tagLabel.text = tagPointer.title
-        //tagCell.accessibilityLabel = tagPointer.title
-        //print("set accessibilityLabel to \(tagCell.accessibilityLabel)")
+        tagCell.apply(parameters: parameters)
         return tagCell
     }
     
@@ -482,15 +508,17 @@ class TagCloudTraditionalDataSource : NSObject, TagCloudDataSource {
     weak var tagCloudDelegate: TagCloudDelegate?
     let tagCloudID: String
     let context: TagContext
+    let parameters: TagCloudParameters
     let resizeCellHandler: () -> ()
     
     var allTagPointers = [TagPointer]()
     var filteredTagPointers = [TagPointer]()
     var lastSearchString = ""
     
-    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, context: TagContext, resizeCellHandler: @escaping () -> ()) {
+    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, parameters: TagCloudParameters, context: TagContext, resizeCellHandler: @escaping () -> ()) {
         self.tagCloudDelegate = tagCloudDelegate
         self.tagCloudID = tagCloudID
+        self.parameters = parameters
         self.context = context
         self.resizeCellHandler = resizeCellHandler
         super.init()
@@ -526,6 +554,7 @@ class TagCloudDiffDataSource : NSObject, TagCloudDataSource {
     weak var tagCloudDelegate: TagCloudDelegate?
     let tagCloudID: String
     let context: TagContext
+    let parameters: TagCloudParameters
     let resizeCellHandler: () -> ()
     
     var allTagPointers = [TagPointer]()
@@ -534,9 +563,10 @@ class TagCloudDiffDataSource : NSObject, TagCloudDataSource {
     
     var dataSource: UICollectionViewDiffableDataSource<Section, String>! = nil
     
-    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, context: TagContext, resizeCellHandler: @escaping () -> ()) {
+    init(tagCloudDelegate: TagCloudDelegate, tagCloudID: String, parameters: TagCloudParameters, context: TagContext, resizeCellHandler: @escaping () -> ()) {
         self.tagCloudDelegate = tagCloudDelegate
         self.tagCloudID = tagCloudID
+        self.parameters = parameters
         self.context = context
         self.resizeCellHandler = resizeCellHandler
         super.init()
@@ -559,10 +589,13 @@ class TagCloudDiffDataSource : NSObject, TagCloudDataSource {
     }
     
     func configureDataSource(collectionView: UICollectionView) {
-        self.dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: collectionView) {
+        self.dataSource = UICollectionViewDiffableDataSource<Section, String>(collectionView: collectionView) { [weak self]
             (collectionView: UICollectionView, indexPath: IndexPath, tag: String) -> UICollectionViewCell? in
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TagCloudCell", for: indexPath) as? TagCollectionViewCell else { fatalError("Could not return TagCollectionViewCell") }
             cell.tagLabel.text = tag
+            if let self = self {
+                cell.apply(parameters: self.parameters)
+            }
             return cell
         }
         

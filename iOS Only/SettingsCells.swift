@@ -25,6 +25,7 @@ public enum SettingsCellType {
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
     case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMinimumWidth: CGFloat?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
     case dateCell(attributes: DateCellAttributes)
+    case tagCloudCell(cloudID: String, tagCloudDelegate: TagCloudDelegate, parameters: TagCloudParameters = TagCloudParameters())
 }
 
 public struct DateCellAttributes {
@@ -874,6 +875,13 @@ open class SettingsTVC: UITableViewController {
                 }
                 return cell
             }
+        case .tagCloudCell(let cloudID, let tagCloudDelegate, let parameters):
+            let cell = TagCloudCell(cloudID: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: cellIdentifier, parameters: parameters)
+            configure(cell: cell, model: model)
+            if let _ = model.visibilityHandler {
+                indexPathsForHidableCells.append(indexPath)
+            }
+            return cell
         }
         // failed
         print("Failed to create a cell for \(model) at \(indexPath)")
