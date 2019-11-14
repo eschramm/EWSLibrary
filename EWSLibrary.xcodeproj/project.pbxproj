@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA065FE5237E000900BFF931 /* ConnectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA065FE4237E000900BFF931 /* ConnectionController.swift */; };
 		DA39DD0422E542D9007976EF /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA39DCFB22E53729007976EF /* IAPController.swift */; };
 		DA4A1671231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */; };
 		DA4A1682231D705000AEE426 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; };
@@ -182,6 +183,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA065FE4237E000900BFF931 /* ConnectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionController.swift; sourceTree = "<group>"; };
 		DA39DCFB22E53729007976EF /* IAPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPController.swift; sourceTree = "<group>"; };
 		DA4A166E231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSLibraryiOSTestAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibraryiOSTestAppUITests.swift; sourceTree = "<group>"; };
@@ -400,13 +402,14 @@
 		DA96FCC021BA00B900C0AAE4 /* iOS Only */ = {
 			isa = PBXGroup;
 			children = (
-				DAC2BEB0230B489400AF3567 /* EWSLibraryiOSTestApp */,
-				DA4A166F231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests */,
 				DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */,
 				DAC3E64722CA707700226217 /* SettingsCells.swift */,
 				DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */,
 				DA39DCFB22E53729007976EF /* IAPController.swift */,
 				DA57CE192327EE6E00B1B397 /* DarkMode.swift */,
+				DA065FE4237E000900BFF931 /* ConnectionController.swift */,
+				DAC2BEB0230B489400AF3567 /* EWSLibraryiOSTestApp */,
+				DA4A166F231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests */,
 			);
 			path = "iOS Only";
 			sourceTree = "<group>";
@@ -1249,6 +1252,7 @@
 				DA39DD0422E542D9007976EF /* IAPController.swift in Sources */,
 				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
 				DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */,
+				DA065FE5237E000900BFF931 /* ConnectionController.swift in Sources */,
 				DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */,
 				DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */,
 			);
