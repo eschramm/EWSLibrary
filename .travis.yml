@@ -7,15 +7,14 @@ env:
     - WORKSPACE_NAME="EWSLibrary.xcworkspace"
     - SCHEME_MAC="EWSLibrary_Mac"
     - SCHEME_IPHONE="EWSLibrary_iOS"
-    - SDK_IPHONE=iphonesimulator12.4
+    #- SDK_IPHONE=iphonesimulator12.4
     - SDK_MAC=macosx10.14
     #- DESTINATION_IOS="platform=iOS Simulator,name=iPhone Xs,OS=12.2"
     #- DESTINATION_MAC="platform=macOS,arch=x86_64,id=42044A08-8570-4C2D-BD4A-BB3EA7766E60"
   matrix:
-    - OS=13.1 NAME="iPhone 11"
-    - OS=12.4 NAME="iPhone Xs"
+    - OS=13.2 NAME="iPhone 11"
+    - OS=12.2 NAME="iPhone Xs"
     - OS=11.4 NAME="iPhone X"
-    - OS=10.3.1 NAME="iPhone 7 Plus"
 
 before_install:
   - brew install carthage || true
