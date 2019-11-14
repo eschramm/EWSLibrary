@@ -1,5 +1,5 @@
 language: swift
-osx_image: xcode10.2
+osx_image: xcode11.2
 
 env:
   #environment variables
@@ -9,8 +9,13 @@ env:
     - SCHEME_IPHONE="EWSLibrary_iOS"
     - SDK_IPHONE=iphonesimulator12.2
     - SDK_MAC=macosx10.14
-    - DESTINATION_IOS="platform=iOS Simulator,name=iPhone Xs,OS=12.2"
-    - DESTINATION_MAC="platform=macOS,arch=x86_64,id=42044A08-8570-4C2D-BD4A-BB3EA7766E60"
+    #- DESTINATION_IOS="platform=iOS Simulator,name=iPhone Xs,OS=12.2"
+    #- DESTINATION_MAC="platform=macOS,arch=x86_64,id=42044A08-8570-4C2D-BD4A-BB3EA7766E60"
+  matrix:
+    - OS=13.1 NAME="iPhone 11"
+    - OS=12.4 NAME="iPhone Xs"
+    - OS=11.4 NAME="iPhone X"
+    - OS=10.3.1 NAME="iPhone 7 Plus"
 
 before_install:
   - brew install carthage || true
@@ -21,6 +26,6 @@ before_script:
 
 script:
   - set -o pipefail
-  - xcodebuild clean test -sdk "$SDK_IPHONE" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_IPHONE" -destination "$DESTINATION_IOS" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+  - xcodebuild clean test -quiet -sdk $SDK_IPHONE -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_IPHONE" -destination "platform=iOS Simulator,OS=$OS,name=$NAME" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO IS_TRAVIS_CI=true
   # on hold while I figure out how to do code-signing on TravisCI
   #- xcodebuild clean test -sdk "$SDK_MAC" -workspace "$WORKSPACE_NAME" -scheme "$SCHEME_MAC" -destination "$DESTINATION_MAC" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
