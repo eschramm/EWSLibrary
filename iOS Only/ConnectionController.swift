@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ConnectionController {
+public class ConnectionController {
     
     let appName: String
     let trackerBase: String          // iqif.ignorelist.com
@@ -19,7 +19,7 @@ class ConnectionController {
     let session: URLSession
     
     
-    init(withAppName appName: String, trackerBase: String, lastCheckInPrefKey: String) {
+    public init(withAppName appName: String, trackerBase: String, lastCheckInPrefKey: String) {
         self.appName = appName
         self.trackerBase = trackerBase
         self.lastCheckInPrefKey = lastCheckInPrefKey
@@ -29,7 +29,7 @@ class ConnectionController {
         self.session = URLSession(configuration: sessionConfig)
     }
     
-    func performCheck(_ additionalTrackingDict: [String : String]?) {
+    public func performCheck(_ additionalTrackingDict: [String : String]?) {
         self.additionalTrackingDict = additionalTrackingDict
         
         if hideNetworkActivityIndicator == false {
