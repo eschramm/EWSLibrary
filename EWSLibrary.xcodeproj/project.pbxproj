@@ -12,6 +12,8 @@
 		DA4A1671231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */; };
 		DA4A1682231D705000AEE426 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; };
 		DA4A1683231D705900AEE426 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DA516A40242EB42000F70A7F /* TimeProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA516A3F242EB42000F70A7F /* TimeProfiler.swift */; };
+		DA516A41242EB42000F70A7F /* TimeProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA516A3F242EB42000F70A7F /* TimeProfiler.swift */; };
 		DA532D2C230DF40800EEFAAE /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; };
 		DA532D2D230DF40800EEFAAE /* EWSLibrary.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA57CE152325B66700B1B397 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; };
@@ -189,6 +191,7 @@
 		DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibraryiOSTestAppUITests.swift; sourceTree = "<group>"; };
 		DA4A1672231D6BD000AEE426 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA4A1681231D705000AEE426 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA516A3F242EB42000F70A7F /* TimeProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeProfiler.swift; sourceTree = "<group>"; };
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
 		DA57CE192327EE6E00B1B397 /* DarkMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkMode.swift; sourceTree = "<group>"; };
 		DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpVC.swift; sourceTree = "<group>"; };
@@ -503,6 +506,7 @@
 			children = (
 				DACDE83C21065EB50077A612 /* EWSLibrary.h */,
 				DACDE83D21065EB50077A612 /* Info.plist */,
+				DA516A3F242EB42000F70A7F /* TimeProfiler.swift */,
 			);
 			path = CommonSource;
 			sourceTree = "<group>";
@@ -1255,6 +1259,7 @@
 				DA065FE5237E000900BFF931 /* ConnectionController.swift in Sources */,
 				DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */,
 				DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */,
+				DA516A40242EB42000F70A7F /* TimeProfiler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1271,6 +1276,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DADDA08421066DB000827123 /* Shell.swift in Sources */,
+				DA516A41242EB42000F70A7F /* TimeProfiler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
