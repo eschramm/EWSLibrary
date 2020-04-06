@@ -47,7 +47,7 @@ class iOSTests: XCTestCase {
     func testSometimesRandomization() {
         for probability in [0.25, 0.5, 0.75] {
             let testRun = realTruesRandomizationTrial(trueProbability: probability)
-            XCTAssertLessThan(fabs(testRun - probability), 0.01)
+            XCTAssertLessThan(fabs(testRun - probability), 0.02)
         }
     }
 }
