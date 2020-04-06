@@ -774,6 +774,10 @@ public struct SettingsSection {
     }
 }
 
+public extension Notification.Name {
+    public static let SettingsTVCCheckForVisibilityChanges = Notification.Name(rawValue: "SettingsTVCCheckForVisibilityChanges")
+}
+
 open class SettingsTVC: UITableViewController {
     
     var gestureRecognizer: UITapGestureRecognizer!
@@ -799,6 +803,16 @@ open class SettingsTVC: UITableViewController {
         gestureRecognizer.isEnabled = false
         tableView.addGestureRecognizer(gestureRecognizer)
         super.viewDidLoad()
+    }
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkVisibilityChanges), name: .SettingsTVCCheckForVisibilityChanges, object: nil)
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: .SettingsTVCCheckForVisibilityChanges, object: nil)
+        super.viewWillDisappear(animated)
     }
     
     open override func numberOfSections(in tableView: UITableView) -> Int {
@@ -937,7 +951,7 @@ open class SettingsTVC: UITableViewController {
         gestureRecognizer.isEnabled = false
     }
     
-    open func checkVisibilityChanges() {
+    @objc open func checkVisibilityChanges() {
         var indexPathsToReload = [IndexPath]()
         for indexPath in indexPathsForHidableCells {
             let model = sections[indexPath.section].cellModels[indexPath.row]
