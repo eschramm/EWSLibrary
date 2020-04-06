@@ -15,7 +15,7 @@ public enum SettingsCellType {
     
     public enum ButtonCellType {
         case centered(titleColor: UIColor, backgroundColor: UIColor)
-        case leftDisplayViewController
+        case leftDisplayViewController(backgroundColor: UIColor?, accessory: UITableViewCell.AccessoryType?)
     }
     
     case boolSwitch(title: String, getBoolHandler: () -> (Bool), setBoolHandler: (Bool) -> ())
@@ -333,9 +333,12 @@ class ButtonCell: UITableViewCell, SettingsCell {
                 label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
                 label.heightAnchor.constraint(lessThanOrEqualToConstant: 44)
                 ])
-        case .leftDisplayViewController:
+        case .leftDisplayViewController(backgroundColor: let backgroundColor, accessory: let accessory):
             textLabel?.text = title
-            accessoryType = .disclosureIndicator
+            if let backgroundColor = backgroundColor {
+                contentView.superview?.backgroundColor = backgroundColor
+            }
+            accessoryType = accessory ?? .disclosureIndicator
         }
     }
     
