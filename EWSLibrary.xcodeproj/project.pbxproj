@@ -32,6 +32,8 @@
 		DA99A45C2171517D00E83EFC /* EWSDB_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */; };
 		DA99A4622171518400E83EFC /* EWSDBTests_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDE21075A9B00F94664 /* EWSDBTests_iOSTests.swift */; };
 		DA99A4632171518900E83EFC /* EWSDBTests_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */; };
+		DAAE96CD243A890C008FA929 /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAE96CC243A890C008FA929 /* Random.swift */; };
+		DAAE96D0243A8A34008FA929 /* iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAE96CF243A8A34008FA929 /* iOSTests.swift */; };
 		DAC2BEB2230B489400AF3567 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BEB1230B489400AF3567 /* AppDelegate.swift */; };
 		DAC2BEB6230B489400AF3567 /* MainTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BEB5230B489400AF3567 /* MainTVC.swift */; };
 		DAC2BEB9230B489400AF3567 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAC2BEB7230B489400AF3567 /* Main.storyboard */; };
@@ -203,6 +205,8 @@
 		DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSDB_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA995AA4216E8CDE0082B3DD /* EWSDB_Mac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSDB_Mac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA99A4572171517D00E83EFC /* EWSDB_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSDB_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAAE96CC243A890C008FA929 /* Random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
+		DAAE96CF243A8A34008FA929 /* iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSTests.swift; sourceTree = "<group>"; };
 		DAB73CDC21075A5A00F94664 /* DBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager.swift; sourceTree = "<group>"; };
 		DAB73CDE21075A9B00F94664 /* EWSDBTests_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_iOSTests.swift; sourceTree = "<group>"; };
 		DAB73CE021075AAD00F94664 /* EWSDBTests_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_MacTests.swift; sourceTree = "<group>"; };
@@ -411,6 +415,7 @@
 				DA39DCFB22E53729007976EF /* IAPController.swift */,
 				DA57CE192327EE6E00B1B397 /* DarkMode.swift */,
 				DA065FE4237E000900BFF931 /* ConnectionController.swift */,
+				DAAE96CE243A8A1E008FA929 /* iOS Tests */,
 				DAC2BEB0230B489400AF3567 /* EWSLibraryiOSTestApp */,
 				DA4A166F231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests */,
 			);
@@ -437,6 +442,14 @@
 				DA995A5E216E84A60082B3DD /* Info.plist */,
 			);
 			path = EWSDBTests;
+			sourceTree = "<group>";
+		};
+		DAAE96CE243A8A1E008FA929 /* iOS Tests */ = {
+			isa = PBXGroup;
+			children = (
+				DAAE96CF243A8A34008FA929 /* iOSTests.swift */,
+			);
+			path = "iOS Tests";
 			sourceTree = "<group>";
 		};
 		DAB73DC621075D2600F94664 /* Frameworks */ = {
@@ -507,6 +520,7 @@
 				DACDE83C21065EB50077A612 /* EWSLibrary.h */,
 				DACDE83D21065EB50077A612 /* Info.plist */,
 				DA516A3F242EB42000F70A7F /* TimeProfiler.swift */,
+				DAAE96CC243A890C008FA929 /* Random.swift */,
 			);
 			path = CommonSource;
 			sourceTree = "<group>";
@@ -1260,6 +1274,7 @@
 				DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */,
 				DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */,
 				DA516A40242EB42000F70A7F /* TimeProfiler.swift in Sources */,
+				DAAE96CD243A890C008FA929 /* Random.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1268,6 +1283,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA97B98721065F8000135BF1 /* EWSLibrary_iOSTests.swift in Sources */,
+				DAAE96D0243A8A34008FA929 /* iOSTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
