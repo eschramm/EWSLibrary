@@ -507,7 +507,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
     
     let textField = UITextField()
     
-    weak var gestureRecognizer: UITapGestureRecognizer?
+    weak var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer?
     
     init?(model: SettingsCellModel, identifier: String) {
         if case .textFieldCell(title: let title, fieldPlaceholder: let fieldPlaceholder, let fieldMinimumWidth, let fieldMaximumWidthPercent, let fieldKeyboardType, let getStringHandler, let setStringHandler) = model.cellType {
@@ -593,7 +593,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
 
 extension TextFieldCell : UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        gestureRecognizer?.isEnabled = true
+        gestureRecognizerToDismissFirstResponder?.isEnabled = true
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -603,7 +603,7 @@ extension TextFieldCell : UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         setStringHandler(textField.text ?? "")
-        gestureRecognizer?.isEnabled = false
+        gestureRecognizerToDismissFirstResponder?.isEnabled = false
     }
 }
 
@@ -621,7 +621,7 @@ class DateCell: UITableViewCell, SettingsCell {
     
     let fieldMinimumWidth: CGFloat = 100
     
-    weak var gestureRecognizer: UITapGestureRecognizer?
+    weak var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer?
     
     init?(model: SettingsCellModel, identifier: String) {
         if case .dateCell(let attributes) = model.cellType {
@@ -732,7 +732,7 @@ class DateCell: UITableViewCell, SettingsCell {
         contentView.addSubview(datePicker)
         NSLayoutConstraint.deactivate(noPickerVerticalConstraints)
         NSLayoutConstraint.activate(pickerVerticalConstraints)
-        gestureRecognizer?.isEnabled = true
+        gestureRecognizerToDismissFirstResponder?.isEnabled = true
     }
     
     func removePicker() {
@@ -740,7 +740,7 @@ class DateCell: UITableViewCell, SettingsCell {
         NSLayoutConstraint.deactivate(pickerVerticalConstraints)
         datePicker.removeFromSuperview()
         NSLayoutConstraint.activate(noPickerVerticalConstraints)
-        gestureRecognizer?.isEnabled = false
+        gestureRecognizerToDismissFirstResponder?.isEnabled = false
     }
     
     @objc func pickerChanged() {
@@ -751,7 +751,7 @@ class DateCell: UITableViewCell, SettingsCell {
 
 extension DateCell : UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        gestureRecognizer?.isEnabled = true
+        gestureRecognizerToDismissFirstResponder?.isEnabled = true
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -761,7 +761,7 @@ extension DateCell : UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         setDateHandler(dateFormatter.date(from: textField.text ?? ""))
-        gestureRecognizer?.isEnabled = false
+        gestureRecognizerToDismissFirstResponder?.isEnabled = false
     }
 }
 
@@ -780,7 +780,7 @@ public extension Notification.Name {
 
 open class SettingsTVC: UITableViewController {
     
-    var gestureRecognizer: UITapGestureRecognizer!
+    var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer!
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
     var pickerCells = [DateCell]()
@@ -789,7 +789,7 @@ open class SettingsTVC: UITableViewController {
     public init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
         self.sections = sections
         super.init(style: .grouped)
-        self.gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleGesture(gestureRecognizer:)))
+        self.gestureRecognizerToDismissFirstResponder = UITapGestureRecognizer(target: self, action: #selector(handleGesture(gestureRecognizer:)))
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -798,10 +798,10 @@ open class SettingsTVC: UITableViewController {
     
     open override func viewDidLoad() {
         tableView.rowHeight = 44
-        gestureRecognizer.numberOfTapsRequired = 1
-        gestureRecognizer.numberOfTouchesRequired = 1
-        gestureRecognizer.isEnabled = false
-        tableView.addGestureRecognizer(gestureRecognizer)
+        gestureRecognizerToDismissFirstResponder.numberOfTapsRequired = 1
+        gestureRecognizerToDismissFirstResponder.numberOfTouchesRequired = 1
+        gestureRecognizerToDismissFirstResponder.isEnabled = false
+        tableView.addGestureRecognizer(gestureRecognizerToDismissFirstResponder)
         super.viewDidLoad()
     }
     
@@ -874,7 +874,7 @@ open class SettingsTVC: UITableViewController {
         case .textFieldCell(_,_,_,_,_,_,_):
             if let cell = TextFieldCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
-                cell.gestureRecognizer = gestureRecognizer
+                cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -885,7 +885,7 @@ open class SettingsTVC: UITableViewController {
             if let cell = DateCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
                 pickerCells.append(cell)
-                cell.gestureRecognizer = gestureRecognizer
+                cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -948,7 +948,7 @@ open class SettingsTVC: UITableViewController {
             pickerCell.removePicker()
         }
         tableView.endUpdates()
-        gestureRecognizer.isEnabled = false
+        gestureRecognizerToDismissFirstResponder.isEnabled = false
     }
     
     @objc open func checkVisibilityChanges() {
