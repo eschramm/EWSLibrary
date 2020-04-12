@@ -775,7 +775,7 @@ public struct SettingsSection {
 }
 
 public extension Notification.Name {
-    public static let SettingsTVCCheckForVisibilityChanges = Notification.Name(rawValue: "SettingsTVCCheckForVisibilityChanges")
+    static let SettingsTVCCheckForVisibilityChanges = Notification.Name(rawValue: "SettingsTVCCheckForVisibilityChanges")
 }
 
 open class SettingsTVC: UITableViewController {
