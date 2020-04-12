@@ -11,6 +11,8 @@ import StoreKit
 
 let kLeadingPaddingToMatchSystemCellLabel: CGFloat = 20.0
 
+public typealias CellDetailGetStringHandler = () -> (String, UIColor?)
+
 public enum SettingsCellType {
     
     public enum ButtonCellType {
@@ -19,7 +21,7 @@ public enum SettingsCellType {
     }
     
     case boolSwitch(title: String, getBoolHandler: () -> (Bool), setBoolHandler: (Bool) -> ())
-    case rightSelection(title: String, getStringHandler: () -> (String, UIColor?))
+    case rightSelection(title: String, getStringHandler: CellDetailGetStringHandler? = nil)
     case buttonCell(type: ButtonCellType, title: String)
     case ratingsCell(initialTitle: String, titleColor: UIColor, appStoreID: String, updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String))
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
@@ -204,7 +206,7 @@ class SwitchCell: UITableViewCell, SettingsCell {
 class RightSelectionCell: UITableViewCell, SettingsCell {
     
     let title: String
-    let getStringHandler: () -> (String, UIColor?)
+    let getStringHandler: CellDetailGetStringHandler?
     var pickerPresenter: PickerPresenter?
     let selectionAction: ((UIViewController) -> ())
     
@@ -270,6 +272,7 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
     }
     
     func updateSelection() {
+        guard let getStringHandler = getStringHandler else { return }
         let (rightSelectionText, rightSelectionColor) = getStringHandler()
         rightSelectionLabel.text = rightSelectionText
         
