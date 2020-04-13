@@ -133,10 +133,25 @@ public struct SettingsCellModel {
     let cellType: SettingsCellType
     let selectionType: SettingsCellSelectionType
     let visibilityHandler: (() -> Bool)?
-    public init(cellType: SettingsCellType, selectionType: SettingsCellSelectionType, visibilityHandler: (() -> Bool)? = nil) {
+    let additionalProperties: [SettingsCellProperties]
+    public init(cellType: SettingsCellType, selectionType: SettingsCellSelectionType, additionalProperties: [SettingsCellProperties] = [], visibilityHandler: (() -> Bool)? = nil) {
         self.cellType = cellType
         self.selectionType = selectionType
         self.visibilityHandler = visibilityHandler
+        self.additionalProperties = additionalProperties
+    }
+}
+
+public enum SettingsCellProperties {
+    case gestureRecognizers(gestureRecognizers: [UIGestureRecognizer])
+    
+    func addProperties(cell: UITableViewCell) {
+        switch self {
+        case .gestureRecognizers(let gestureRecognizers):
+            for gestureRecognizer in gestureRecognizers {
+                cell.addGestureRecognizer(gestureRecognizer)
+            }
+        }
     }
 }
 
@@ -914,6 +929,9 @@ open class SettingsTVC: UITableViewController {
             showCell = visibilityHandler()
         }
         cell.isHidden = !showCell
+        for additionalProperty in model.additionalProperties {
+            additionalProperty.addProperties(cell: cell)
+        }
     }
     
     open override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
