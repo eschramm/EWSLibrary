@@ -9,7 +9,34 @@
 import UIKit
 import EWSLibrary
 
-class MainTVC: UITableViewController {
+class MainTVC: SettingsTVC {
+    
+    init() {
+        //self.trampoline = Trampoline()
+        let sections = [
+            SettingsSection(title: nil, cellModels: [
+                Self.settingsTVCCell()
+            ])
+        ]
+        super.init(sections: sections)
+        //self.trampoline.mainMenuTVC = self
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    static func settingsTVCCell() -> SettingsCellModel {
+        let selectionType = SettingsCellSelectionType.cellButtonAction { (presentingViewController) in
+            let settingsTVC = TestSettingsTVC()
+            presentingViewController.navigationController?.pushViewController(settingsTVC, animated: true)
+        }
+        return SettingsCellModel(cellType: .rightSelection(title: "SettingsTVC Example"), selectionType: selectionType)
+    }
+    
+}
+
+class TagCellExampleTVC: UITableViewController {
     
     var allTags = ["One", "Twenty", "Three Hundred", "Four Thousand", "Fifty Thousand", "Six Hundred Thousand", "Seven Million", "Eighty Million"]
     var filteredAllTags = [String]()
@@ -44,7 +71,7 @@ extension String: Tag {
     }
 }
 
-extension MainTVC: TagCloudDelegate {
+extension TagCellExampleTVC: TagCloudDelegate {
     
     func tagCount(cloudID: String, context: TagContext) -> Int {
         switch context {

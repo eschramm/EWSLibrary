@@ -12,6 +12,7 @@
 		DA4A1671231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */; };
 		DA4A1682231D705000AEE426 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; };
 		DA4A1683231D705900AEE426 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DA4E6DFF24451D39005DA39E /* TestSettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4E6DFE24451D39005DA39E /* TestSettingsTVC.swift */; };
 		DA516A40242EB42000F70A7F /* TimeProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA516A3F242EB42000F70A7F /* TimeProfiler.swift */; };
 		DA516A41242EB42000F70A7F /* TimeProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA516A3F242EB42000F70A7F /* TimeProfiler.swift */; };
 		DA532D2C230DF40800EEFAAE /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; };
@@ -36,7 +37,6 @@
 		DAAE96D0243A8A34008FA929 /* iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAE96CF243A8A34008FA929 /* iOSTests.swift */; };
 		DAC2BEB2230B489400AF3567 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BEB1230B489400AF3567 /* AppDelegate.swift */; };
 		DAC2BEB6230B489400AF3567 /* MainTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BEB5230B489400AF3567 /* MainTVC.swift */; };
-		DAC2BEB9230B489400AF3567 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAC2BEB7230B489400AF3567 /* Main.storyboard */; };
 		DAC2BEBB230B489500AF3567 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAC2BEBA230B489500AF3567 /* Assets.xcassets */; };
 		DAC2BEBE230B489500AF3567 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAC2BEBC230B489500AF3567 /* LaunchScreen.storyboard */; };
 		DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC3E64722CA707700226217 /* SettingsCells.swift */; };
@@ -193,6 +193,7 @@
 		DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibraryiOSTestAppUITests.swift; sourceTree = "<group>"; };
 		DA4A1672231D6BD000AEE426 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA4A1681231D705000AEE426 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA4E6DFE24451D39005DA39E /* TestSettingsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSettingsTVC.swift; sourceTree = "<group>"; };
 		DA516A3F242EB42000F70A7F /* TimeProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeProfiler.swift; sourceTree = "<group>"; };
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
 		DA57CE192327EE6E00B1B397 /* DarkMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkMode.swift; sourceTree = "<group>"; };
@@ -216,7 +217,6 @@
 		DAC2BEAF230B489400AF3567 /* EWSLibraryiOSTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EWSLibraryiOSTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAC2BEB1230B489400AF3567 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DAC2BEB5230B489400AF3567 /* MainTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTVC.swift; sourceTree = "<group>"; };
-		DAC2BEB8230B489400AF3567 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DAC2BEBA230B489500AF3567 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DAC2BEBD230B489500AF3567 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DAC2BEBF230B489500AF3567 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -469,7 +469,7 @@
 			children = (
 				DAC2BEB1230B489400AF3567 /* AppDelegate.swift */,
 				DAC2BEB5230B489400AF3567 /* MainTVC.swift */,
-				DAC2BEB7230B489400AF3567 /* Main.storyboard */,
+				DA4E6DFE24451D39005DA39E /* TestSettingsTVC.swift */,
 				DAC2BEBA230B489500AF3567 /* Assets.xcassets */,
 				DAC2BEBC230B489500AF3567 /* LaunchScreen.storyboard */,
 				DAC2BEBF230B489500AF3567 /* Info.plist */,
@@ -1129,7 +1129,6 @@
 			files = (
 				DAC2BEBE230B489500AF3567 /* LaunchScreen.storyboard in Resources */,
 				DAC2BEBB230B489500AF3567 /* Assets.xcassets in Resources */,
-				DAC2BEB9230B489400AF3567 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1258,6 +1257,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAC2BEB6230B489400AF3567 /* MainTVC.swift in Sources */,
+				DA4E6DFF24451D39005DA39E /* TestSettingsTVC.swift in Sources */,
 				DAC2BEB2230B489400AF3567 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1410,14 +1410,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		DAC2BEB7230B489400AF3567 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DAC2BEB8230B489400AF3567 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		DAC2BEBC230B489500AF3567 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
