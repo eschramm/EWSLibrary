@@ -826,8 +826,12 @@ public extension Notification.Name {
     static let SettingsTVCTableviewEndUpdates = Notification.Name(rawValue: "SettingsTVCTableviewEndUpdates")
 }
 
+// Trampoline is a way to inject a weak reference to the SettingsTVC for situations where the cell needs to communicate back to the SettingsTVC
+// If needed for static cell creation, create the Trampoline in the init and pass thru.
+
 public class Trampoline {
-    public weak var testSettingsTVC: SettingsTVC?
+    public weak var settingsTVC: SettingsTVC?
+    public init() { }
 }
 
 open class SettingsTVC: UITableViewController {
@@ -838,12 +842,12 @@ open class SettingsTVC: UITableViewController {
     var indexPathsForHidableCells = [IndexPath]()
     public let trampoline: Trampoline
     
-    public init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
+    public init(sections: [SettingsSection], trampoline: Trampoline? = nil) {  // or ensure sections are populated before tableView attempts to load
         self.sections = sections
-        self.trampoline = Trampoline()
+        self.trampoline = trampoline ?? Trampoline()
         super.init(style: .grouped)
         self.gestureRecognizerToDismissFirstResponder = UITapGestureRecognizer(target: self, action: #selector(handleGesture(gestureRecognizer:)))
-        self.trampoline.testSettingsTVC = self
+        self.trampoline.settingsTVC = self
     }
     
     public required init?(coder aDecoder: NSCoder) {
