@@ -787,7 +787,7 @@ class DateCell: UITableViewCell, SettingsCell {
     
     @objc func pickerChanged() {
         textField.text = dateFormatter.string(from: datePicker.date)
-        textFieldDidEndEditing(textField)
+        updateDate()
     }
 }
 
@@ -802,6 +802,10 @@ extension DateCell : UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
+        updateDate()
+    }
+    
+    func updateDate() {
         setDateHandler(dateFormatter.date(from: textField.text ?? ""))
         gestureRecognizerToDismissFirstResponder?.isEnabled = false
     }
