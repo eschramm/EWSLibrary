@@ -25,7 +25,7 @@ public enum SettingsCellType {
     case buttonCell(type: ButtonCellType, title: String)
     case ratingsCell(initialTitle: String, titleColor: UIColor, appStoreID: String, updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String))
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
-    case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMinimumWidth: CGFloat?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
+    case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
     case dateCell(attributes: DateCellAttributes)
     case tagCloudCell(cloudID: String, tagCloudDelegate: TagCloudDelegate, parameters: TagCloudParameters = TagCloudParameters())
 }
@@ -267,6 +267,7 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
         
         rightSelectionLabel.translatesAutoresizingMaskIntoConstraints = false
         rightSelectionLabel.numberOfLines = 0
+        rightSelectionLabel.textAlignment = .right
         contentView.addSubview(rightSelectionLabel)
         
         updateSelection()
@@ -527,7 +528,6 @@ public class IAPCell : UITableViewCell, SettingsCell {
 class TextFieldCell: UITableViewCell, SettingsCell {
     
     let title: String
-    let fieldMinimumWidth: CGFloat
     let fieldMaximumWidthPercent: CGFloat?
     let getStringHandler: () -> (String?, UIColor?)
     let setStringHandler: (String) -> ()
@@ -538,9 +538,8 @@ class TextFieldCell: UITableViewCell, SettingsCell {
     weak var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer?
     
     init?(model: SettingsCellModel, identifier: String) {
-        if case .textFieldCell(title: let title, fieldPlaceholder: let fieldPlaceholder, let fieldMinimumWidth, let fieldMaximumWidthPercent, let fieldKeyboardType, let getStringHandler, let setStringHandler) = model.cellType {
+        if case .textFieldCell(title: let title, fieldPlaceholder: let fieldPlaceholder, let fieldMaximumWidthPercent, let fieldKeyboardType, let getStringHandler, let setStringHandler) = model.cellType {
             self.title = title ?? ""
-            self.fieldMinimumWidth = fieldMinimumWidth ?? 50
             self.fieldMaximumWidthPercent = fieldMaximumWidthPercent
             textField.placeholder = fieldPlaceholder
             textField.keyboardType = fieldKeyboardType
@@ -559,6 +558,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
         textField.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(textField)
         textField.delegate = self
+        textField.textAlignment = .right
         
         let (fieldText, fieldTextColor) = getStringHandler()
         textField.text = fieldText
@@ -598,7 +598,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
                 textField.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor, constant: -8),
                 textField.topAnchor.constraint(equalTo: marginGuide.topAnchor),
                 textField.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor),
-                textField.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8)
+                textField.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 8)
             ]
             
             if let fieldMaximumWidthPercent = fieldMaximumWidthPercent {
@@ -933,7 +933,7 @@ open class SettingsTVC: UITableViewController {
                 }
                 return cell
             }
-        case .textFieldCell(_,_,_,_,_,_,_):
+        case .textFieldCell(_,_,_,_,_,_):
             if let cell = TextFieldCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
                 cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
