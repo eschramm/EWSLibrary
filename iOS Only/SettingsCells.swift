@@ -183,10 +183,9 @@ class SwitchCell: UITableViewCell, SettingsCell {
         
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 2
-        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 0
         label.text = title
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)  // ensures on doesn't push switch off view on rotation and back
         contentView.addSubview(label)
         
         let cellSwitch = UISwitch()
@@ -195,14 +194,16 @@ class SwitchCell: UITableViewCell, SettingsCell {
         cellSwitch.addTarget(self, action: #selector(switchToggled(_:)), for: .valueChanged)
         contentView.addSubview(cellSwitch)
         
+        let marginGuide = contentView.layoutMarginsGuide
+        
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-            label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-            label.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-            cellSwitch.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
-            cellSwitch.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
+            label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+            label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor),
+            cellSwitch.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+            cellSwitch.centerYAnchor.constraint(equalTo: marginGuide.centerYAnchor),
             cellSwitch.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8)
-            ])
+        ])
     }
     
     @objc func switchToggled(_ cellSwitch: UISwitch) {
@@ -260,25 +261,29 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
         
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 2
-        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 0
         label.text = title
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         contentView.addSubview(label)
         
         rightSelectionLabel.translatesAutoresizingMaskIntoConstraints = false
+        rightSelectionLabel.numberOfLines = 0
         contentView.addSubview(rightSelectionLabel)
         
         updateSelection()
         
+        let marginGuide = contentView.layoutMarginsGuide
+        
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-            label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-            label.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-            rightSelectionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            rightSelectionLabel.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-            rightSelectionLabel.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8)
-            ])
+            label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+            label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor),
+            label.widthAnchor.constraint(greaterThanOrEqualTo: marginGuide.widthAnchor, multiplier: 0.4),
+            rightSelectionLabel.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor, constant: -8),
+            rightSelectionLabel.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            rightSelectionLabel.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor),
+            rightSelectionLabel.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8),
+            rightSelectionLabel.widthAnchor.constraint(greaterThanOrEqualTo: marginGuide.widthAnchor, multiplier: 0.4),
+        ])
         
         pickerPresenter?.add(pickerPresenterSelectionHandler: PickerPresenterSelectionHandler(sortPriority: 5, itemSelectedHandler: { [weak self] (updatedItem) in
             self?.rightSelectionLabel.text = updatedItem?.displayTitle()
@@ -289,6 +294,7 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
     func updateSelection() {
         guard let getStringHandler = getStringHandler else { return }
         let (rightSelectionText, rightSelectionColor) = getStringHandler()
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
         rightSelectionLabel.text = rightSelectionText
         
         #if swift(>=5.1)
@@ -300,6 +306,7 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
         #else
             rightSelectionLabel.textColor = rightSelectionColor ?? .blue
         #endif
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -331,33 +338,34 @@ class ButtonCell: UITableViewCell, SettingsCell {
     
     func buildCell() {
         
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        label.text = title
+        contentView.addSubview(label)
+        
+        let marginGuide = contentView.layoutMarginsGuide
+        
         switch type {
         case .centered(titleColor: let titleColor, backgroundColor: let backgroundColor):
-            let label = UILabel()
-            contentView.backgroundColor = backgroundColor
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.numberOfLines = 2
-            label.lineBreakMode = .byWordWrapping
-            label.text = title
             label.textColor = titleColor
             label.font = UIFont.boldSystemFont(ofSize: label.font.pointSize)
-            label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-            contentView.addSubview(label)
-            
-            NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-                label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-                label.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: 8),
-                label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
-                label.heightAnchor.constraint(lessThanOrEqualToConstant: 44)
-                ])
+            label.textAlignment = .center
+            contentView.backgroundColor = backgroundColor
         case .leftDisplayViewController(backgroundColor: let backgroundColor, accessory: let accessory):
-            textLabel?.text = title
+            label.textAlignment = .natural
             if let backgroundColor = backgroundColor {
                 contentView.superview?.backgroundColor = backgroundColor
             }
             accessoryType = accessory ?? .disclosureIndicator
         }
+        
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+            label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
+        ])
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -400,26 +408,27 @@ public class RatingCell : UITableViewCell, SettingsCell {
         
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 2
-        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 0
         label.text = initialText
         label.textColor = ratingsTextColor
         label.font = UIFont.systemFont(ofSize: 12)
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         contentView.addSubview(label)
         
+        let marginGuide = contentView.layoutMarginsGuide
+        
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-            label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-            label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
-            label.heightAnchor.constraint(lessThanOrEqualToConstant: 44)
-            ])
+            label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+            label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
+        ])
         
         let appInfo = AppInfo(with: appStoreID)
         appInfo.getData { (dataDict : [AnyHashable : Any]) in
-            DispatchQueue.main.async {
-                label.text = self.updateTitleHandler(dataDict)
+            DispatchQueue.main.async { [weak self] in
+                NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
+                label.text = self?.updateTitleHandler(dataDict)
+                NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
             }
         }
     }
@@ -464,18 +473,17 @@ public class IAPCell : UITableViewCell, SettingsCell {
     func buildCell() {
         
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 2
-        label.lineBreakMode = .byWordWrapping
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        label.numberOfLines = 0
         contentView.addSubview(label)
         
+        let marginGuide = contentView.layoutMarginsGuide
+        
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-            label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-            label.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
-            label.heightAnchor.constraint(lessThanOrEqualToConstant: 44)
-            ])
+            label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+            label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
+        ])
         
         update()
         
@@ -487,8 +495,10 @@ public class IAPCell : UITableViewCell, SettingsCell {
     }
     
     @objc func update() {
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
         selectionStyle = UserDefaults.standard.bool(forKey: iapKey) ? .none : .default
         label.text = UserDefaults.standard.bool(forKey: iapKey) ? purchasedTitle : initialTitle
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
     }
     
     public static func defaultSelectAction(iapCoordinator: IAPCoordinator, productIdentifier: String) -> SettingsCellSelectionType {
@@ -563,37 +573,41 @@ class TextFieldCell: UITableViewCell, SettingsCell {
             textField.textColor = fieldTextColor ?? .blue
         #endif
         
+        let marginGuide = contentView.layoutMarginsGuide
+        
         if title.isEmpty {
             NSLayoutConstraint.activate([
-                textField.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-                textField.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-                textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-                textField.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-                textField.widthAnchor.constraint(greaterThanOrEqualToConstant: fieldMinimumWidth)
-                ])
+                textField.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+                textField.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+                textField.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+                textField.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
+            ])
         } else {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.numberOfLines = 2
-            label.lineBreakMode = .byWordWrapping
+            label.numberOfLines = 0
             label.text = title
-            label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
             contentView.addSubview(label)
             
             var constraints = [NSLayoutConstraint]()
             
             constraints = [
-                label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-                label.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-                label.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-                textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-                textField.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor),
-                textField.widthAnchor.constraint(greaterThanOrEqualToConstant: fieldMinimumWidth),
+                label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+                label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+                label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor),
+                textField.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor, constant: -8),
+                textField.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+                textField.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor),
                 textField.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8)
             ]
             
             if let fieldMaximumWidthPercent = fieldMaximumWidthPercent {
                 constraints.append(textField.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor, multiplier: fieldMaximumWidthPercent / 100))
+            } else {
+                constraints.append(contentsOf: [
+                    label.widthAnchor.constraint(greaterThanOrEqualTo: marginGuide.widthAnchor, multiplier: 0.4),
+                    textField.widthAnchor.constraint(greaterThanOrEqualTo: marginGuide.widthAnchor, multiplier: 0.4)
+                ])
             }
             
             NSLayoutConstraint.activate(constraints)
@@ -685,16 +699,17 @@ class DateCell: UITableViewCell, SettingsCell {
         
         datePicker.addTarget(self, action: #selector(pickerChanged), for: .valueChanged)
         
+        let marginGuide = contentView.layoutMarginsGuide
+        
         noPickerVerticalConstraints = [
-            textField.topAnchor.constraint(equalToSystemSpacingBelow: contentView.topAnchor, multiplier: 1),
-            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+            textField.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            textField.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
         ]
-        let bottomConstraint = datePicker.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 8)
+        let bottomConstraint = datePicker.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
         bottomConstraint.priority = UILayoutPriority(rawValue: 999)
         pickerVerticalConstraints = [
-            textField.topAnchor.constraint(greaterThanOrEqualToSystemSpacingBelow: contentView.topAnchor, multiplier: 1),
-            datePicker.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-            datePicker.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 54),
+            textField.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+            datePicker.centerXAnchor.constraint(equalTo: marginGuide.centerXAnchor),
             bottomConstraint
         ]
         
@@ -709,23 +724,28 @@ class DateCell: UITableViewCell, SettingsCell {
                 textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
                 textField.widthAnchor.constraint(greaterThanOrEqualToConstant: fieldMinimumWidth)
                 ]
+            pickerVerticalConstraints.append(datePicker.topAnchor.constraint(equalTo: textField.bottomAnchor))
         } else {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.numberOfLines = 2
-            label.lineBreakMode = .byWordWrapping
+            label.numberOfLines = 0
             label.text = title
-            label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
             contentView.addSubview(label)
-            noPickerVerticalConstraints.append(label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
-            pickerVerticalConstraints.append(label.topAnchor.constraint(equalToSystemSpacingBelow: contentView.topAnchor, multiplier: 1))
+            
+            noPickerVerticalConstraints.append(contentsOf: [
+                label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+                label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
+            ])
+            pickerVerticalConstraints.append(contentsOf: [
+                label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+                datePicker.topAnchor.constraint(equalTo: label.bottomAnchor)
+            ])
             
             constraints = [
-                label.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: kLeadingPaddingToMatchSystemCellLabel),
-                label.heightAnchor.constraint(lessThanOrEqualToConstant: 44),
-                textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+                label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+                textField.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor, constant: -8),
                 textField.widthAnchor.constraint(greaterThanOrEqualToConstant: fieldMinimumWidth),
-                textField.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8)
+                textField.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 8),
             ]
         }
         
@@ -747,18 +767,22 @@ class DateCell: UITableViewCell, SettingsCell {
     
     func addPicker() {
         guard datePicker.superview == nil else { return }
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
         contentView.addSubview(datePicker)
         NSLayoutConstraint.deactivate(noPickerVerticalConstraints)
         NSLayoutConstraint.activate(pickerVerticalConstraints)
         gestureRecognizerToDismissFirstResponder?.isEnabled = true
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
     }
     
     func removePicker() {
         guard let _ = datePicker.superview else { return }
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
         NSLayoutConstraint.deactivate(pickerVerticalConstraints)
         datePicker.removeFromSuperview()
         NSLayoutConstraint.activate(noPickerVerticalConstraints)
         gestureRecognizerToDismissFirstResponder?.isEnabled = false
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
     }
     
     @objc func pickerChanged() {
@@ -794,6 +818,12 @@ public struct SettingsSection {
 
 public extension Notification.Name {
     static let SettingsTVCCheckForVisibilityChanges = Notification.Name(rawValue: "SettingsTVCCheckForVisibilityChanges")
+    static let SettingsTVCTableviewBeginUpdates = Notification.Name(rawValue: "SettingsTVCTableviewBeginUpdates")
+    static let SettingsTVCTableviewEndUpdates = Notification.Name(rawValue: "SettingsTVCTableviewEndUpdates")
+}
+
+public class Trampoline {
+    public weak var testSettingsTVC: SettingsTVC?
 }
 
 open class SettingsTVC: UITableViewController {
@@ -801,13 +831,15 @@ open class SettingsTVC: UITableViewController {
     var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer!
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
-    var pickerCells = [DateCell]()
     var indexPathsForHidableCells = [IndexPath]()
+    public let trampoline: Trampoline
     
     public init(sections: [SettingsSection]) {  // or ensure sections are populated before tableView attempts to load
         self.sections = sections
+        self.trampoline = Trampoline()
         super.init(style: .grouped)
         self.gestureRecognizerToDismissFirstResponder = UITapGestureRecognizer(target: self, action: #selector(handleGesture(gestureRecognizer:)))
+        self.trampoline.testSettingsTVC = self
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -815,7 +847,7 @@ open class SettingsTVC: UITableViewController {
     }
     
     open override func viewDidLoad() {
-        tableView.rowHeight = 44
+        tableView.estimatedRowHeight = 44
         gestureRecognizerToDismissFirstResponder.numberOfTapsRequired = 1
         gestureRecognizerToDismissFirstResponder.numberOfTouchesRequired = 1
         gestureRecognizerToDismissFirstResponder.isEnabled = false
@@ -826,10 +858,18 @@ open class SettingsTVC: UITableViewController {
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(checkVisibilityChanges), name: .SettingsTVCCheckForVisibilityChanges, object: nil)
+        if let tableView = tableView {
+            NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.beginUpdates), name: .SettingsTVCTableviewBeginUpdates, object: nil)
+            NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.endUpdates), name: .SettingsTVCTableviewEndUpdates, object: nil)
+        }
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
         NotificationCenter.default.removeObserver(self, name: .SettingsTVCCheckForVisibilityChanges, object: nil)
+        if let tableView = tableView {
+            NotificationCenter.default.removeObserver(tableView, name: .SettingsTVCTableviewBeginUpdates, object: nil)
+            NotificationCenter.default.removeObserver(tableView, name: .SettingsTVCTableviewEndUpdates, object: nil)
+        }
         super.viewWillDisappear(animated)
     }
     
@@ -902,7 +942,6 @@ open class SettingsTVC: UITableViewController {
         case .dateCell(_):
             if let cell = DateCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
-                pickerCells.append(cell)
                 cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
@@ -964,11 +1003,6 @@ open class SettingsTVC: UITableViewController {
         for textField in textFields {
             textField.resignFirstResponder()
         }
-        tableView.beginUpdates()
-        for pickerCell in pickerCells {
-            pickerCell.removePicker()
-        }
-        tableView.endUpdates()
         gestureRecognizerToDismissFirstResponder.isEnabled = false
     }
     
