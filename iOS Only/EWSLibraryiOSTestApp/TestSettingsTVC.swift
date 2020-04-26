@@ -176,7 +176,16 @@ class TestSettingsTVC: SettingsTVC {
                 stateDict["honingDelay"] = number.doubleValue
             }
         }
-        return SettingsCellModel(cellType: .textFieldCell(title: "Honing delay (sec)", fieldPlaceholder: "2", fieldMinimumWidth: nil, fieldMaximumWidthPercent: nil, fieldKeyboard: .decimalPad, getStringHandler: getStringHandler, setStringHandler: setStringHandler), selectionType: selectionType)
+        let isValidHandler: (String) -> (Bool) = { string in
+            let nf = NumberFormatter()
+            if let number = nf.number(from: string), number.floatValue > 0 {
+                return true
+            } else {
+                return false
+            }
+        }
+        let attributes = TextFieldAttributes(title: "Honing delay (sec)", fieldPlaceHolder: "2", fieldMaximumWidthPercent: nil, fieldKeyboard: nil, getStringHandler: getStringHandler, setStringHandler: setStringHandler, isValidHandler: isValidHandler)
+        return SettingsCellModel(cellType: .textFieldCell(attributes: attributes), selectionType: selectionType)
     }
     
     static func textFieldWrapCell(stateDict: NSMutableDictionary) -> SettingsCellModel {
@@ -188,7 +197,16 @@ class TestSettingsTVC: SettingsTVC {
         let setStringHandler: (String) -> () = { updatedString in
             stateDict["honingDelayWrap"] = updatedString
         }
-        return SettingsCellModel(cellType: .textFieldCell(title: "Honing delay (sec) but let's make some pressure for wrapping text here", fieldPlaceholder: "long text to start out with", fieldMinimumWidth: nil, fieldMaximumWidthPercent: nil, fieldKeyboard: .default, getStringHandler: getStringHandler, setStringHandler: setStringHandler), selectionType: selectionType)
+        let isValidHandler: (String) -> (Bool) = { string in
+            let nf = NumberFormatter()
+            if let number = nf.number(from: string), number.floatValue > 0 {
+                return true
+            } else {
+                return false
+            }
+        }
+        let attributes = TextFieldAttributes(title: "Honing delay (sec) but let's make some pressure for wrapping text here", fieldPlaceHolder: "long text to start out with", fieldMaximumWidthPercent: nil, fieldKeyboard: nil, getStringHandler: getStringHandler, setStringHandler: setStringHandler, isValidHandler: isValidHandler)
+        return SettingsCellModel(cellType: .textFieldCell(attributes: attributes), selectionType: selectionType)
     }
     
     static func dateCell() -> SettingsCellModel {
@@ -262,11 +280,11 @@ class TagCloudExampleDelegate : TagCloudDelegate {
     }
     
     func presentTagAddingViewController(tagAddingViewController: UIViewController) {
-        trampoline.testSettingsTVC?.present(tagAddingViewController, animated: true, completion: nil)
+        trampoline.settingsTVC?.present(tagAddingViewController, animated: true, completion: nil)
     }
     
     func dismissTagAddingViewController() {
-        trampoline.testSettingsTVC?.dismiss(animated: true, completion: nil)
+        trampoline.settingsTVC?.dismiss(animated: true, completion: nil)
     }
     
     func shouldCreateTag(with title: String) -> Bool {

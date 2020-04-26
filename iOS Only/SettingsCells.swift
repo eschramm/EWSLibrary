@@ -25,7 +25,7 @@ public enum SettingsCellType {
     case buttonCell(type: ButtonCellType, title: String)
     case ratingsCell(initialTitle: String, titleColor: UIColor, appStoreID: String, updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String))
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
-    case textFieldCell(title: String?, fieldPlaceholder: String?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType, getStringHandler: () -> (String?, UIColor?), setStringHandler: (String) -> ())
+    case textFieldCell(attributes: TextFieldAttributes)
     case dateCell(attributes: DateCellAttributes)
     case tagCloudCell(cloudID: String, tagCloudDelegate: TagCloudDelegate, parameters: TagCloudParameters = TagCloudParameters())
 }
@@ -45,6 +45,26 @@ public struct DateCellAttributes {
         self.dateFormatter = dateFormatter
         self.getDateHandler = getDateHandler
         self.setDateHandler = setDateHandler
+    }
+}
+
+public struct TextFieldAttributes {
+    let title: String?
+    let fieldPlaceHolder: String?
+    let fieldMaximumWidthPercent: CGFloat?
+    let fieldKeyboard: UIKeyboardType?
+    let getStringHandler: () -> (String?, UIColor?)
+    let setStringHandler: (String) -> ()
+    let isValidHandler: (String) -> (Bool)
+    
+    public init(title: String, fieldPlaceHolder: String?, fieldMaximumWidthPercent: CGFloat?, fieldKeyboard: UIKeyboardType?, getStringHandler: @escaping () -> (String?, UIColor?), setStringHandler: @escaping (String) -> (), isValidHandler: @escaping (String) -> (Bool)) {
+        self.title = title
+        self.fieldPlaceHolder = fieldPlaceHolder
+        self.fieldMaximumWidthPercent = fieldMaximumWidthPercent
+        self.fieldKeyboard = fieldKeyboard
+        self.getStringHandler = getStringHandler
+        self.setStringHandler = setStringHandler
+        self.isValidHandler = isValidHandler
     }
 }
 
@@ -531,6 +551,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
     let fieldMaximumWidthPercent: CGFloat?
     let getStringHandler: () -> (String?, UIColor?)
     let setStringHandler: (String) -> ()
+    let isValidHandler: (String) -> (Bool)
     let selectActionHandler: (_ presentingViewController: UIViewController) -> ()
     
     let textField = UITextField()
@@ -538,13 +559,14 @@ class TextFieldCell: UITableViewCell, SettingsCell {
     weak var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer?
     
     init?(model: SettingsCellModel, identifier: String) {
-        if case .textFieldCell(title: let title, fieldPlaceholder: let fieldPlaceholder, let fieldMaximumWidthPercent, let fieldKeyboardType, let getStringHandler, let setStringHandler) = model.cellType {
-            self.title = title ?? ""
-            self.fieldMaximumWidthPercent = fieldMaximumWidthPercent
-            textField.placeholder = fieldPlaceholder
-            textField.keyboardType = fieldKeyboardType
-            self.getStringHandler = getStringHandler
-            self.setStringHandler = setStringHandler
+        if case .textFieldCell(let attributes) = model.cellType {
+            self.title = attributes.title ?? ""
+            self.fieldMaximumWidthPercent = attributes.fieldMaximumWidthPercent
+            textField.placeholder = attributes.fieldPlaceHolder
+            textField.keyboardType = attributes.fieldKeyboard ?? .default
+            self.getStringHandler = attributes.getStringHandler
+            self.setStringHandler = attributes.setStringHandler
+            self.isValidHandler = attributes.isValidHandler
             self.selectActionHandler = model.selectionType.action()
             super.init(style: .default, reuseIdentifier: identifier)
             buildCell()
@@ -559,6 +581,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
         contentView.addSubview(textField)
         textField.delegate = self
         textField.textAlignment = .right
+        textField.clearButtonMode = .whileEditing
         
         let (fieldText, fieldTextColor) = getStringHandler()
         textField.text = fieldText
@@ -621,6 +644,26 @@ class TextFieldCell: UITableViewCell, SettingsCell {
     func selectAction(presentingViewController: UIViewController) {
         self.selectActionHandler(presentingViewController)
     }
+    
+    func validateText(text: String) {
+        if isValidHandler(text) {
+            if #available(iOS 13.0, *) {
+                backgroundColor = .systemBackground
+                textField.textColor = .systemBlue
+            } else {
+                backgroundColor = .white
+                textField.textColor = .blue
+            }
+        } else {
+            if #available(iOS 13.0, *) {
+                backgroundColor = .systemYellow
+                textField.textColor = .systemRed
+            } else {
+                backgroundColor = .yellow
+                textField.textColor = .red
+            }
+        }
+    }
 }
 
 extension TextFieldCell : UITextFieldDelegate {
@@ -634,6 +677,7 @@ extension TextFieldCell : UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
+        validateText(text: textField.text ?? "")
         setStringHandler(textField.text ?? "")
         gestureRecognizerToDismissFirstResponder?.isEnabled = false
     }
@@ -937,7 +981,7 @@ open class SettingsTVC: UITableViewController {
                 }
                 return cell
             }
-        case .textFieldCell(_,_,_,_,_,_):
+        case .textFieldCell(_):
             if let cell = TextFieldCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
                 cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
