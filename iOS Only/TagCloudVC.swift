@@ -60,7 +60,7 @@ public struct TagCloudParameters {
     }
 }
 
-public class TagCloudCell : UITableViewCell, TagCloudController {
+public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
     
     // https://stackoverflow.com/questions/55061353/non-scrolling-uicollectionview-inside-uitableviewcell-dynamic-height
 
@@ -221,7 +221,7 @@ public class TagCloudCell : UITableViewCell, TagCloudController {
     }
 }
 
-extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension SettingsTagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     // MARK: - UICollectionViewDataSource
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -257,7 +257,7 @@ extension TagCloudCell : UICollectionViewDelegate, UICollectionViewDelegateFlowL
     }
 }
 
-extension TagCloudCell : SettingsCell {
+extension SettingsTagCloudCell : SettingsCell {
     func selectAction(presentingViewController: UIViewController) {
         // nothing
     }
@@ -299,12 +299,12 @@ class TagCollectionViewCell : UICollectionViewCell {
 
 class TagAddingTVC : UITableViewController {
     
-    let allTagsCell: TagCloudCell
+    let allTagsCell: SettingsTagCloudCell
     weak var tagCloudDelegate: TagCloudDelegate?
     let updateItemTagCellHandler: (Int) -> ()
     
     init(tagCloudDelegate: TagCloudDelegate, cloudID: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
-        self.allTagsCell = TagCloudCell(allCell: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
+        self.allTagsCell = SettingsTagCloudCell(allCell: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
         self.tagCloudDelegate = tagCloudDelegate
         self.updateItemTagCellHandler = updateItemTagCellHandler
         super.init(style: .grouped)

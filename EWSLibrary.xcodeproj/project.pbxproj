@@ -20,6 +20,7 @@
 		DA57CE152325B66700B1B397 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; };
 		DA57CE162325B66700B1B397 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA57CE1A2327EE6E00B1B397 /* DarkMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA57CE192327EE6E00B1B397 /* DarkMode.swift */; };
+		DA5C0D0D24564296004BF000 /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5C0D0C24564296004BF000 /* TableViewCells.swift */; };
 		DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */; };
 		DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */; };
 		DA97B98521065F5800135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -197,6 +198,7 @@
 		DA516A3F242EB42000F70A7F /* TimeProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeProfiler.swift; sourceTree = "<group>"; };
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
 		DA57CE192327EE6E00B1B397 /* DarkMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkMode.swift; sourceTree = "<group>"; };
+		DA5C0D0C24564296004BF000 /* TableViewCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCells.swift; sourceTree = "<group>"; };
 		DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpVC.swift; sourceTree = "<group>"; };
 		DA97B9892106601700135BF1 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		DA995A51216E84A60082B3DD /* EWSDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EWSDB.h; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 				DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */,
 				DAC3E64722CA707700226217 /* SettingsCells.swift */,
 				DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */,
+				DA5C0D0C24564296004BF000 /* TableViewCells.swift */,
 				DA39DCFB22E53729007976EF /* IAPController.swift */,
 				DA57CE192327EE6E00B1B397 /* DarkMode.swift */,
 				DA065FE4237E000900BFF931 /* ConnectionController.swift */,
@@ -1269,6 +1272,7 @@
 				DA57CE1A2327EE6E00B1B397 /* DarkMode.swift in Sources */,
 				DA39DD0422E542D9007976EF /* IAPController.swift in Sources */,
 				DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */,
+				DA5C0D0D24564296004BF000 /* TableViewCells.swift in Sources */,
 				DAC3E64822CA707700226217 /* SettingsCells.swift in Sources */,
 				DA065FE5237E000900BFF931 /* ConnectionController.swift in Sources */,
 				DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */,

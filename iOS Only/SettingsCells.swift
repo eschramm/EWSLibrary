@@ -179,7 +179,7 @@ protocol SettingsCell {
     func selectAction(presentingViewController: UIViewController)
 }
 
-class SwitchCell: UITableViewCell, SettingsCell {
+class SettingsSwitchCell: UITableViewCell, SettingsCell {
     
     let title: String
     let getBoolHandler: () -> (Bool)
@@ -239,7 +239,7 @@ class SwitchCell: UITableViewCell, SettingsCell {
     }
 }
 
-class RightSelectionCell: UITableViewCell, SettingsCell {
+class SettingsRightSelectionCell: UITableViewCell, SettingsCell {
     
     let title: String
     let getStringHandler: CellDetailGetStringHandler?
@@ -339,7 +339,7 @@ class RightSelectionCell: UITableViewCell, SettingsCell {
     }
 }
 
-class ButtonCell: UITableViewCell, SettingsCell {
+class SettingsButtonCell: UITableViewCell, SettingsCell {
     
     let type: SettingsCellType.ButtonCellType
     let title: String
@@ -398,7 +398,7 @@ class ButtonCell: UITableViewCell, SettingsCell {
     }
 }
 
-public class RatingCell : UITableViewCell, SettingsCell {
+public class SettingsRatingCell : UITableViewCell, SettingsCell {
     
     let initialText: String
     let ratingsTextColor: UIColor
@@ -465,7 +465,7 @@ public class RatingCell : UITableViewCell, SettingsCell {
     }
 }
 
-public class IAPCell : UITableViewCell, SettingsCell {
+public class SettingsIAPCell : UITableViewCell, SettingsCell {
     
     let initialTitle: String
     let purchasedTitle: String
@@ -510,7 +510,7 @@ public class IAPCell : UITableViewCell, SettingsCell {
         
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(IAPCell.update),
+            selector: #selector(SettingsIAPCell.update),
             name: NSNotification.Name("IAPHelperProductPurchasedNotification"),
             object: nil)
     }
@@ -545,7 +545,7 @@ public class IAPCell : UITableViewCell, SettingsCell {
     }
 }
 
-class TextFieldCell: UITableViewCell, SettingsCell {
+class SettingsTextFieldCell: UITableViewCell, SettingsCell {
     
     let title: String
     let fieldMaximumWidthPercent: CGFloat?
@@ -666,7 +666,7 @@ class TextFieldCell: UITableViewCell, SettingsCell {
     }
 }
 
-extension TextFieldCell : UITextFieldDelegate {
+extension SettingsTextFieldCell : UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         gestureRecognizerToDismissFirstResponder?.isEnabled = true
     }
@@ -683,7 +683,7 @@ extension TextFieldCell : UITextFieldDelegate {
     }
 }
 
-class DateCell: UITableViewCell, SettingsCell {
+class SettingsDateCell: UITableViewCell, SettingsCell {
     
     let title: String
     let dateFormatter: DateFormatter
@@ -835,7 +835,7 @@ class DateCell: UITableViewCell, SettingsCell {
     }
 }
 
-extension DateCell : UITextFieldDelegate {
+extension SettingsDateCell : UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         gestureRecognizerToDismissFirstResponder?.isEnabled = true
     }
@@ -942,7 +942,7 @@ open class SettingsTVC: UITableViewController {
         }
         switch model.cellType {
         case .boolSwitch(_,_,_):
-            if let cell = SwitchCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsSwitchCell(model: model, identifier: cellIdentifier) {
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -950,7 +950,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .rightSelection(_,_):
-            if let cell = RightSelectionCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsRightSelectionCell(model: model, identifier: cellIdentifier) {
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -958,7 +958,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .buttonCell(_,_):
-            if let cell = ButtonCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsButtonCell(model: model, identifier: cellIdentifier) {
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -966,7 +966,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .ratingsCell(_,_,_,_):
-            if let cell = RatingCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsRatingCell(model: model, identifier: cellIdentifier) {
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -974,7 +974,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .iapCell(_,_,_):
-            if let cell = IAPCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsIAPCell(model: model, identifier: cellIdentifier) {
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
@@ -982,7 +982,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .textFieldCell(_):
-            if let cell = TextFieldCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsTextFieldCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
                 cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
                 configure(cell: cell, model: model)
@@ -992,7 +992,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .dateCell(_):
-            if let cell = DateCell(model: model, identifier: cellIdentifier) {
+            if let cell = SettingsDateCell(model: model, identifier: cellIdentifier) {
                 textFields.append(cell.textField)
                 cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
                 configure(cell: cell, model: model)
@@ -1002,7 +1002,7 @@ open class SettingsTVC: UITableViewController {
                 return cell
             }
         case .tagCloudCell(let cloudID, let tagCloudDelegate, let parameters):
-            let cell = TagCloudCell(cloudID: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: cellIdentifier, parameters: parameters)
+            let cell = SettingsTagCloudCell(cloudID: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: cellIdentifier, parameters: parameters)
             configure(cell: cell, model: model)
             if let _ = model.visibilityHandler {
                 indexPathsForHidableCells.append(indexPath)
@@ -1040,7 +1040,7 @@ open class SettingsTVC: UITableViewController {
     
     open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? SettingsCell {
-            if let cell = cell as? DateCell {
+            if let cell = cell as? SettingsDateCell {
                 tableView.beginUpdates()
                 cell.selectAction(presentingViewController: self)
                 tableView.endUpdates()
