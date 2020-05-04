@@ -60,6 +60,168 @@ public struct TagCloudParameters {
     }
 }
 
+public class TagCloudChildViewController: UIViewController {
+    
+    public enum ResizeStyle {
+        case none
+        case resizeWithEmptySize(emptySize: CGFloat)
+    }
+    
+    public let cloudID: String
+    let parameters: TagCloudParameters
+    let resizeStyle: ResizeStyle
+    let inset: CGFloat = 8
+    
+    var tagCloudDataSource: TagCloudDataSource!
+    
+    public weak var tagCloudDelegate: TagCloudDelegate?
+    
+    var collectionView: UICollectionView!
+    var collectionViewHeightConstraint: NSLayoutConstraint?
+    
+    public init(cloudID: String, parameters: TagCloudParameters, tagCloudDelegate: TagCloudDelegate, resizeStyle: ResizeStyle) {
+        self.cloudID = cloudID
+        self.parameters = parameters
+        self.tagCloudDelegate = tagCloudDelegate
+        self.resizeStyle = resizeStyle
+        super.init(nibName: nil, bundle: nil)
+        buildDataSource()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        buildView()
+    }
+    
+    func buildDataSource() {
+        if #available(iOS 13.0, *) {
+            self.tagCloudDataSource = TagCloudDiffDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: .item, resizeCellHandler: {
+                self.view.setNeedsLayout()
+            })
+        } else {
+            self.tagCloudDataSource = TagCloudTraditionalDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: .item, resizeCellHandler: { })
+        }
+    }
+    
+    func buildView() {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.itemSize = CGSize(width: 50, height: 55)
+        flowLayout.sectionInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+        flowLayout.headerReferenceSize = CGSize.zero
+        flowLayout.footerReferenceSize = CGSize.zero
+        collectionView = UICollectionView(frame: view.frame, collectionViewLayout: flowLayout)
+        view.addSubview(collectionView)
+        if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
+            tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
+        }
+        
+        accessibilityElements = [collectionView!]  // enables accessibility for collection view elements (and UI testing)
+        collectionView.delegate = self
+        if #available(iOS 13.0, *) {
+            // nothing
+        } else {
+            collectionView.dataSource = tagCloudDataSource
+        }
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .clear
+        collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
+        view.backgroundColor = parameters.backgroundColor
+        
+        let addButton = UIButton(type: .contactAdd)
+        addButton.translatesAutoresizingMaskIntoConstraints = false
+        addButton.addTarget(self, action: #selector(addTag), for: .touchUpInside)
+        view.addSubview(addButton)
+        
+        if case .resizeWithEmptySize(emptySize: let emptySize) = resizeStyle {
+            let updatedEmptySize = max(emptySize - (inset * 2), 0)
+            let heightConstraint = collectionView.heightAnchor.constraint(equalToConstant: updatedEmptySize)
+            heightConstraint.priority = .defaultHigh
+            heightConstraint.isActive = true
+            collectionViewHeightConstraint = heightConstraint
+        }
+        
+        NSLayoutConstraint.activate([
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: inset),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -inset),
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: inset),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -inset),
+            addButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -inset),
+            addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -inset)
+        ])
+        
+        NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: nil, queue: .main) { [weak self] (_) in
+            self?.collectionView.reloadData()
+        }
+    }
+    
+    @objc func addTag() {
+        guard let tagCloudDelegate = tagCloudDelegate else { return }
+        let updateItemTagCellHandler: (Int) -> () = { [weak self] index in
+            let allowAdd = tagCloudDelegate.didAddTag(from: index)
+            if allowAdd {
+                if #available(iOS 13.0, *), let tagCloudDiffDataSource = self?.tagCloudDataSource as? TagCloudDiffDataSource {
+                    tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+                } else {
+                    self?.tagCloudDataSource.updateCache()
+                    // assumes add to end, but check if already handled
+                    if self?.collectionView.numberOfItems(inSection: 0) ?? 0 < tagCloudDelegate.tagCount(cloudID: self?.cloudID ?? "", context: .item) {
+                        self?.collectionView.insertItems(at: [IndexPath(row: tagCloudDelegate.tagCount(cloudID: self?.cloudID ?? "", context: .item) - 1, section: 0)])
+                    }
+                }
+                self?.updateHeightOfCollectionView()
+            }
+            tagCloudDelegate.dismissTagAddingViewController()
+        }
+        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
+        let navController = UINavigationController(rootViewController: tagAddingTVC)
+        let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelAdd))
+        tagAddingTVC.navigationItem.rightBarButtonItem = cancelButton
+        tagCloudDelegate.presentTagAddingViewController(tagAddingViewController: navController)
+    }
+    
+    @objc func cancelAdd() {
+        tagCloudDelegate?.dismissTagAddingViewController()
+    }
+    
+    func updateHeightOfCollectionView() {
+        if case .resizeWithEmptySize(emptySize: let emptySize) = resizeStyle {
+            let updatedEmptySize = max(emptySize - (inset * 2), 0)
+            let updatedHeight = collectionView?.collectionViewLayout.collectionViewContentSize.height
+            self.collectionViewHeightConstraint?.constant = updatedHeight ?? updatedEmptySize
+            view.setNeedsLayout()
+        }
+    }
+}
+
+extension TagCloudChildViewController : UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    // MARK: - UICollectionViewDataSource
+    
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let title = tagCloudDataSource.filteredTagPointers[indexPath.row].title
+        let titleSize = title.size(withAttributes: [.font : parameters.tagTitleFont])
+        return CGSize(width: titleSize.width + parameters.horizontalPadding, height: titleSize.height + parameters.verticalPadding)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        tagCloudDelegate?.removeTag(at: indexPath.row)
+        if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
+            tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+        } else {
+            tagCloudDataSource.updateCache()
+            collectionView.deleteItems(at: [indexPath])
+        }
+        updateHeightOfCollectionView()
+    }
+}
+
 public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
     
     // https://stackoverflow.com/questions/55061353/non-scrolling-uicollectionview-inside-uitableviewcell-dynamic-height
