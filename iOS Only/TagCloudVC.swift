@@ -97,11 +97,14 @@ public class TagCloudChildViewController: UIViewController {
         buildView()
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateHeightOfCollectionView()
+    }
+    
     func buildDataSource() {
         if #available(iOS 13.0, *) {
-            self.tagCloudDataSource = TagCloudDiffDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: .item, resizeCellHandler: {
-                self.view.setNeedsLayout()
-            })
+            self.tagCloudDataSource = TagCloudDiffDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: .item, resizeCellHandler: { })
         } else {
             self.tagCloudDataSource = TagCloudTraditionalDataSource(tagCloudDelegate: tagCloudDelegate!, tagCloudID: cloudID, parameters: parameters, context: .item, resizeCellHandler: { })
         }
@@ -115,9 +118,7 @@ public class TagCloudChildViewController: UIViewController {
         flowLayout.footerReferenceSize = CGSize.zero
         collectionView = UICollectionView(frame: view.frame, collectionViewLayout: flowLayout)
         view.addSubview(collectionView)
-        if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
-            tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
-        }
+        collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
         
         accessibilityElements = [collectionView!]  // enables accessibility for collection view elements (and UI testing)
         collectionView.delegate = self
@@ -128,7 +129,6 @@ public class TagCloudChildViewController: UIViewController {
         }
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
-        collectionView.register(TagCollectionViewCell.self, forCellWithReuseIdentifier: "TagCloudCell")
         view.backgroundColor = parameters.backgroundColor
         
         let addButton = UIButton(type: .contactAdd)
@@ -152,6 +152,10 @@ public class TagCloudChildViewController: UIViewController {
             addButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -inset),
             addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -inset)
         ])
+        
+        if #available(iOS 13.0, *), let tagCloudDiffDataSource = tagCloudDataSource as? TagCloudDiffDataSource {
+            tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
+        }
         
         NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: nil, queue: .main) { [weak self] (_) in
             self?.collectionView.reloadData()
