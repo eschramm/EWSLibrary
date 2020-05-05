@@ -627,7 +627,8 @@ class SettingsTextFieldCell: UITableViewCell, SettingsCell {
             ]
             
             if let fieldMaximumWidthPercent = fieldMaximumWidthPercent {
-                constraints.append(textField.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor, multiplier: fieldMaximumWidthPercent / 100))
+                //constraints.append(textField.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor, multiplier: fieldMaximumWidthPercent / 100))
+                constraints.append(textField.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: fieldMaximumWidthPercent / 100))
             } else {
                 constraints.append(contentsOf: [
                     label.widthAnchor.constraint(greaterThanOrEqualTo: marginGuide.widthAnchor, multiplier: 0.4),
