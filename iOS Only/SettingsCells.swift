@@ -529,9 +529,11 @@ public class SettingsIAPCell : UITableViewCell, SettingsCell {
                 return
             }
             let presentHandler: (UIViewController) -> () = { (viewController) in
-                let navigationController = UINavigationController(rootViewController: viewController)
-                presentingController.present(navigationController, animated: true, completion: nil)
-                viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: iapCoordinator, action: #selector(IAPCoordinator.dismiss))
+                DispatchQueue.main.async {
+                    let navigationController = UINavigationController(rootViewController: viewController)
+                    presentingController.present(navigationController, animated: true, completion: nil)
+                    viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: iapCoordinator, action: #selector(IAPCoordinator.dismiss))
+                }
             }
             let dismissHandler: (UIViewController) -> () = { _ in
                 presentingController.dismiss(animated: true, completion: nil)
