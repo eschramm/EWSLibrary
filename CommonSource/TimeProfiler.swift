@@ -129,10 +129,17 @@ public class ProgressTimeProfiler {
         nf.maximumFractionDigits = 2
         return nf
     }()
-    var lastResultWeight = 0.6
+    let lastResultWeight: Double?
     
-    public init(totalWorkUnits: Int) {
+    /**
+    Creates a ProgressTimeProfiler which will track progress and predict time to completion
+
+    - Parameter totalWorkUnits: The count of total items to process
+    - Parameter lastResultWeight: Default 0.6 - how much to weight the last reported work completed against the running average. If nil, will weight all work evenly
+    */
+    public init(totalWorkUnits: Int, lastResultWeight: Double? = 0.6) {
         self.totalWork = totalWorkUnits
+        self.lastResultWeight = lastResultWeight
     }
     
     public func stamp(withWorkUnitsComplete workUnitsComplete: Int) {
@@ -167,7 +174,12 @@ public class ProgressTimeProfiler {
             let lastFractionCompleteDiff = lastTimeStamp.fractionComplete - secondToLastTimeStamp.fractionComplete
             let lastInterval = lastTimeStamp.timeStamp - secondToLastTimeStamp.timeStamp
             let lastRate = lastFractionCompleteDiff / Double(lastInterval)
-            let weightedRate = (totalRate * (1 - lastResultWeight)) + (lastRate * lastResultWeight)
+            let weightedRate: Double
+            if let lastResultWeight = lastResultWeight {
+                weightedRate = (totalRate * (1 - lastResultWeight)) + (lastRate * lastResultWeight)
+            } else {
+                weightedRate = totalRate
+            }
             secondsRemaining = (1 - lastTimeStamp.fractionComplete) / weightedRate
         }
         var output = ""
@@ -186,9 +198,45 @@ public class ProgressTimeProfiler {
     }
 }
 
-
-
 func timeStampDiff(start: TimeInterval, end: TimeInterval) -> String {
     let diffInSeconds = end - start
     return "\(diffInSeconds) seconds"
+}
+
+public class Debouncer: NSObject {
+    let callback: (() -> ())
+    let delay: Double
+    let useDelayAsThrottle: Bool
+    weak var timer: Timer?
+    
+    /**
+    Creates a Debouncer based on the callback
+
+    - Parameter delay: The delay in seconds (TimeInterval
+    - Parameter callback: The code to be executed when debounced
+    - Parameter useDelayAsThrottle: when true, will always update, throttling at delay, otherwise will only update after a delay interval with no calls
+    */
+    public init(delay: Double, useDelayAsThrottle: Bool, callback: @escaping (() -> ())) {
+        self.delay = delay
+        self.callback = callback
+        self.useDelayAsThrottle = useDelayAsThrottle
+    }
+    
+    public func call() {
+        if useDelayAsThrottle {
+            guard timer == nil else { return }
+            timer = Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(Debouncer.fireNow), userInfo: nil, repeats: false)
+        } else {
+            timer?.invalidate()
+            let nextTimer = Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(Debouncer.fireNow), userInfo: nil, repeats: false)
+            timer = nextTimer
+        }
+    }
+    
+    @objc func fireNow() {
+        self.callback()
+        if useDelayAsThrottle {
+            timer = nil
+        }
+    }
 }
