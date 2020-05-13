@@ -17,7 +17,7 @@ public class TimeProfiler {
     }
     
     struct TimeStamp {
-        let timeStamp: UInt64
+        let timeStamp: TimeInterval
         let tag: String
     }
     
@@ -37,7 +37,7 @@ public class TimeProfiler {
     }
     
     public func stamp(tag: String) {
-        timeStamps.append(TimeStamp(timeStamp: mach_absolute_time(), tag: tag))
+        timeStamps.append(TimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, tag: tag))
     }
     
     public func report() -> String {
@@ -56,18 +56,18 @@ public class TimeProfiler {
         guard let lastTimeStamp = lastTimeStamp else {
             return (String(repeating: "-", count: timeLength + 7 - 1) + " " + timeStamp.tag).trunc(length: lineLength - (timeLength + 7))
         }
-        let nanoSecondDifference = timeStamp.timeStamp - lastTimeStamp.timeStamp
+        let secondDifference = timeStamp.timeStamp - lastTimeStamp.timeStamp
         let unit: NSCalendar.Unit
         switch granularity {
         case .automatic:
-            switch nanoSecondDifference {
-            case 0...1000:
+            switch secondDifference {
+            case 0...0.000001000:
                 unit = .nanosecond
-            case 1000...90_000_000_000:                   // 90 sec
+            case 0.000001000...90:            // 90 sec
                 unit = .second
-            case 90_000_000_000...(90_000_000_000 * 60):  // 90 min
+            case 90...(90 * 60):              // 90 min
                 unit = .minute
-            case (90_000_000_000 * 60)...(1_000_000_000 * 60 * 60 * 36):  // 36 hours
+            case (90 * 60)...(60 * 60 * 36):  // 36 hours
                 unit = .hour
             default:
                 unit = .day
@@ -79,19 +79,19 @@ public class TimeProfiler {
         let unitString: String  // length of 3 char
         switch unit {
         case .nanosecond:
-            double = Double(nanoSecondDifference)
+            double = secondDifference / 1_000_000_000
             unitString = "ns "
         case .second:
-            double = Double(nanoSecondDifference) / Double(1_000_000_000)
+            double = secondDifference
             unitString = "sec"
         case .minute:
-            double = Double(nanoSecondDifference) / Double(1_000_000_000 * 60)
+            double = secondDifference / 60
             unitString = "min"
         case .hour:
-            double = Double(nanoSecondDifference) / Double(1_000_000_000 * 60 * 60)
+            double = secondDifference / (60 * 60)
             unitString = "hr "
         default:
-            double = Double(nanoSecondDifference) / Double(1_000_000_000 * 60 * 60 * 24)
+            double = secondDifference / (60 * 60 * 24)
             unitString = "day"
         }
         let numberString = (numberFormatter.string(for: double) ?? "").trunc(length: timeLength, trailing: "")
@@ -106,16 +106,16 @@ extension String {
     }
 }
 
-class ProgressTimeProfiler {
+public class ProgressTimeProfiler {
 
     struct ProgressTimeStamp {
-        let timeStamp: UInt64
+        let timeStamp: TimeInterval
         let workComplete: Int
         let fractionComplete: Double
     }
     
     var timeStamps = [ProgressTimeStamp]()
-    let totalWork: Int
+    public let totalWork: Int
     let timeFormatter: DateComponentsFormatter = {
         let dcf = DateComponentsFormatter()
         dcf.allowedUnits = [.day, .hour, .minute, .second]
@@ -131,18 +131,18 @@ class ProgressTimeProfiler {
     }()
     var lastResultWeight = 0.6
     
-    init(totalWorkUnits: Int) {
+    public init(totalWorkUnits: Int) {
         self.totalWork = totalWorkUnits
     }
     
-    func stamp(with workUnitsComplete: Int) {
-        timeStamps.append(ProgressTimeStamp(timeStamp: mach_absolute_time(), workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
+    public func stamp(withWorkUnitsComplete workUnitsComplete: Int) {
+        timeStamps.append(ProgressTimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
     }
     
-    func progress(showRawUnits: Bool = false) -> String {
-        var timeSum: UInt64 = 0
+    public func progress(showRawUnits: Bool = false) -> String {
+        var timeSum: TimeInterval = 0
         var countSum = 0
-        var lastInstant: UInt64?
+        var lastInstant: TimeInterval?
         var lastCount: Int?
         var firstFractionComplete: Double?
         for timeStamp in timeStamps {
@@ -157,24 +157,22 @@ class ProgressTimeProfiler {
             lastCount = timeStamp.workComplete
         }
         
-        //assumes called at symmetric intervals, e.g. every 10,000, etc.
-        var nanoSecondsRemaining: Double?
-        var nanoSecondsSoFar: Double?
+        // assumes called at symmetric intervals, e.g. every 10,000, etc.
+        var secondsRemaining: Double?
+        var secondsSoFar: Double?
         if timeSum > 0, timeStamps.count > 1, let firstFractionComplete = firstFractionComplete, let lastTimeStamp = timeStamps.last {
-            nanoSecondsSoFar = Double(timeSum) / (lastTimeStamp.fractionComplete - firstFractionComplete) * lastTimeStamp.fractionComplete
-            let totalRate = lastTimeStamp.fractionComplete / nanoSecondsSoFar!
+            secondsSoFar = Double(timeSum) / (lastTimeStamp.fractionComplete - firstFractionComplete) * lastTimeStamp.fractionComplete
+            let totalRate = lastTimeStamp.fractionComplete / secondsSoFar!
             let secondToLastTimeStamp = timeStamps[timeStamps.count - 2]
             let lastFractionCompleteDiff = lastTimeStamp.fractionComplete - secondToLastTimeStamp.fractionComplete
             let lastInterval = lastTimeStamp.timeStamp - secondToLastTimeStamp.timeStamp
             let lastRate = lastFractionCompleteDiff / Double(lastInterval)
             let weightedRate = (totalRate * (1 - lastResultWeight)) + (lastRate * lastResultWeight)
-            nanoSecondsRemaining = (1 - lastTimeStamp.fractionComplete) / weightedRate
+            secondsRemaining = (1 - lastTimeStamp.fractionComplete) / weightedRate
         }
         var output = ""
-        if let nanoSecondsRemaining = nanoSecondsRemaining, let nanoSecondsSoFar = nanoSecondsSoFar {
-            let secSoFar: TimeInterval = Double(Double(Int(Double(nanoSecondsSoFar) / 1_000_000_000 * 10000)) / 10000)  //round to four decimal places
-            let diffInSeconds: TimeInterval = Double(Double(Int(Double(nanoSecondsRemaining) / 1_000_000_000 * 10000)) / 10000)  //round to four decimal places
-            output = "Elapsed: \(timeFormatter.string(from: secSoFar)!) - Est time remaining: \(timeFormatter.string(from: diffInSeconds)!) - "
+        if let secondsRemaining = secondsRemaining, let secondsSoFar = secondsSoFar {
+            output = "Elapsed: \(timeFormatter.string(from: secondsSoFar)!) - Est time remaining: \(timeFormatter.string(from: secondsRemaining)!) - "
         }
         if let lastTimeStamp = timeStamps.last {
             let percentComplete = lastTimeStamp.fractionComplete * 100
@@ -190,8 +188,7 @@ class ProgressTimeProfiler {
 
 
 
-func timeStampDiff(start: UInt64, end: UInt64) -> String {
-    let diffInNanoseconds = end - start
-    let diffInSeconds = Double(Double(Int(Double(diffInNanoseconds) / 1_000_000_000 * 10000)) / 10000)  //round to four decimal places
+func timeStampDiff(start: TimeInterval, end: TimeInterval) -> String {
+    let diffInSeconds = end - start
     return "\(diffInSeconds) seconds"
 }
