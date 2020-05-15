@@ -146,7 +146,7 @@ public class ProgressTimeProfiler {
         timeStamps.append(ProgressTimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
     }
     
-    public func progress(showRawUnits: Bool = false) -> String {
+    public func progress(showRawUnits: Bool, showEstTotalTime: Bool) -> String {
         var timeSum: TimeInterval = 0
         var countSum = 0
         var lastInstant: TimeInterval?
@@ -184,7 +184,11 @@ public class ProgressTimeProfiler {
         }
         var output = ""
         if let secondsRemaining = secondsRemaining, let secondsSoFar = secondsSoFar {
-            output = "Elapsed: \(timeFormatter.string(from: secondsSoFar)!) - Est time remaining: \(timeFormatter.string(from: secondsRemaining)!) - "
+            output = "Elapsed: \(timeFormatter.string(from: secondsSoFar)!) - Est left: \(timeFormatter.string(from: secondsRemaining)!) - "
+            if showEstTotalTime {
+                let estimatedTotalTime = secondsSoFar + secondsRemaining
+                output += " [Est total: \(timeFormatter.string(from: estimatedTotalTime)!)] "
+            }
         }
         if let lastTimeStamp = timeStamps.last {
             let percentComplete = lastTimeStamp.fractionComplete * 100
