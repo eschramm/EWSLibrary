@@ -226,6 +226,15 @@ extension TagCloudChildViewController : UICollectionViewDelegate, UICollectionVi
     }
 }
 
+public extension UIViewController {
+    // helper to ensure all steps are taken
+    public func add(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.didMove(toParent: self)
+    }
+}
+
 public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
     
     // https://stackoverflow.com/questions/55061353/non-scrolling-uicollectionview-inside-uitableviewcell-dynamic-height
