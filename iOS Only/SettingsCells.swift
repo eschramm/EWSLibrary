@@ -859,11 +859,15 @@ extension SettingsDateCell : UITextFieldDelegate {
 }
 
 public struct SettingsSection {
+    public enum SectionType {
+        case standard([SettingsCellModel])
+        case dynamic(dataSource: UITableViewDataSource, tableViewDelegate: UITableViewDelegate)
+    }
     let title: String?
-    let cellModels: [SettingsCellModel]
-    public init(title: String?, cellModels: [SettingsCellModel]) {
+    let type: SectionType
+    public init(title: String?, type: SectionType) {
         self.title = title
-        self.cellModels = cellModels
+        self.type = type
     }
 }
 
@@ -933,11 +937,25 @@ open class SettingsTVC: UITableViewController {
     }
     
     open override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sections[section].cellModels.count
+        let settingsSection = sections[section]
+        switch settingsSection.type {
+        case .standard(let cellModels):
+            return cellModels.count
+        case .dynamic(dataSource: let dataSource, _):
+            return dataSource.tableView(tableView, numberOfRowsInSection: section)
+        }
     }
     
     open override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = sections[indexPath.section].cellModels[indexPath.row]
+        let section = sections[indexPath.section]
+        guard case .standard(let cellModels) = section.type else {
+            if case .dynamic(dataSource: let dataSource, _) = section.type {
+                return dataSource.tableView(tableView, cellForRowAt: indexPath)
+            } else {
+                fatalError("Unhandled case")
+            }
+        }
+        let model = cellModels[indexPath.row]
         let cellIdentifier = "\(indexPath.section)-\(indexPath.row)"
         if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
             configure(cell: cell, model: model)
@@ -1029,12 +1047,18 @@ open class SettingsTVC: UITableViewController {
     }
     
     open override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let model = sections[indexPath.section].cellModels[indexPath.row]
-        var showCell = true
-        if let visibilityHandler = model.visibilityHandler {
-            showCell = visibilityHandler()
+        let section = sections[indexPath.section]
+        switch section.type {
+        case .standard(let cellModels):
+            let model = cellModels[indexPath.row]
+            var showCell = true
+            if let visibilityHandler = model.visibilityHandler {
+                showCell = visibilityHandler()
+            }
+            return showCell ? UITableView.automaticDimension : 0
+        case .dynamic(_, tableViewDelegate: let tableViewDelegate):
+            return tableViewDelegate.tableView?(tableView, heightForRowAt: indexPath) ?? UITableView.automaticDimension
         }
-        return showCell ? UITableView.automaticDimension : 0
     }
     
     open override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -1042,15 +1066,21 @@ open class SettingsTVC: UITableViewController {
     }
     
     open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? SettingsCell {
-            if let cell = cell as? SettingsDateCell {
-                tableView.beginUpdates()
-                cell.selectAction(presentingViewController: self)
-                tableView.endUpdates()
-            } else {
-                cell.selectAction(presentingViewController: self)
+        let section = sections[indexPath.section]
+        switch section.type {
+        case .standard(_):
+            if let cell = tableView.cellForRow(at: indexPath) as? SettingsCell {
+                if let cell = cell as? SettingsDateCell {
+                    tableView.beginUpdates()
+                    cell.selectAction(presentingViewController: self)
+                    tableView.endUpdates()
+                } else {
+                    cell.selectAction(presentingViewController: self)
+                }
+                tableView.deselectRow(at: indexPath, animated: true)
             }
-            tableView.deselectRow(at: indexPath, animated: true)
+        case .dynamic(_, tableViewDelegate: let tableViewDelegate):
+            tableViewDelegate.tableView?(tableView, didSelectRowAt: indexPath)
         }
     }
     
@@ -1064,7 +1094,9 @@ open class SettingsTVC: UITableViewController {
     @objc open func checkVisibilityChanges() {
         var indexPathsToReload = [IndexPath]()
         for indexPath in indexPathsForHidableCells {
-            let model = sections[indexPath.section].cellModels[indexPath.row]
+            let section = sections[indexPath.section]
+            guard case .standard(let cellModels) = section.type else { continue }
+            let model = cellModels[indexPath.row]
             if let cell = tableView.cellForRow(at: indexPath), let visibilityHandler = model.visibilityHandler {
                 if cell.isHidden == visibilityHandler() {
                     indexPathsToReload.append(indexPath)
