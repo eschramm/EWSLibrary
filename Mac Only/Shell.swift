@@ -45,4 +45,30 @@ public final class Shell
     
 }
 
-//example: let symbol = shell.outputOf(commandName: "atos", arguments: ["-arch", "arm64", "-o", fullPath, "-l", startAddress, address])
+// example: let symbol = shell.outputOf(commandName: "atos", arguments: ["-arch", "arm64", "-o", fullPath, "-l", startAddress, address])
+
+
+// https://stackoverflow.com/a/32240064/1364404
+
+extension String {
+    func runAsCommand() -> String {
+        let pipe = Pipe()
+        let task = Process()
+        task.launchPath = "/bin/sh"
+        task.arguments = ["-c", String(format:"%@", self)]
+        task.standardOutput = pipe
+        let file = pipe.fileHandleForReading
+        task.launch()
+        if let result = NSString(data: file.readDataToEndOfFile(), encoding: String.Encoding.utf8.rawValue) {
+            return result as String
+        }
+        else {
+            return "--- Error running command - Unable to initialize string from file data ---"
+        }
+    }
+}
+
+/* example:
+ let command = "echo This is the email message | mail -s \"This is the subject\" eric.schramm@gmail.com"
+ let returnString = command.runAsCommand()
+ */
