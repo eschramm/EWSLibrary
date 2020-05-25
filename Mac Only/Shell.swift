@@ -50,7 +50,7 @@ public final class Shell
 
 // https://stackoverflow.com/a/32240064/1364404
 
-extension String {
+public extension String {
     func runAsCommand() -> String {
         let pipe = Pipe()
         let task = Process()
@@ -65,6 +65,11 @@ extension String {
         else {
             return "--- Error running command - Unable to initialize string from file data ---"
         }
+    }
+    
+    public func emailAsBody(subject: String, emailTo: String) {
+        let command = "echo \(self) | mail -s \"\(subject)\" \(emailTo)"
+        command.runAsCommand()
     }
 }
 
