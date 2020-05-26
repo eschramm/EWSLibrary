@@ -67,8 +67,8 @@ public extension String {
         }
     }
     
-    public func emailAsBody(subject: String, emailTo: String) {
-        let command = "echo \(self) | mail -s \"\(subject)\" \(emailTo)"
+    func emailAsBody(subject: String, emailTo: String) {
+        let command = "echo \"\(self)\" | mail -s \"\(subject)\" \(emailTo)"
         command.runAsCommand()
     }
 }
