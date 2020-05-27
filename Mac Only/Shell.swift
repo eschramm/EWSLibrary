@@ -51,7 +51,7 @@ public final class Shell
 // https://stackoverflow.com/a/32240064/1364404
 
 public extension String {
-    func runAsCommand() -> String {
+    @discardableResult func runAsCommand() -> String {
         let pipe = Pipe()
         let task = Process()
         task.launchPath = "/bin/sh"
