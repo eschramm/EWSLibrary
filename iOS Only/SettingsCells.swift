@@ -1084,6 +1084,18 @@ open class SettingsTVC: UITableViewController {
         }
     }
     
+    open override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let section = sections[indexPath.section]
+        guard case .dynamic(dataSource: _, tableViewDelegate: let tableViewDelegate) = section.type else { return nil }
+        return tableViewDelegate.tableView?(tableView, leadingSwipeActionsConfigurationForRowAt: indexPath)
+    }
+    
+    open override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let section = sections[indexPath.section]
+        guard case .dynamic(dataSource: _, tableViewDelegate: let tableViewDelegate) = section.type else { return nil }
+        return tableViewDelegate.tableView?(tableView, trailingSwipeActionsConfigurationForRowAt: indexPath)
+    }
+    
     @objc func handleGesture(gestureRecognizer: UIGestureRecognizer) {
         for textField in textFields {
             textField.resignFirstResponder()
