@@ -1096,6 +1096,25 @@ open class SettingsTVC: UITableViewController {
         return tableViewDelegate.tableView?(tableView, trailingSwipeActionsConfigurationForRowAt: indexPath)
     }
     
+    open override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        let section = sections[indexPath.section]
+        guard case .dynamic(dataSource: let tableViewDataSource, tableViewDelegate: _) = section.type else { return false }
+        return tableViewDataSource.tableView?(tableView, canEditRowAt: indexPath) ?? false
+    }
+    
+    open override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        let section = sections[indexPath.section]
+        guard case .dynamic(dataSource: let tableViewDataSource, tableViewDelegate: _) = section.type else { return false }
+        return tableViewDataSource.tableView?(tableView, canMoveRowAt: indexPath) ?? false
+    }
+    
+    open override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let section = sections[sourceIndexPath.section]
+        guard case .dynamic(dataSource: let tableViewDataSource, tableViewDelegate: _) = section.type else { return }
+        tableViewDataSource.tableView?(tableView, moveRowAt: sourceIndexPath, to: destinationIndexPath)
+    }
+
+    
     @objc func handleGesture(gestureRecognizer: UIGestureRecognizer) {
         for textField in textFields {
             textField.resignFirstResponder()
