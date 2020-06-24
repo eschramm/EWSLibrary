@@ -14,9 +14,9 @@ class MainTVC: SettingsTVC {
     init() {
         //self.trampoline = Trampoline()
         let sections = [
-            SettingsSection(title: nil, cellModels: [
+            SettingsSection(title: nil, type: .standard([
                 Self.settingsTVCCell()
-            ])
+            ]))
         ]
         super.init(sections: sections)
         //self.trampoline.mainMenuTVC = self
@@ -59,7 +59,7 @@ class TagCellExampleTVC: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: "TagCloudCell")
         if cell == nil {
-            cell = TagCloudCell(cloudID: "TagCloud", tagCloudDelegate: self, reuseIdentifier: "TagCloudCell")
+            cell = SettingsTagCloudCell(cloudID: "TagCloud", tagCloudDelegate: self, reuseIdentifier: "TagCloudCell")
         }
         return cell!
     }

@@ -25,34 +25,37 @@ class TestSettingsTVC: SettingsTVC {
     init() {
         let stateDict = NSMutableDictionary()
         let sections = [
-            SettingsSection(title: "Bool Switch", cellModels: [
+            SettingsSection(title: "Bool Switch", type: .standard([
                 Self.switchTVC(stateDict: stateDict),
                 Self.switchWrapTVC(stateDict: stateDict)
-            ]),
-            SettingsSection(title: "Right Selection", cellModels: [
+            ])),
+            SettingsSection(title: "Right Selection", type: .standard([
                 Self.rightSelection(),
                 Self.rightSelectionWrap()
-            ]),
-            SettingsSection(title: "Button", cellModels: [
+            ])),
+            SettingsSection(title: "Button", type: .standard([
                 Self.buttonCenteredCell(),
                 Self.buttonLeftDisplayViewControllerCell()
-            ]),
-            SettingsSection(title: "Ratings Cell", cellModels: [
+            ])),
+            SettingsSection(title: "Ratings Cell", type: .standard([
                 Self.ratingsCell()
-            ]),
-            SettingsSection(title: "In App Purchase Cell", cellModels: [
+            ])),
+            SettingsSection(title: "In App Purchase Cell", type: .standard([
                 Self.iapGPSSnapFixCell(iapCoordinator: iapCoordinator)
-            ]),
-            SettingsSection(title: "Text Field", cellModels: [
+            ])),
+            SettingsSection(title: "Text Field", type: .standard([
                 Self.textFieldCell(numberFormatter: numberFormatter, stateDict: stateDict),
                 Self.textFieldWrapCell(stateDict: stateDict)
-            ]),
-            SettingsSection(title: "Date Cell", cellModels: [
+            ])),
+            SettingsSection(title: "Date Cell", type: .standard([
                 Self.dateCell()
-            ]),
-            SettingsSection(title: "Tag Cell", cellModels: [
+            ])),
+            SettingsSection(title: "Tag Cell", type: .standard([
                 Self.tagCell(tagCloudDelegate: tagCloudDelegate)
-            ])
+            ])),
+            SettingsSection(title: "Photo Cell", type: .standard([
+                Self.photoCell()
+            ]))
         ]
         self.stateDict = stateDict
         super.init(sections: sections)
@@ -152,14 +155,14 @@ class TestSettingsTVC: SettingsTVC {
             return initialTitle
         }
         
-        return SettingsCellModel(cellType: .ratingsCell(initialTitle: initialTitle, titleColor: .systemGray, appStoreID: "386493543", updateTitleHandler: updateTitleHandler), selectionType: RatingCell.defaultSelectAction())
+        return SettingsCellModel(cellType: .ratingsCell(initialTitle: initialTitle, titleColor: .systemGray, appStoreID: "386493543", updateTitleHandler: updateTitleHandler), selectionType: SettingsRatingCell.defaultSelectAction())
     }
     
     static func iapGPSSnapFixCell(iapCoordinator: IAPCoordinator) -> SettingsCellModel {
         let initialTitle = "Add option to save GPS fix on a stroke - but making this very long to watch wrapping"
         let purchasedTitle = "GPS fix on a stroke enabled - Thank You"
         
-        let selectionType = IAPCell.defaultSelectAction(iapCoordinator: iapCoordinator, productIdentifier: "IAPsnapGPSfix")
+        let selectionType = SettingsIAPCell.defaultSelectAction(iapCoordinator: iapCoordinator, productIdentifier: "IAPsnapGPSfix")
         
         return SettingsCellModel(cellType: .iapCell(initialTitle: initialTitle, purchasedTitle: purchasedTitle, iapKey: "Constants.IAPsnapGPSfix"), selectionType: selectionType)
     }
@@ -227,6 +230,15 @@ class TestSettingsTVC: SettingsTVC {
     static func tagCell(tagCloudDelegate: TagCloudDelegate) -> SettingsCellModel {
         let tagCloudParameters = TagCloudParameters(tagTitleColor: UIColor.dynamicBackground(), tagTitleFont: UIFont.boldSystemFont(ofSize: 14), verticalPadding: 15, horizontalPadding: 15)
         return SettingsCellModel(cellType: .tagCloudCell(cloudID: "TagCloudExample", tagCloudDelegate: tagCloudDelegate, parameters: tagCloudParameters), selectionType: .handledByCell)
+    }
+    
+    static func photoCell() -> SettingsCellModel {
+        let image = UIImage(named: "sample.jpg")
+        let imageUpdateTitleHandler: (UIImage?) -> (String?) = { image in
+            print("Updated image: \(image)")
+            return "Image Updated"
+        }
+        return SettingsCellModel(cellType: .photoCell(maxCellHeight: 150, getImageTitleHandler: { (image, "Set Image") }, setImageUpdateTitleHandler: imageUpdateTitleHandler), selectionType: .handledByCell)
     }
 }
 
