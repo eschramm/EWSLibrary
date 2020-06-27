@@ -21,7 +21,7 @@ public enum SettingsCellType {
     }
     
     case boolSwitch(title: String, getBoolHandler: () -> (Bool), setBoolHandler: (Bool) -> ())
-    case rightSelection(title: String, getStringHandler: CellDetailGetStringHandler? = nil)
+    case rightSelection(title: String, getStringHandler: CellDetailGetStringHandler? = nil, refreshOnViewWillAppear: Bool = false)
     case buttonCell(type: ButtonCellType, title: String)
     case ratingsCell(initialTitle: String, titleColor: UIColor, appStoreID: String, updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String))
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
@@ -250,7 +250,7 @@ class SettingsRightSelectionCell: UITableViewCell, SettingsCell {
     let rightSelectionLabel = UILabel()
     
     init?(model: SettingsCellModel, identifier: String) {
-        if case .rightSelection(let title, let getStringHandler) = model.cellType {
+        if case .rightSelection(let title, let getStringHandler, _) = model.cellType {
             self.title = title
             self.getStringHandler = getStringHandler
             if case SettingsCellSelectionType.helpTextPresentPicker(_,_,_, let pickerPresenter,_) = model.selectionType {
@@ -1057,6 +1057,7 @@ open class SettingsTVC: UITableViewController {
     var sections = [SettingsSection]()
     var textFields = [UITextField]()
     var indexPathsForHidableCells = [IndexPath]()
+    var indexPathsForRefreshOnViewWillAppear = [IndexPath]()
     public let trampoline: Trampoline
     
     public init(sections: [SettingsSection], trampoline: Trampoline? = nil) {  // or ensure sections are populated before tableView attempts to load
@@ -1086,6 +1087,7 @@ open class SettingsTVC: UITableViewController {
         if let tableView = tableView {
             NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.beginUpdates), name: .SettingsTVCTableviewBeginUpdates, object: nil)
             NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.endUpdates), name: .SettingsTVCTableviewEndUpdates, object: nil)
+            tableView.reloadRows(at: indexPathsForRefreshOnViewWillAppear, with: .none)
         }
     }
     
@@ -1136,11 +1138,14 @@ open class SettingsTVC: UITableViewController {
                 }
                 return cell
             }
-        case .rightSelection(_,_):
+        case .rightSelection(_,_, let refreshOnViewWillAppear):
             if let cell = SettingsRightSelectionCell(model: model, identifier: cellIdentifier) {
                 configure(cell: cell, model: model)
                 if let _ = model.visibilityHandler {
                     indexPathsForHidableCells.append(indexPath)
+                }
+                if refreshOnViewWillAppear {
+                    indexPathsForRefreshOnViewWillAppear.append(indexPath)
                 }
                 return cell
             }

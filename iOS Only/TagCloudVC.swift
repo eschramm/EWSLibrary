@@ -228,7 +228,7 @@ extension TagCloudChildViewController : UICollectionViewDelegate, UICollectionVi
 
 public extension UIViewController {
     // helper to ensure all steps are taken
-    public func add(_ child: UIViewController) {
+    func add(_ child: UIViewController) {
         addChild(child)
         view.addSubview(child.view)
         child.didMove(toParent: self)
