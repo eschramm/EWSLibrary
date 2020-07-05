@@ -29,6 +29,7 @@ public enum SettingsCellType {
     case dateCell(attributes: DateCellAttributes)
     case tagCloudCell(cloudID: String, tagCloudDelegate: TagCloudDelegate, parameters: TagCloudParameters = TagCloudParameters())
     case photoCell(maxCellHeight: CGFloat?, getImageTitleHandler: () -> (UIImage?, String?), setImageUpdateTitleHandler: (UIImage?) -> (String?))
+    case textViewCell(attributes: TextViewAttributes)
 }
 
 public struct DateCellAttributes {
@@ -66,6 +67,20 @@ public struct TextFieldAttributes {
         self.getStringHandler = getStringHandler
         self.setStringHandler = setStringHandler
         self.isValidHandler = isValidHandler
+    }
+}
+
+public struct TextViewAttributes {
+    let title: String?
+    let fieldKeyboard: UIKeyboardType?
+    let getStringHandler: () -> (String?, UIColor?)
+    let setStringHandler: (String) -> ()
+    
+    public init(title: String, fieldKeyboard: UIKeyboardType?, getStringHandler: @escaping () -> (String?, UIColor?), setStringHandler: @escaping (String) -> ()) {
+        self.title = title
+        self.fieldKeyboard = fieldKeyboard
+        self.getStringHandler = getStringHandler
+        self.setStringHandler = setStringHandler
     }
 }
 
@@ -1024,6 +1039,108 @@ extension SettingsDateCell : UITextFieldDelegate {
     }
 }
 
+class SettingsTextViewCell: UITableViewCell, SettingsCell {
+    
+    let title: String
+    let getStringHandler: () -> (String?, UIColor?)
+    let setStringHandler: (String) -> ()
+    let selectActionHandler: (_ presentingViewController: UIViewController) -> ()
+    
+    let textView = UITextView()
+    
+    weak var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer?
+    
+    init?(model: SettingsCellModel, identifier: String) {
+        if case .textViewCell(let attributes) = model.cellType {
+            self.title = attributes.title ?? ""
+            textView.keyboardType = attributes.fieldKeyboard ?? .default
+            self.getStringHandler = attributes.getStringHandler
+            self.setStringHandler = attributes.setStringHandler
+            self.selectActionHandler = model.selectionType.action()
+            super.init(style: .default, reuseIdentifier: identifier)
+            buildCell()
+        } else {
+            return nil
+        }
+    }
+    
+    func buildCell() {
+        
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(textView)
+        textView.delegate = self
+        textView.isScrollEnabled = false
+        
+        let (fieldText, fieldTextColor) = getStringHandler()
+        textView.text = fieldText
+        
+        #if swift(>=5.1)
+            if #available(iOS 13, *) {
+                textView.textColor = fieldTextColor ?? .systemBlue
+            } else {
+                textView.textColor = fieldTextColor ?? .blue
+            }
+        #else
+            textView.textColor = fieldTextColor ?? .blue
+        #endif
+        
+        let marginGuide = contentView.layoutMarginsGuide
+        
+        if title.isEmpty {
+            NSLayoutConstraint.activate([
+                textView.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+                textView.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+                textView.topAnchor.constraint(equalTo: contentView.topAnchor),
+                textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+                textView.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
+            ])
+        } else {
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.numberOfLines = 0
+            label.text = title
+            contentView.addSubview(label)
+            
+            var constraints = [NSLayoutConstraint]()
+            
+            constraints = [
+                label.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+                label.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor),
+                label.topAnchor.constraint(equalTo: marginGuide.topAnchor),
+                textView.topAnchor.constraint(equalTo: label.bottomAnchor),
+                textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+                textView.trailingAnchor.constraint(equalTo: marginGuide.trailingAnchor, constant: -8),
+                textView.leadingAnchor.constraint(equalTo: marginGuide.leadingAnchor),
+                textView.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
+            ]
+            
+            NSLayoutConstraint.activate(constraints)
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func selectAction(presentingViewController: UIViewController) {
+        self.selectActionHandler(presentingViewController)
+    }
+}
+
+extension SettingsTextViewCell : UITextViewDelegate {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        gestureRecognizerToDismissFirstResponder?.isEnabled = true
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
+        setStringHandler(textView.text)
+        NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
+        gestureRecognizerToDismissFirstResponder?.isEnabled = false
+    }
+}
+
+
 public struct SettingsSection {
     public enum SectionType {
         case standard([SettingsCellModel])
@@ -1055,7 +1172,7 @@ open class SettingsTVC: UITableViewController {
     
     var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer!
     var sections = [SettingsSection]()
-    var textFields = [UITextField]()
+    var textFields = [UIResponder]()
     var indexPathsForHidableCells = [IndexPath]()
     var indexPathsForRefreshOnViewWillAppear = [IndexPath]()
     public let trampoline: Trampoline
@@ -1203,6 +1320,16 @@ open class SettingsTVC: UITableViewController {
         case .photoCell:
             let cell = SettingsPhotoCell(model: model, identifier: cellIdentifier)!
             return cell
+        case .textViewCell(_):
+            if let cell = SettingsTextViewCell(model: model, identifier: cellIdentifier) {
+                textFields.append(cell.textView)
+                cell.gestureRecognizerToDismissFirstResponder = gestureRecognizerToDismissFirstResponder
+                configure(cell: cell, model: model)
+                if let _ = model.visibilityHandler {
+                    indexPathsForHidableCells.append(indexPath)
+                }
+                return cell
+            }
         }
         // failed
         print("Failed to create a cell for \(model) at \(indexPath)")

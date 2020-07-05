@@ -55,6 +55,10 @@ class TestSettingsTVC: SettingsTVC {
             ])),
             SettingsSection(title: "Photo Cell", type: .standard([
                 Self.photoCell()
+            ])),
+            SettingsSection(title: "Text View", type: .standard([
+                Self.textViewCell(stateDict: stateDict),
+                Self.textViewCellNoTitle(stateDict: stateDict)
             ]))
         ]
         self.stateDict = stateDict
@@ -235,10 +239,38 @@ class TestSettingsTVC: SettingsTVC {
     static func photoCell() -> SettingsCellModel {
         let image = UIImage(named: "sample.jpg")
         let imageUpdateTitleHandler: (UIImage?) -> (String?) = { image in
-            print("Updated image: \(image)")
+            if let image = image {
+                print("Updated image: \(image)")
+            }
             return "Image Updated"
         }
         return SettingsCellModel(cellType: .photoCell(maxCellHeight: 150, getImageTitleHandler: { (image, "Set Image") }, setImageUpdateTitleHandler: imageUpdateTitleHandler), selectionType: .handledByCell)
+    }
+    
+    static func textViewCell(stateDict: NSMutableDictionary) -> SettingsCellModel {
+        let selectionType = SettingsCellSelectionType.helpText(title: "Testing Help",
+                                                               message: "This is where you can put notes about this item.")
+        let getStringHandler: () -> (String, UIColor?) = {
+            return (stateDict["textView"] as? String ?? "This is a longer piece of text. Long so it can force some word wrapping. But this cell is intended for a notes section where a larger chunk of user-editable text can be stored", nil)
+        }
+        let setStringHandler: (String) -> () = { updatedString in
+            stateDict["textView"] = updatedString
+        }
+        let attributes = TextViewAttributes(title: "Notes about this item:", fieldKeyboard: nil, getStringHandler: getStringHandler, setStringHandler: setStringHandler)
+        return SettingsCellModel(cellType: .textViewCell(attributes: attributes), selectionType: selectionType)
+    }
+    
+    static func textViewCellNoTitle(stateDict: NSMutableDictionary) -> SettingsCellModel {
+        let selectionType = SettingsCellSelectionType.helpText(title: "Testing Help",
+                                                               message: "This is where you can put notes about this item.")
+        let getStringHandler: () -> (String, UIColor?) = {
+            return (stateDict["textView"] as? String ?? "This is a longer piece of text. Long so it can force some word wrapping. But this cell is intended for a notes section where a larger chunk of user-editable text can be stored", .lightGray)
+        }
+        let setStringHandler: (String) -> () = { updatedString in
+            stateDict["textView"] = updatedString
+        }
+        let attributes = TextViewAttributes(title: "", fieldKeyboard: nil, getStringHandler: getStringHandler, setStringHandler: setStringHandler)
+        return SettingsCellModel(cellType: .textViewCell(attributes: attributes), selectionType: selectionType)
     }
 }
 
