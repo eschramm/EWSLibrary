@@ -35,14 +35,17 @@ public struct DateCellAttributes {
     let fieldPlaceholder: String?
     let datePickerMode: UIDatePicker.Mode
     let dateFormatter: DateFormatter
+    let dismissalSetsDateToPickerDate: Bool
     let getDateHandler: () -> (Date?, UIColor?)
     let setDateHandler: (Date?) -> ()
     
-    public init(title: String?, fieldPlaceholder: String?, datePickerMode: UIDatePicker.Mode, dateFormatter: DateFormatter, getDateHandler: @escaping () -> (Date?, UIColor?), setDateHandler: @escaping (Date?) -> ()) {
+    
+    public init(title: String?, fieldPlaceholder: String?, datePickerMode: UIDatePicker.Mode, dateFormatter: DateFormatter, dismissalSetsDateToPickerDate: Bool, getDateHandler: @escaping () -> (Date?, UIColor?), setDateHandler: @escaping (Date?) -> ()) {
         self.title = title
         self.fieldPlaceholder = fieldPlaceholder
         self.datePickerMode = datePickerMode
         self.dateFormatter = dateFormatter
+        self.dismissalSetsDateToPickerDate = dismissalSetsDateToPickerDate
         self.getDateHandler = getDateHandler
         self.setDateHandler = setDateHandler
     }
@@ -602,6 +605,7 @@ class SettingsDateCell: UITableViewCell, SettingsCell {
     
     let title: String
     let dateFormatter: DateFormatter
+    let dismissalSetsDateToPickerDate: Bool
     let getDateHandler: () -> (Date?, UIColor?)
     let setDateHandler: (Date?) -> ()
     var noPickerVerticalConstraints = [NSLayoutConstraint]()
@@ -620,6 +624,7 @@ class SettingsDateCell: UITableViewCell, SettingsCell {
             textField.placeholder = attributes.fieldPlaceholder
             textField.keyboardType = .numbersAndPunctuation
             self.dateFormatter = attributes.dateFormatter
+            self.dismissalSetsDateToPickerDate = attributes.dismissalSetsDateToPickerDate
             self.getDateHandler = attributes.getDateHandler
             self.setDateHandler = attributes.setDateHandler
             datePicker.datePickerMode = attributes.datePickerMode
@@ -736,6 +741,12 @@ class SettingsDateCell: UITableViewCell, SettingsCell {
     
     func removePicker() {
         guard let _ = datePicker.superview else { return }
+        
+        if dismissalSetsDateToPickerDate {
+            textField.text = dateFormatter.string(from: datePicker.date)
+            updateDate()
+        }
+        
         NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
         NSLayoutConstraint.deactivate(pickerVerticalConstraints)
         datePicker.removeFromSuperview()
