@@ -226,7 +226,7 @@ class TestSettingsTVC: SettingsTVC {
             
         }
         
-        let attributes = DateCellAttributes(title: "Date but I want to make it really long in the title, maybe even 3 lines worth", fieldPlaceholder: nil, datePickerMode: .date, dateFormatter: dateFormatter, getDateHandler: getDateHandler, setDateHandler: setDateHandler)
+        let attributes = DateCellAttributes(title: "Date but I want to make it really long in the title, maybe even 3 lines worth", fieldPlaceholder: nil, datePickerMode: .date, dateFormatter: dateFormatter, dismissalSetsDateToPickerDate: true, getDateHandler: getDateHandler, setDateHandler: setDateHandler)
         
         return SettingsCellModel(cellType: .dateCell(attributes: attributes), selectionType: .handledByCell)
     }
