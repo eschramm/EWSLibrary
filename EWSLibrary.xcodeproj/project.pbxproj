@@ -18,6 +18,7 @@
 		DA57CE1A2327EE6E00B1B397 /* DarkMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA57CE192327EE6E00B1B397 /* DarkMode.swift */; };
 		DA5C0D0D24564296004BF000 /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5C0D0C24564296004BF000 /* TableViewCells.swift */; };
 		DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */; };
+		DA8B65452505945A0030DD9C /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAE96CC243A890C008FA929 /* Random.swift */; };
 		DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */; };
 		DA97B98521065F5800135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98621065F5900135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -742,6 +743,7 @@
 			files = (
 				DADDA08421066DB000827123 /* Shell.swift in Sources */,
 				DA516A41242EB42000F70A7F /* TimeProfiler.swift in Sources */,
+				DA8B65452505945A0030DD9C /* Random.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
