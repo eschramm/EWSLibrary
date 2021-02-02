@@ -13,16 +13,18 @@ public class ConnectionController {
     let appName: String
     let trackerBase: String          // iqif.ignorelist.com
     let lastCheckInPrefKey: String
+    let https: Bool
     
     var hideNetworkActivityIndicator = true
     var additionalTrackingDict: [String : String]?
     let session: URLSession
     
     
-    public init(withAppName appName: String, trackerBase: String, lastCheckInPrefKey: String) {
+    public init(withAppName appName: String, trackerBase: String, lastCheckInPrefKey: String, https: Bool) {
         self.appName = appName
         self.trackerBase = trackerBase
         self.lastCheckInPrefKey = lastCheckInPrefKey
+        self.https = https
         
         let sessionConfig = URLSessionConfiguration.ephemeral
         sessionConfig.timeoutIntervalForRequest = 15.0
@@ -63,7 +65,7 @@ public class ConnectionController {
         guard let encodedDeviceName = nameData?.base64EncodedString(options: .lineLength76Characters) else { return }
         
         var urlComponents = URLComponents()
-        urlComponents.scheme = "http"
+        urlComponents.scheme = https ? "https" : "http"
         urlComponents.host = trackerBase
         urlComponents.path = ""
         
