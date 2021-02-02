@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import FMDB
 
 class EWSLibraryiOSTestAppUITests: XCTestCase {
 

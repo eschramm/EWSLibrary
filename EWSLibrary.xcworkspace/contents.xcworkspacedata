@@ -4,17 +4,4 @@
    <FileRef
       location = "container:EWSLibrary.xcodeproj">
    </FileRef>
-   <Group
-      location = "container:"
-      name = "Carthage">
-      <FileRef
-         location = "group:Cartfile">
-      </FileRef>
-      <FileRef
-         location = "group:Cartfile.resolved">
-      </FileRef>
-      <FileRef
-         location = "group:Carthage/Checkouts/fmdb/fmdb.xcodeproj">
-      </FileRef>
-   </Group>
 </Workspace>

@@ -162,6 +162,19 @@ public class TagCloudChildViewController: UIViewController {
         }
     }
     
+    /**
+     Use this when programmatically updating the tags set and the view needs to be refreshed
+     */
+    public func refreshTags() {
+        if #available(iOS 13.0, *), let tagCloudDiffDataSource = self.tagCloudDataSource as? TagCloudDiffDataSource {
+            tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+        } else {
+            self.tagCloudDataSource.updateCache()
+            self.collectionView.reloadData()
+        }
+        self.updateHeightOfCollectionView()
+    }
+    
     @objc func addTag() {
         guard let tagCloudDelegate = tagCloudDelegate else { return }
         let updateItemTagCellHandler: (Int) -> () = { [weak self] index in

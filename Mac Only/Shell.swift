@@ -14,27 +14,32 @@ public final class Shell
 {
     public init() {}
     
-    public func outputOf(commandName: String, arguments: [String] = []) -> String? {
-        return bash(commandName: commandName, arguments:arguments)
+    public func outputOf(commandName: String, arguments: [String] = [], runFromPath: String = "") -> String? {
+        return bash(commandName: commandName, arguments:arguments, runFromPath: runFromPath)
     }
     
     // MARK: private
     
-    private func bash(commandName: String, arguments: [String]) -> String? {
-        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ]) else {
+    private func bash(commandName: String, arguments: [String], runFromPath: String) -> String? {
+        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "") else {
             return "\(commandName) not found"
         }
         whichPathForCommand = whichPathForCommand.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
-        return executeShell(command: whichPathForCommand, arguments: arguments)
+        return executeShell(command: whichPathForCommand, arguments: arguments, runFromPath: runFromPath)
     }
     
-    private func executeShell(command: String, arguments: [String] = []) -> String? {
+    private func executeShell(command: String, arguments: [String] = [], runFromPath: String) -> String? {
         let task = Process()
         task.launchPath = command
         task.arguments = arguments
         
         let pipe = Pipe()
         task.standardOutput = pipe
+        
+        if !runFromPath.isEmpty {
+            task.currentDirectoryPath = runFromPath
+        }
+        
         task.launch()
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()

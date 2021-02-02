@@ -10,30 +10,19 @@
 		DA065FE5237E000900BFF931 /* ConnectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA065FE4237E000900BFF931 /* ConnectionController.swift */; };
 		DA39DD0422E542D9007976EF /* IAPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA39DCFB22E53729007976EF /* IAPController.swift */; };
 		DA4A1671231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */; };
-		DA4A1682231D705000AEE426 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; };
-		DA4A1683231D705900AEE426 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A1681231D705000AEE426 /* FMDB.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA4E6DFF24451D39005DA39E /* TestSettingsTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4E6DFE24451D39005DA39E /* TestSettingsTVC.swift */; };
 		DA516A40242EB42000F70A7F /* TimeProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA516A3F242EB42000F70A7F /* TimeProfiler.swift */; };
 		DA516A41242EB42000F70A7F /* TimeProfiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA516A3F242EB42000F70A7F /* TimeProfiler.swift */; };
 		DA532D2C230DF40800EEFAAE /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; };
 		DA532D2D230DF40800EEFAAE /* EWSLibrary.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE80521065D910077A612 /* EWSLibrary.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DA57CE152325B66700B1B397 /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; };
-		DA57CE162325B66700B1B397 /* FMDB.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAB73DCB21075D5A00F94664 /* FMDB.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA57CE1A2327EE6E00B1B397 /* DarkMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA57CE192327EE6E00B1B397 /* DarkMode.swift */; };
 		DA5C0D0D24564296004BF000 /* TableViewCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5C0D0C24564296004BF000 /* TableViewCells.swift */; };
 		DA892AAD2319EEB800D3E66A /* TagCloudVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC2BED0230B4AA400AF3567 /* TagCloudVC.swift */; };
+		DA8B65452505945A0030DD9C /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAE96CC243A890C008FA929 /* Random.swift */; };
 		DA96FCC221BA00D500C0AAE4 /* HelpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FCC121BA00D500C0AAE4 /* HelpVC.swift */; };
 		DA97B98521065F5800135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98621065F5900135BF1 /* EWSLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = DACDE83C21065EB50077A612 /* EWSLibrary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA97B98721065F8000135BF1 /* EWSLibrary_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACDE83F21065EB50077A612 /* EWSLibrary_iOSTests.swift */; };
-		DA995A69216E85CA0082B3DD /* EWSDBTests_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CE021075AAD00F94664 /* EWSDBTests_MacTests.swift */; };
-		DA995A6A216E85CA0082B3DD /* EWSDBTests_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */; };
-		DA995ABC216E8D6D0082B3DD /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE756CB21079880002C5DFA /* FMDB.framework */; };
-		DA995ABE216E8D950082B3DD /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDC21075A5A00F94664 /* DBManager.swift */; };
-		DA995ABF216E8D960082B3DD /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDC21075A5A00F94664 /* DBManager.swift */; };
-		DA99A45C2171517D00E83EFC /* EWSDB_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */; };
-		DA99A4622171518400E83EFC /* EWSDBTests_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB73CDE21075A9B00F94664 /* EWSDBTests_iOSTests.swift */; };
-		DA99A4632171518900E83EFC /* EWSDBTests_SharedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */; };
 		DAA1E02824B2723C00AD9ED1 /* SettingsPhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1E02724B2723C00AD9ED1 /* SettingsPhotoCell.swift */; };
 		DAA1E02A24B2728300AD9ED1 /* SettingsPickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1E02924B2728300AD9ED1 /* SettingsPickerCell.swift */; };
 		DAA1E02C24B272C700AD9ED1 /* SettingsCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA1E02B24B272C700AD9ED1 /* SettingsCells.swift */; };
@@ -49,32 +38,7 @@
 		DACDE82D21065E1D0077A612 /* EWSLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDE82421065E1D0077A612 /* EWSLibrary.framework */; };
 		DADDA08421066DB000827123 /* Shell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA97B9892106601700135BF1 /* Shell.swift */; };
 		DADDA0882106712100827123 /* EWSLibrary_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */; };
-		DAE756CC21079880002C5DFA /* FMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE756CB21079880002C5DFA /* FMDB.framework */; };
-		DAF7263E2175665D00223AB5 /* LineChart_Mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF7263C2175650100223AB5 /* LineChart_Mac.swift */; };
-		DAF7263F2175666000223AB5 /* LineChart_Mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF7263C2175650100223AB5 /* LineChart_Mac.swift */; };
-		DAF8BAEE2171751B00EBF484 /* EWSChart_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */; };
-		DAF8BAF32171751B00EBF484 /* EWSChart_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BAF22171751B00EBF484 /* EWSChart_iOSTests.swift */; };
-		DAF8BAF52171751B00EBF484 /* EWSChart.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF8BAE72171751A00EBF484 /* EWSChart.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DAF8BB0A2171753600EBF484 /* EWSChart_Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */; };
-		DAF8BB1F2171756000EBF484 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB1E2171756000EBF484 /* AppDelegate.swift */; };
-		DAF8BB212171756000EBF484 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB202171756000EBF484 /* ViewController.swift */; };
-		DAF8BB242171756000EBF484 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB222171756000EBF484 /* Main.storyboard */; };
-		DAF8BB262171756100EBF484 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB252171756100EBF484 /* Assets.xcassets */; };
-		DAF8BB292171756100EBF484 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB272171756100EBF484 /* LaunchScreen.storyboard */; };
-		DAF8BB512171758B00EBF484 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB502171758B00EBF484 /* AppDelegate.swift */; };
-		DAF8BB532171758B00EBF484 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB522171758B00EBF484 /* ViewController.swift */; };
-		DAF8BB552171758B00EBF484 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB542171758B00EBF484 /* Assets.xcassets */; };
-		DAF8BB582171758B00EBF484 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAF8BB562171758B00EBF484 /* Main.storyboard */; };
 		DAF8BB7E2171933600EBF484 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB7D2171933600EBF484 /* Chart.swift */; };
-		DAF8BB7F217193AA00EBF484 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB7D2171933600EBF484 /* Chart.swift */; };
-		DAF8BB80217193AB00EBF484 /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB7D2171933600EBF484 /* Chart.swift */; };
-		DAF8BB83217193F400EBF484 /* BarChart_Mac.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB81217193C100EBF484 /* BarChart_Mac.swift */; };
-		DAF8BB842171971300EBF484 /* EWSChart_Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */; };
-		DAF8BB852171971300EBF484 /* EWSChart_Mac.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DAF8BB8B21719B4000EBF484 /* BarChart_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB8921719ACA00EBF484 /* BarChart_iOS.swift */; };
-		DAF8BB8C21719BD500EBF484 /* EWSChart_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF8BB0E2171753600EBF484 /* EWSChart_MacTests.swift */; };
-		DAF8BB8D21719C5300EBF484 /* EWSChart_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */; };
-		DAF8BB8E21719C5300EBF484 /* EWSChart_iOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,13 +56,6 @@
 			remoteGlobalIDString = DACDE80421065D910077A612;
 			remoteInfo = EWSLibrary_iOS;
 		};
-		DA99A45D2171517D00E83EFC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DA995A87216E8CB00082B3DD;
-			remoteInfo = EWSDB_iOS;
-		};
 		DACDE81021065D920077A612 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
@@ -113,34 +70,6 @@
 			remoteGlobalIDString = DACDE82321065E1D0077A612;
 			remoteInfo = EWSLibrary_Mac;
 		};
-		DAF8BAEF2171751B00EBF484 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DAF8BAE42171751A00EBF484;
-			remoteInfo = EWSChart_iOS;
-		};
-		DAF8BB0B2171753600EBF484 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DAF8BB002171753500EBF484;
-			remoteInfo = EWSChart_Mac;
-		};
-		DAF8BB862171971300EBF484 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DAF8BB002171753500EBF484;
-			remoteInfo = EWSChart_Mac;
-		};
-		DAF8BB8F21719C5300EBF484 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DACDE7FC21065D910077A612 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DAF8BAE42171751A00EBF484;
-			remoteInfo = EWSChart_iOS;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -150,41 +79,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				DA4A1683231D705900AEE426 /* FMDB.framework in Embed Frameworks */,
 				DA532D2D230DF40800EEFAAE /* EWSLibrary.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA57CE172325B66700B1B397 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				DA57CE162325B66700B1B397 /* FMDB.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB882171971300EBF484 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				DAF8BB852171971300EBF484 /* EWSChart_Mac.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB9121719C5300EBF484 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				DAF8BB8E21719C5300EBF484 /* EWSChart_iOS.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -197,7 +92,6 @@
 		DA4A166E231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSLibraryiOSTestAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA4A1670231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibraryiOSTestAppUITests.swift; sourceTree = "<group>"; };
 		DA4A1672231D6BD000AEE426 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA4A1681231D705000AEE426 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA4E6DFE24451D39005DA39E /* TestSettingsTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSettingsTVC.swift; sourceTree = "<group>"; };
 		DA516A3F242EB42000F70A7F /* TimeProfiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeProfiler.swift; sourceTree = "<group>"; };
 		DA534A942108D7A9004B0CC0 /* EWSDBTests_SharedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_SharedTests.swift; sourceTree = "<group>"; };
@@ -207,11 +101,7 @@
 		DA97B9892106601700135BF1 /* Shell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
 		DA995A51216E84A60082B3DD /* EWSDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EWSDB.h; sourceTree = "<group>"; };
 		DA995A52216E84A60082B3DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA995A57216E84A60082B3DD /* EWSDB_MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSDB_MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA995A5E216E84A60082B3DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSDB_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA995AA4216E8CDE0082B3DD /* EWSDB_Mac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSDB_Mac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA99A4572171517D00E83EFC /* EWSDB_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSDB_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAA1E02724B2723C00AD9ED1 /* SettingsPhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPhotoCell.swift; sourceTree = "<group>"; };
 		DAA1E02924B2728300AD9ED1 /* SettingsPickerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPickerCell.swift; sourceTree = "<group>"; };
 		DAA1E02B24B272C700AD9ED1 /* SettingsCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCells.swift; sourceTree = "<group>"; };
@@ -221,9 +111,6 @@
 		DAB73CDC21075A5A00F94664 /* DBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager.swift; sourceTree = "<group>"; };
 		DAB73CDE21075A9B00F94664 /* EWSDBTests_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_iOSTests.swift; sourceTree = "<group>"; };
 		DAB73CE021075AAD00F94664 /* EWSDBTests_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSDBTests_MacTests.swift; sourceTree = "<group>"; };
-		DAB73DC721075D2600F94664 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAB73DC921075D2C00F94664 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAB73DCB21075D5A00F94664 /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAC2BEAF230B489400AF3567 /* EWSLibraryiOSTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EWSLibraryiOSTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAC2BEB1230B489400AF3567 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DAC2BEB5230B489400AF3567 /* MainTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTVC.swift; sourceTree = "<group>"; };
@@ -241,18 +128,12 @@
 		DACDE83F21065EB50077A612 /* EWSLibrary_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibrary_iOSTests.swift; sourceTree = "<group>"; };
 		DACDE84021065EB50077A612 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DADDA0862106710700827123 /* EWSLibrary_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSLibrary_MacTests.swift; sourceTree = "<group>"; };
-		DAE756CB21079880002C5DFA /* FMDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FMDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF7263C2175650100223AB5 /* LineChart_Mac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChart_Mac.swift; sourceTree = "<group>"; };
-		DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSChart_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8BAE72171751A00EBF484 /* EWSChart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EWSChart.h; sourceTree = "<group>"; };
 		DAF8BAE82171751A00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DAF8BAED2171751B00EBF484 /* EWSChart_iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChart_iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8BAF22171751B00EBF484 /* EWSChart_iOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChart_iOSTests.swift; sourceTree = "<group>"; };
 		DAF8BAF42171751B00EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EWSChart_Mac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAF8BB092171753600EBF484 /* EWSChart_MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EWSChart_MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8BB0E2171753600EBF484 /* EWSChart_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChart_MacTests.swift; sourceTree = "<group>"; };
-		DAF8BB1C2171756000EBF484 /* EWSChartSample_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EWSChartSample_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8BB1E2171756000EBF484 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DAF8BB202171756000EBF484 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		DAF8BB232171756000EBF484 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -263,7 +144,6 @@
 		DAF8BB352171756100EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAF8BB3E2171756100EBF484 /* EWSChartSample_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWSChartSample_iOSUITests.swift; sourceTree = "<group>"; };
 		DAF8BB402171756100EBF484 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DAF8BB4E2171758B00EBF484 /* EWSChartSample_Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EWSChartSample_Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8BB502171758B00EBF484 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DAF8BB522171758B00EBF484 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		DAF8BB542171758B00EBF484 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -287,42 +167,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DA995A54216E84A60082B3DD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995A85216E8CB00082B3DD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA57CE152325B66700B1B397 /* FMDB.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995AA1216E8CDE0082B3DD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA995ABC216E8D6D0082B3DD /* FMDB.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA99A4542171517D00E83EFC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA99A45C2171517D00E83EFC /* EWSDB_iOS.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DAC2BEAC230B489400AF3567 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA4A1682231D705000AEE426 /* FMDB.framework in Frameworks */,
 				DA532D2C230DF40800EEFAAE /* EWSLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -346,7 +194,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAE756CC21079880002C5DFA /* FMDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,52 +202,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DACDE82D21065E1D0077A612 /* EWSLibrary.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAE22171751A00EBF484 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAEA2171751B00EBF484 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BAEE2171751B00EBF484 /* EWSChart_iOS.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAFE2171753500EBF484 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB062171753600EBF484 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB0A2171753600EBF484 /* EWSChart_Mac.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB192171756000EBF484 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB8D21719C5300EBF484 /* EWSChart_iOS.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB4B2171758B00EBF484 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB842171971300EBF484 /* EWSChart_Mac.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,11 +279,6 @@
 		DAB73DC621075D2600F94664 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DA4A1681231D705000AEE426 /* FMDB.framework */,
-				DAE756CB21079880002C5DFA /* FMDB.framework */,
-				DAB73DCB21075D5A00F94664 /* FMDB.framework */,
-				DAB73DC921075D2C00F94664 /* FMDB.framework */,
-				DAB73DC721075D2600F94664 /* FMDB.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -521,16 +317,6 @@
 				DACDE80E21065D920077A612 /* EWSLibrary_iOSTests.xctest */,
 				DACDE82421065E1D0077A612 /* EWSLibrary.framework */,
 				DACDE82C21065E1D0077A612 /* EWSLibrary_MacTests.xctest */,
-				DA995A57216E84A60082B3DD /* EWSDB_MacTests.xctest */,
-				DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */,
-				DA995AA4216E8CDE0082B3DD /* EWSDB_Mac.framework */,
-				DA99A4572171517D00E83EFC /* EWSDB_iOSTests.xctest */,
-				DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */,
-				DAF8BAED2171751B00EBF484 /* EWSChart_iOSTests.xctest */,
-				DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */,
-				DAF8BB092171753600EBF484 /* EWSChart_MacTests.xctest */,
-				DAF8BB1C2171756000EBF484 /* EWSChartSample_iOS.app */,
-				DAF8BB4E2171758B00EBF484 /* EWSChartSample_Mac.app */,
 				DAC2BEAF230B489400AF3567 /* EWSLibraryiOSTestApp.app */,
 				DA4A166E231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.xctest */,
 			);
@@ -669,20 +455,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		DA995A83216E8CB00082B3DD /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995A9F216E8CDE0082B3DD /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DACDE80221065D910077A612 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -696,21 +468,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA97B98621065F5900135BF1 /* EWSLibrary.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAE02171751A00EBF484 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BAF52171751B00EBF484 /* EWSChart.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAFC2171753500EBF484 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -734,78 +491,6 @@
 			productName = EWSLibraryiOSTestAppUITests;
 			productReference = DA4A166E231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		DA995A56216E84A60082B3DD /* EWSDB_MacTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DA995A65216E84A60082B3DD /* Build configuration list for PBXNativeTarget "EWSDB_MacTests" */;
-			buildPhases = (
-				DA995A53216E84A60082B3DD /* Sources */,
-				DA995A54216E84A60082B3DD /* Frameworks */,
-				DA995A55216E84A60082B3DD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = EWSDB_MacTests;
-			productName = EWSDBTests;
-			productReference = DA995A57216E84A60082B3DD /* EWSDB_MacTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		DA995A87216E8CB00082B3DD /* EWSDB_iOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DA995A99216E8CB00082B3DD /* Build configuration list for PBXNativeTarget "EWSDB_iOS" */;
-			buildPhases = (
-				DA995A83216E8CB00082B3DD /* Headers */,
-				DA995A84216E8CB00082B3DD /* Sources */,
-				DA995A85216E8CB00082B3DD /* Frameworks */,
-				DA995A86216E8CB00082B3DD /* Resources */,
-				DA57CE172325B66700B1B397 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = EWSDB_iOS;
-			productName = EWSDB_iOS;
-			productReference = DA995A88216E8CB00082B3DD /* EWSDB_iOS.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		DA995AA3216E8CDE0082B3DD /* EWSDB_Mac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DA995AB5216E8CDE0082B3DD /* Build configuration list for PBXNativeTarget "EWSDB_Mac" */;
-			buildPhases = (
-				DA995A9F216E8CDE0082B3DD /* Headers */,
-				DA995AA0216E8CDE0082B3DD /* Sources */,
-				DA995AA1216E8CDE0082B3DD /* Frameworks */,
-				DA995AA2216E8CDE0082B3DD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = EWSDB_Mac;
-			productName = EWSDB_Mac;
-			productReference = DA995AA4216E8CDE0082B3DD /* EWSDB_Mac.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		DA99A4562171517D00E83EFC /* EWSDB_iOSTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DA99A45F2171517D00E83EFC /* Build configuration list for PBXNativeTarget "EWSDB_iOSTests" */;
-			buildPhases = (
-				DA99A4532171517D00E83EFC /* Sources */,
-				DA99A4542171517D00E83EFC /* Frameworks */,
-				DA99A4552171517D00E83EFC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DA99A45E2171517D00E83EFC /* PBXTargetDependency */,
-			);
-			name = EWSDB_iOSTests;
-			productName = EWSDB_iOSTests;
-			productReference = DA99A4572171517D00E83EFC /* EWSDB_iOSTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		DAC2BEAE230B489400AF3567 /* EWSLibraryiOSTestApp */ = {
 			isa = PBXNativeTarget;
@@ -898,116 +583,6 @@
 			productReference = DACDE82C21065E1D0077A612 /* EWSLibrary_MacTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		DAF8BAE42171751A00EBF484 /* EWSChart_iOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DAF8BAF62171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOS" */;
-			buildPhases = (
-				DAF8BAE02171751A00EBF484 /* Headers */,
-				DAF8BAE12171751A00EBF484 /* Sources */,
-				DAF8BAE22171751A00EBF484 /* Frameworks */,
-				DAF8BAE32171751A00EBF484 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = EWSChart_iOS;
-			productName = EWSChart_iOS;
-			productReference = DAF8BAE52171751A00EBF484 /* EWSChart_iOS.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		DAF8BAEC2171751B00EBF484 /* EWSChart_iOSTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DAF8BAF92171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOSTests" */;
-			buildPhases = (
-				DAF8BAE92171751B00EBF484 /* Sources */,
-				DAF8BAEA2171751B00EBF484 /* Frameworks */,
-				DAF8BAEB2171751B00EBF484 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DAF8BAF02171751B00EBF484 /* PBXTargetDependency */,
-			);
-			name = EWSChart_iOSTests;
-			productName = EWSChart_iOSTests;
-			productReference = DAF8BAED2171751B00EBF484 /* EWSChart_iOSTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		DAF8BB002171753500EBF484 /* EWSChart_Mac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DAF8BB122171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_Mac" */;
-			buildPhases = (
-				DAF8BAFC2171753500EBF484 /* Headers */,
-				DAF8BAFD2171753500EBF484 /* Sources */,
-				DAF8BAFE2171753500EBF484 /* Frameworks */,
-				DAF8BAFF2171753500EBF484 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = EWSChart_Mac;
-			productName = EWSChart_Mac;
-			productReference = DAF8BB012171753500EBF484 /* EWSChart_Mac.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		DAF8BB082171753600EBF484 /* EWSChart_MacTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DAF8BB152171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_MacTests" */;
-			buildPhases = (
-				DAF8BB052171753600EBF484 /* Sources */,
-				DAF8BB062171753600EBF484 /* Frameworks */,
-				DAF8BB072171753600EBF484 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DAF8BB0C2171753600EBF484 /* PBXTargetDependency */,
-			);
-			name = EWSChart_MacTests;
-			productName = EWSChart_MacTests;
-			productReference = DAF8BB092171753600EBF484 /* EWSChart_MacTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		DAF8BB1B2171756000EBF484 /* EWSChartSample_iOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DAF8BB412171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOS" */;
-			buildPhases = (
-				DAF8BB182171756000EBF484 /* Sources */,
-				DAF8BB192171756000EBF484 /* Frameworks */,
-				DAF8BB1A2171756000EBF484 /* Resources */,
-				DAF8BB9121719C5300EBF484 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DAF8BB9021719C5300EBF484 /* PBXTargetDependency */,
-			);
-			name = EWSChartSample_iOS;
-			productName = EWSChartSample_iOS;
-			productReference = DAF8BB1C2171756000EBF484 /* EWSChartSample_iOS.app */;
-			productType = "com.apple.product-type.application";
-		};
-		DAF8BB4D2171758B00EBF484 /* EWSChartSample_Mac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DAF8BB712171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_Mac" */;
-			buildPhases = (
-				DAF8BB4A2171758B00EBF484 /* Sources */,
-				DAF8BB4B2171758B00EBF484 /* Frameworks */,
-				DAF8BB4C2171758B00EBF484 /* Resources */,
-				DAF8BB882171971300EBF484 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DAF8BB872171971300EBF484 /* PBXTargetDependency */,
-			);
-			name = EWSChartSample_Mac;
-			productName = EWSChartSample_Mac;
-			productReference = DAF8BB4E2171758B00EBF484 /* EWSChartSample_Mac.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1022,20 +597,6 @@
 						CreatedOnToolsVersion = 11.0;
 						TestTargetID = DAC2BEAE230B489400AF3567;
 					};
-					DA995A56216E84A60082B3DD = {
-						CreatedOnToolsVersion = 10.0;
-					};
-					DA995A87216E8CB00082B3DD = {
-						CreatedOnToolsVersion = 10.0;
-						LastSwiftMigration = 1020;
-					};
-					DA995AA3216E8CDE0082B3DD = {
-						CreatedOnToolsVersion = 10.0;
-					};
-					DA99A4562171517D00E83EFC = {
-						CreatedOnToolsVersion = 10.0;
-						LastSwiftMigration = 1020;
-					};
 					DAC2BEAE230B489400AF3567 = {
 						CreatedOnToolsVersion = 11.0;
 					};
@@ -1049,31 +610,11 @@
 					};
 					DACDE82321065E1D0077A612 = {
 						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 1000;
+						LastSwiftMigration = 1200;
 					};
 					DACDE82B21065E1D0077A612 = {
 						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 1000;
-					};
-					DAF8BAE42171751A00EBF484 = {
-						CreatedOnToolsVersion = 10.0;
-						LastSwiftMigration = 1020;
-					};
-					DAF8BAEC2171751B00EBF484 = {
-						CreatedOnToolsVersion = 10.0;
-					};
-					DAF8BB002171753500EBF484 = {
-						CreatedOnToolsVersion = 10.0;
-					};
-					DAF8BB082171753600EBF484 = {
-						CreatedOnToolsVersion = 10.0;
-					};
-					DAF8BB1B2171756000EBF484 = {
-						CreatedOnToolsVersion = 10.0;
-						LastSwiftMigration = 1020;
-					};
-					DAF8BB4D2171758B00EBF484 = {
-						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1200;
 					};
 				};
 			};
@@ -1094,16 +635,6 @@
 				DACDE80D21065D920077A612 /* EWSLibrary_iOSTests */,
 				DACDE82321065E1D0077A612 /* EWSLibrary_Mac */,
 				DACDE82B21065E1D0077A612 /* EWSLibrary_MacTests */,
-				DA995A87216E8CB00082B3DD /* EWSDB_iOS */,
-				DA99A4562171517D00E83EFC /* EWSDB_iOSTests */,
-				DA995AA3216E8CDE0082B3DD /* EWSDB_Mac */,
-				DA995A56216E84A60082B3DD /* EWSDB_MacTests */,
-				DAF8BAE42171751A00EBF484 /* EWSChart_iOS */,
-				DAF8BAEC2171751B00EBF484 /* EWSChart_iOSTests */,
-				DAF8BB002171753500EBF484 /* EWSChart_Mac */,
-				DAF8BB082171753600EBF484 /* EWSChart_MacTests */,
-				DAF8BB1B2171756000EBF484 /* EWSChartSample_iOS */,
-				DAF8BB4D2171758B00EBF484 /* EWSChartSample_Mac */,
 				DAC2BEAE230B489400AF3567 /* EWSLibraryiOSTestApp */,
 				DA4A166D231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests */,
 			);
@@ -1112,34 +643,6 @@
 
 /* Begin PBXResourcesBuildPhase section */
 		DA4A166C231D6BD000AEE426 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995A55216E84A60082B3DD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995A86216E8CB00082B3DD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995AA2216E8CDE0082B3DD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA99A4552171517D00E83EFC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1183,53 +686,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DAF8BAE32171751A00EBF484 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAEB2171751B00EBF484 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAFF2171753500EBF484 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB072171753600EBF484 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB1A2171756000EBF484 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB292171756100EBF484 /* LaunchScreen.storyboard in Resources */,
-				DAF8BB262171756100EBF484 /* Assets.xcassets in Resources */,
-				DAF8BB242171756000EBF484 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB4C2171758B00EBF484 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB552171758B00EBF484 /* Assets.xcassets in Resources */,
-				DAF8BB582171758B00EBF484 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1238,40 +694,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA4A1671231D6BD000AEE426 /* EWSLibraryiOSTestAppUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995A53216E84A60082B3DD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA995A6A216E85CA0082B3DD /* EWSDBTests_SharedTests.swift in Sources */,
-				DA995A69216E85CA0082B3DD /* EWSDBTests_MacTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995A84216E8CB00082B3DD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA995ABE216E8D950082B3DD /* DBManager.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA995AA0216E8CDE0082B3DD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA995ABF216E8D960082B3DD /* DBManager.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DA99A4532171517D00E83EFC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA99A4632171518900E83EFC /* EWSDBTests_SharedTests.swift in Sources */,
-				DA99A4622171518400E83EFC /* EWSDBTests_iOSTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1321,6 +743,7 @@
 			files = (
 				DADDA08421066DB000827123 /* Shell.swift in Sources */,
 				DA516A41242EB42000F70A7F /* TimeProfiler.swift in Sources */,
+				DA8B65452505945A0030DD9C /* Random.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1329,60 +752,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DADDA0882106712100827123 /* EWSLibrary_MacTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAE12171751A00EBF484 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB8B21719B4000EBF484 /* BarChart_iOS.swift in Sources */,
-				DAF8BB80217193AB00EBF484 /* Chart.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAE92171751B00EBF484 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BAF32171751B00EBF484 /* EWSChart_iOSTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BAFD2171753500EBF484 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB83217193F400EBF484 /* BarChart_Mac.swift in Sources */,
-				DAF8BB7F217193AA00EBF484 /* Chart.swift in Sources */,
-				DAF7263E2175665D00223AB5 /* LineChart_Mac.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB052171753600EBF484 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF7263F2175666000223AB5 /* LineChart_Mac.swift in Sources */,
-				DAF8BB8C21719BD500EBF484 /* EWSChart_MacTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB182171756000EBF484 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB212171756000EBF484 /* ViewController.swift in Sources */,
-				DAF8BB1F2171756000EBF484 /* AppDelegate.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DAF8BB4A2171758B00EBF484 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DAF8BB532171758B00EBF484 /* ViewController.swift in Sources */,
-				DAF8BB512171758B00EBF484 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1400,11 +769,6 @@
 			target = DACDE80421065D910077A612 /* EWSLibrary_iOS */;
 			targetProxy = DA532D2E230DF40800EEFAAE /* PBXContainerItemProxy */;
 		};
-		DA99A45E2171517D00E83EFC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DA995A87216E8CB00082B3DD /* EWSDB_iOS */;
-			targetProxy = DA99A45D2171517D00E83EFC /* PBXContainerItemProxy */;
-		};
 		DACDE81121065D920077A612 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DACDE80421065D910077A612 /* EWSLibrary_iOS */;
@@ -1414,26 +778,6 @@
 			isa = PBXTargetDependency;
 			target = DACDE82321065E1D0077A612 /* EWSLibrary_Mac */;
 			targetProxy = DACDE82E21065E1D0077A612 /* PBXContainerItemProxy */;
-		};
-		DAF8BAF02171751B00EBF484 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DAF8BAE42171751A00EBF484 /* EWSChart_iOS */;
-			targetProxy = DAF8BAEF2171751B00EBF484 /* PBXContainerItemProxy */;
-		};
-		DAF8BB0C2171753600EBF484 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DAF8BB002171753500EBF484 /* EWSChart_Mac */;
-			targetProxy = DAF8BB0B2171753600EBF484 /* PBXContainerItemProxy */;
-		};
-		DAF8BB872171971300EBF484 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DAF8BB002171753500EBF484 /* EWSChart_Mac */;
-			targetProxy = DAF8BB862171971300EBF484 /* PBXContainerItemProxy */;
-		};
-		DAF8BB9021719C5300EBF484 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DAF8BAE42171751A00EBF484 /* EWSChart_iOS */;
-			targetProxy = DAF8BB8F21719C5300EBF484 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1479,7 +823,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VM6VE536WY;
 				INFOPLIST_FILE = "iOS Only/EWSLibraryiOSTestAppUITests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1501,7 +845,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VM6VE536WY;
 				INFOPLIST_FILE = "iOS Only/EWSLibraryiOSTestAppUITests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1516,206 +860,6 @@
 			};
 			name = Release;
 		};
-		DA995A62216E84A60082B3DD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSDB/EWSDBTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ericschramm.EWSDBTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		DA995A63216E84A60082B3DD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSDB/EWSDBTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ericschramm.EWSDBTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
-		DA995A9A216E8CB00082B3DD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = EWSDB/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ericschramm.EWSDB-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DA995A9B216E8CB00082B3DD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = EWSDB/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ericschramm.EWSDB-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		DA995AB6216E8CDE0082B3DD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = EWSDB/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ericschramm.EWSDB-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		DA995AB7216E8CDE0082B3DD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = EWSDB/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ericschramm.EWSDB-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
-		DA99A4602171517D00E83EFC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSDB/EWSDBTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ericschramm.EWSDB-iOSTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DA99A4612171517D00E83EFC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSDB/EWSDBTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ericschramm.EWSDB-iOSTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		DAC2BEC0230B489500AF3567 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1723,7 +867,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E6DZ2MSZ48;
 				INFOPLIST_FILE = "iOS Only/EWSLibraryiOSTestApp/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1744,7 +888,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E6DZ2MSZ48;
 				INFOPLIST_FILE = "iOS Only/EWSLibraryiOSTestApp/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1809,8 +953,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1867,8 +1011,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1892,7 +1036,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = CommonSource/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1920,7 +1064,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = CommonSource/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1991,12 +1135,12 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSLibrary-Mac";
 				PRODUCT_NAME = EWSLibrary;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2019,12 +1163,12 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSLibrary-Mac";
 				PRODUCT_NAME = EWSLibrary;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -2042,11 +1186,11 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSLibrary-MacTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2064,297 +1208,11 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSLibrary-MacTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
-		DAF8BAF72171751B00EBF484 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = EWSChart/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DAF8BAF82171751B00EBF484 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = EWSChart/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		DAF8BAFA2171751B00EBF484 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSChart_iOSTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOSTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DAF8BAFB2171751B00EBF484 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSChart_iOSTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-iOSTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		DAF8BB132171753600EBF484 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = EWSChart/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		DAF8BB142171753600EBF484 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = EWSChart/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
-		DAF8BB162171753600EBF484 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSChart_MacTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-MacTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		DAF8BB172171753600EBF484 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = EWSChart_MacTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChart-MacTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Release;
-		};
-		DAF8BB422171756100EBF484 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_iOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DAF8BB432171756100EBF484 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_iOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		DAF8BB722171758B00EBF484 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/EWSChartSample_Mac.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
-			};
-			name = Debug;
-		};
-		DAF8BB732171758B00EBF484 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/EWSChartSample_Mac.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = VM6VE536WY;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "EWSChart/EWSChartSample Apps/EWSChartSample_Mac/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.eware.EWSChartSample-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -2366,42 +1224,6 @@
 			buildConfigurations = (
 				DA4A1675231D6BD000AEE426 /* Debug */,
 				DA4A1676231D6BD000AEE426 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DA995A65216E84A60082B3DD /* Build configuration list for PBXNativeTarget "EWSDB_MacTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DA995A62216E84A60082B3DD /* Debug */,
-				DA995A63216E84A60082B3DD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DA995A99216E8CB00082B3DD /* Build configuration list for PBXNativeTarget "EWSDB_iOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DA995A9A216E8CB00082B3DD /* Debug */,
-				DA995A9B216E8CB00082B3DD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DA995AB5216E8CDE0082B3DD /* Build configuration list for PBXNativeTarget "EWSDB_Mac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DA995AB6216E8CDE0082B3DD /* Debug */,
-				DA995AB7216E8CDE0082B3DD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DA99A45F2171517D00E83EFC /* Build configuration list for PBXNativeTarget "EWSDB_iOSTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DA99A4602171517D00E83EFC /* Debug */,
-				DA99A4612171517D00E83EFC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2456,60 +1278,6 @@
 			buildConfigurations = (
 				DACDE83921065E1D0077A612 /* Debug */,
 				DACDE83A21065E1D0077A612 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DAF8BAF62171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DAF8BAF72171751B00EBF484 /* Debug */,
-				DAF8BAF82171751B00EBF484 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DAF8BAF92171751B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_iOSTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DAF8BAFA2171751B00EBF484 /* Debug */,
-				DAF8BAFB2171751B00EBF484 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DAF8BB122171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_Mac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DAF8BB132171753600EBF484 /* Debug */,
-				DAF8BB142171753600EBF484 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DAF8BB152171753600EBF484 /* Build configuration list for PBXNativeTarget "EWSChart_MacTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DAF8BB162171753600EBF484 /* Debug */,
-				DAF8BB172171753600EBF484 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DAF8BB412171756100EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_iOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DAF8BB422171756100EBF484 /* Debug */,
-				DAF8BB432171756100EBF484 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DAF8BB712171758B00EBF484 /* Build configuration list for PBXNativeTarget "EWSChartSample_Mac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DAF8BB722171758B00EBF484 /* Debug */,
-				DAF8BB732171758B00EBF484 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

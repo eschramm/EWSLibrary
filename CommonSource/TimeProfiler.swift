@@ -21,7 +21,7 @@ public class TimeProfiler {
         let tag: String
     }
     
-    var timeStamps = [TimeStamp]()
+    var timeStamps = [Int: [TimeStamp]]()
     
     let numberFormatter = NumberFormatter()
     
@@ -36,19 +36,69 @@ public class TimeProfiler {
         }
     }
     
-    public func stamp(tag: String) {
-        timeStamps.append(TimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, tag: tag))
+    public func stamp(tag: String, trial: Int = 0) {
+        var trialTimeStamps = timeStamps[trial] ?? [TimeStamp]()
+        trialTimeStamps.append(TimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, tag: tag))
+        timeStamps[trial] = trialTimeStamps
     }
     
-    public func report() -> String {
+    public func report(trial: Int? = nil) -> String {
         var lastTimeStamp: TimeStamp?
         var lines = [String]()
-        for timeStamp in timeStamps {
-            lines.append(reportLine(timeStamp: timeStamp, lastTimeStamp: lastTimeStamp))
-            lastTimeStamp = timeStamp
+        if timeStamps.count == 1 {
+            if let trialStamps = timeStamps.first?.value {
+                for timeStamp in trialStamps {
+                    lines.append(reportLine(timeStamp: timeStamp, lastTimeStamp: lastTimeStamp))
+                    lastTimeStamp = timeStamp
+                }
+            }
+        } else {
+            if let trial = trial {
+                if let trialStamps = timeStamps[trial] {
+                    for timeStamp in trialStamps {
+                        lines.append(reportLine(timeStamp: timeStamp, lastTimeStamp: lastTimeStamp))
+                        lastTimeStamp = timeStamp
+                    }
+                }
+            } else {
+                // summarize
+                var dataDict = [String : [TimeInterval]]()
+                for (_, timeStamps) in timeStamps {
+                    for idx in 1..<timeStamps.count {
+                        let interval = timeStamps[idx].timeStamp - timeStamps[idx - 1].timeStamp
+                        let key = "[\(idx)]: \(timeStamps[idx - 1].tag) - \(timeStamps[idx].tag)"
+                        var intervals = dataDict[key] ?? [TimeInterval]()
+                        intervals.append(interval)
+                        dataDict[key] = intervals
+                    }
+                }
+                let sortedKeys = dataDict.keys.sorted()
+                lines = sortedKeys.map({ (key) -> String in
+                    let intervals = dataDict[key]!
+                    let stats = intervals.stats()
+                    return """
+                           \(key)
+                           n     = \(intervals.count)
+                           mean  = \(stats.string(stat: .mean, numberFormatter: numberFormatter))
+                           range = \(stats.string(stat: .min, numberFormatter: numberFormatter)) - \(stats.string(stat: .max, numberFormatter: numberFormatter))
+                           stDev = \(stats.string(stat: .stDev, numberFormatter: numberFormatter)) (\(stats.string(stat: .relDev, numberFormatter: numberFormatter)))
+                           ---
+                           \(intervals.map({ numberFormatter.string(for: $0)! }).joined(separator: "\n"))
+                           """
+                })
+            }
         }
         return lines.joined(separator: "\n")
     }
+    /*
+    public func reportOnlyRawSegmentNumbers() -> String {
+        var lines = [String]()
+        for idx in 1..<timeStamps.count {
+            let distance = timeStamps[idx].timeStamp - timeStamps[idx - 1].timeStamp
+            lines.append("\(distance)")
+        }
+        return lines.joined(separator: "\n")
+    }*/
     
     private func reportLine(timeStamp: TimeStamp, lastTimeStamp: TimeStamp?) -> String {
         let lineLength = 80
@@ -98,6 +148,8 @@ public class TimeProfiler {
         
         return "\(String(repeating: " ", count: timeLength - numberString.count))\(numberString) \(unitString) : \(timeStamp.tag)"
     }
+    
+    
 }
 
 extension String {
