@@ -19,7 +19,6 @@ let package = Package(
         .target(
             name: "EWSLibrary",
             dependencies: [],
-            path: "/",
-            publicHeadersPath: "."),
+            ),
     ]
 )
