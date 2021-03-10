@@ -1,3 +1,3 @@
 # EWSLibrary
 
-A description of this package.
+Shared code I may use from time to time..
