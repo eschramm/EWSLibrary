@@ -34,3 +34,4 @@ xcuserdata/
 MANIFEST
 dist/
 build/
+.swiftpm
