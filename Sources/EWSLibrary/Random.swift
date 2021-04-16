@@ -81,6 +81,20 @@ public struct EWSStats<T:FloatingPoint> {
             }
         }
     }
+    
+    func printAllStats(count: Int, numberFormatter: NumberFormatter?) {
+        let numberFormatter = numberFormatter ?? {
+            let nf = NumberFormatter()
+            nf.numberStyle = .decimal
+            return nf
+        }()
+        print("Count  : \(count)")
+        print("Sum    : \(string(stat: .sum, numberFormatter: numberFormatter))")
+        print("Range  : \(string(stat: .min, numberFormatter: numberFormatter)) - \(string(stat: .max, numberFormatter: numberFormatter))")
+        print("Mean   : \(string(stat: .mean, numberFormatter: numberFormatter))")
+        print("Median : \(string(stat: .median, numberFormatter: numberFormatter))")
+        print("StDev  : \(string(stat: .stDev, numberFormatter: numberFormatter)) (\(string(stat: .relDev, numberFormatter: numberFormatter)))")
+    }
 }
 
 // MARK - Statistical Simple Calculations
