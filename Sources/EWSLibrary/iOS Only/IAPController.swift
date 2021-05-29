@@ -243,7 +243,7 @@ class IAPviewController : UIViewController {
         restoreButton.addTarget(self, action: #selector(IAPviewController.restoreButtonTapped), for: .touchUpInside)
         view.addSubview(restoreButton)
         
-        let indicator = UIActivityIndicatorView(style: .gray)
+        let indicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
         activityIndicator = indicator
         indicator.translatesAutoresizingMaskIntoConstraints = false
         indicator.hidesWhenStopped = true

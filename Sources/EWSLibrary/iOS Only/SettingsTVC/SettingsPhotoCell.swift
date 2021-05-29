@@ -72,7 +72,7 @@ extension SettingsPhotoCell: PhotoViewControllerDelegate {
     }
 }
 
-protocol PhotoViewControllerDelegate: class {
+protocol PhotoViewControllerDelegate: AnyObject {
     func photoViewController(photoViewController: PhotoViewController, didUpdate image: UIImage?)
 }
 

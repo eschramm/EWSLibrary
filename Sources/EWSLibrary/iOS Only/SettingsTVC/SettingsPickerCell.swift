@@ -10,7 +10,7 @@
 import UIKit
 
 
-public protocol PickerDelegate: class {
+public protocol PickerDelegate: AnyObject {
     func pickerDidSelect(picker: PickerDelegate, selectedTitle: String)
 }
 

@@ -22,7 +22,7 @@ public enum TagContext {
     case all
 }
 
-public protocol TagCloudDelegate : class {
+public protocol TagCloudDelegate : AnyObject {
     func tagCount(cloudID: String, context: TagContext) -> Int
     func tag(cloudID: String, context: TagContext, for index: Int) -> Tag
     func shouldCreateTag(with title: String) -> Bool

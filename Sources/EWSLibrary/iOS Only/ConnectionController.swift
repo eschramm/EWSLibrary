@@ -17,7 +17,6 @@ public class ConnectionController {
     let lastCheckInPrefKey: String
     let https: Bool
     
-    var hideNetworkActivityIndicator = true
     var additionalTrackingDict: [String : String]?
     let session: URLSession
     
@@ -35,11 +34,6 @@ public class ConnectionController {
     
     public func performCheck(_ additionalTrackingDict: [String : String]?) {
         self.additionalTrackingDict = additionalTrackingDict
-        
-        if hideNetworkActivityIndicator == false {
-            UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        }
-        
         sendTrackingURL()
         UserDefaults.standard.set(Date(), forKey: lastCheckInPrefKey)
     }
