@@ -149,8 +149,9 @@ public class AppReleaseNotesVC : UIViewController {
         }
         
         guard let currentAppVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String else { return true }
+        guard let currentAppBuild = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else { return true }
         
-        let isUpdated = (currentAppVersion != previousAppVersion)
+        let isUpdated = ("\(currentAppVersion).\(currentAppBuild)" != previousAppVersion)
         
         if !isUpdated {
             Self.storeCurrentAppVersionString()
@@ -161,8 +162,9 @@ public class AppReleaseNotesVC : UIViewController {
     
     static func storeCurrentAppVersionString() {
         // Store current app version string in the user defaults
-        guard let currentAppVersion = Bundle.main.infoDictionary?["CFBundleVersion"] else { return }
-        UserDefaults.standard.setValue(currentAppVersion, forKey: kReleaseNotesViewVersionKey)
+        guard let currentAppVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String else { return }
+        guard let currentAppBuild = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else { return }
+        UserDefaults.standard.setValue("\(currentAppVersion).\(currentAppBuild)", forKey: kReleaseNotesViewVersionKey)
     }
     
     @objc func dismissNotes() {
