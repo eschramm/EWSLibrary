@@ -6,6 +6,7 @@
 //  Copyright © 2021 Eric Schramm. All rights reserved.
 //
 
+#if os(iOS)
 import UIKit
 
 
@@ -168,3 +169,4 @@ public class AppReleaseNotesVC : UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
 }
+#endif

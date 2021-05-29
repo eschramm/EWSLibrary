@@ -5,6 +5,7 @@
 //  Created by Eric Schramm on 5/28/21.
 //
 
+#if os(iOS)
 import UIKit
 
 
@@ -102,3 +103,4 @@ public class GhostAlertView : UIView {
         }
     }
 }
+#endif
