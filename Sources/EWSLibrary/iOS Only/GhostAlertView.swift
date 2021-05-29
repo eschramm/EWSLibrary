@@ -70,7 +70,6 @@ public class GhostAlertView : UIView {
     }
     
     @objc public func show(in view: UIView) {
-        print("SHOWING ONE")
         for subview in view.subviews {
             if let otherGAV = subview as? GhostAlertView {
                 otherGAV.hide()
@@ -87,7 +86,6 @@ public class GhostAlertView : UIView {
         UIView.animate(withDuration: 0.5) {
             self.alpha = 1
         } completion: { _ in
-            print("Animation completed")
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(self.timeout * 1000))) {
                 self.hide()
             }
