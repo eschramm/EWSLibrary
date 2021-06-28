@@ -153,7 +153,7 @@ public class AppReleaseNotesVC : UIViewController {
         
         let isUpdated = ("\(currentAppVersion).\(currentAppBuild)" != previousAppVersion)
         
-        if !isUpdated {
+        if isUpdated {
             Self.storeCurrentAppVersionString()
         }
         
