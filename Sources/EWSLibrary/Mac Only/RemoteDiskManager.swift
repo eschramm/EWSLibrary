@@ -262,7 +262,7 @@ public class RemoteDiskManager {
                     if let urlItem = item as? URL {
                         var isUrlItemDirectory: ObjCBool = false
                         guard FileManager.default.fileExists(atPath: urlItem.path, isDirectory: &isUrlItemDirectory) else {
-                            throw RemoteDiskManagerError.fileSizeCalculationError(description: "No file exists for \(url.path), returning zero bytes")
+                            throw RemoteDiskManagerError.fileSizeCalculationError(description: "No file exists for \(urlItem.path), returning zero bytes")
                         }
                         guard !isUrlItemDirectory.boolValue else { continue }
                         let size = try (FileManager.default.attributesOfItem(atPath: urlItem.path)[.size] as? Int ?? 0)
