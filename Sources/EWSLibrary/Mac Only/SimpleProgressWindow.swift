@@ -15,7 +15,7 @@ public struct SimpleProgressWindow {
         case modalWindow
     }
     
-    public static func present(presentingVC: NSViewController, presentationStyle: PresentationStyle, progress: ObservableProgress, windowSize: CGSize? = CGSize(width: 600, height: 180)) -> NSViewController {
+    public static func present(presentingVC: NSViewController, presentationStyle: PresentationStyle, progress: ObservableProgress, windowSize: CGSize = CGSize(width: 600, height: 180)) -> NSViewController {
         let sheetVC = NSViewController(nibName: nil, bundle: nil)
         let progressView = NSHostingView(rootView: ESProgressView(observableProgress: progress))
         progressView.frame = CGRect(origin: .zero, size: windowSize)
