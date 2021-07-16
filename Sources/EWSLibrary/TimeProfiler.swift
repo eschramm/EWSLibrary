@@ -167,7 +167,7 @@ public class ProgressTimeProfiler {
     }
     
     var timeStamps = [ProgressTimeStamp]()
-    public let totalWork: Int
+    public var totalWork: Int
     let timeFormatter: DateComponentsFormatter = {
         let dcf = DateComponentsFormatter()
         dcf.allowedUnits = [.day, .hour, .minute, .second]
