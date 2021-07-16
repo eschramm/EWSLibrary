@@ -11,12 +11,27 @@ import Foundation
 
 //https://gist.github.com/andreacipriani/8c3af3719da31c8fae2cdfa8c21e17ba
 
-public final class Shell
+public class Shell
 {
+    public enum StreamingOutput {
+        case string(String)
+        case complete
+        case error(String)
+    }
+    
     public init() {}
     
     public func outputOf(commandName: String, arguments: [String] = [], runFromPath: String = "") -> String? {
         return bash(commandName: commandName, arguments:arguments, runFromPath: runFromPath)
+    }
+    
+    public func streaming(commandName: String, arguments: [String] = [], runFromPath: String = "", handler: @escaping (StreamingOutput) -> ()) {
+        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "") else {
+            handler(.error("\(commandName) not found"))
+            return
+        }
+        whichPathForCommand = whichPathForCommand.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+        streamingExecuteShell(command: whichPathForCommand, arguments: arguments, runFromPath: runFromPath, handler: handler)
     }
     
     // MARK: private
@@ -47,6 +62,32 @@ public final class Shell
         let output: String? = String(data: data, encoding: String.Encoding.utf8)
         
         return output
+    }
+    
+    private func streamingExecuteShell(command: String, arguments: [String] = [], runFromPath: String, handler: @escaping (StreamingOutput) -> ()) {
+        let task = Process()
+        task.launchPath = command
+        task.arguments = arguments
+        
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        
+        if !runFromPath.isEmpty {
+            task.currentDirectoryPath = runFromPath
+        }
+        
+        NotificationCenter.default.addObserver(forName: FileHandle.readCompletionNotification, object: pipe.fileHandleForReading, queue: .main) { notification in
+            let data = notification.userInfo![NSFileHandleNotificationDataItem] as! Data
+            guard !data.isEmpty else {
+                handler(.complete)
+                return
+            }
+            (notification.object as! FileHandle).readInBackgroundAndNotify()
+            handler(.string(String(data: data, encoding: .utf8) ?? ""))
+        }
+        
+        pipe.fileHandleForReading.readInBackgroundAndNotify()
+        task.launch()
     }
     
 }
