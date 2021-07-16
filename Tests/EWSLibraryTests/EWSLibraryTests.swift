@@ -3,10 +3,12 @@ import XCTest
 
 final class EWSLibraryTests: XCTestCase {
     
+    #if os(macOS)
     func testShell() {
         let shell = Shell()
         XCTAssert(shell.outputOf(commandName: "echo", arguments: ["testing the shell"]) == "testing the shell\n")
     }
+    #endif
     
     func realTruesRandomizationTrial(trueProbability: Double) -> Double {
         let trialCount = 10_000
@@ -38,10 +40,18 @@ final class EWSLibraryTests: XCTestCase {
         }
     }
 
+    #if os(macOS)
     static var allTests = [
         ("testShell", testShell),
         ("testAlwaysRandomization", testAlwaysRandomization),
         ("testNeverRandomization", testNeverRandomization),
         ("testSometimeRandomization", testSometimesRandomization)
     ]
+    #elseif os(iOS)
+    static var allTests = [
+        ("testAlwaysRandomization", testAlwaysRandomization),
+        ("testNeverRandomization", testNeverRandomization),
+        ("testSometimeRandomization", testSometimesRandomization)
+    ]
+    #endif
 }

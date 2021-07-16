@@ -5,6 +5,7 @@
 //  Created by Eric Schramm on 7/7/21.
 //
 
+#if os(macOS)
 import SwiftUI
 
 
@@ -335,3 +336,4 @@ struct CredentialsView_Previews: PreviewProvider {
         CredentialsView(title: "Please provide login information for TimeMachineBackup", usernameTitle: "Username") { creds in print(creds) }
     }
 }
+#endif

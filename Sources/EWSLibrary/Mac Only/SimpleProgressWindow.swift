@@ -5,6 +5,7 @@
 //  Created by Eric Schramm on 7/14/21.
 //
 
+#if os(macOS)
 import SwiftUI
 
 
@@ -126,4 +127,4 @@ struct ProgressView_Preview: PreviewProvider {
         ESProgressView(observableProgress: ObservableProgress(current: 23, total: 100, title: "This is the title", progressBarTitleStyle: .custom("Downloading...")))
     }
 }
-
+#endif
