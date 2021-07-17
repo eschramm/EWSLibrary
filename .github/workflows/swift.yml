@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  DEVELOPER_DIR: /Applications/Xcode_12.5.1.app/Contents/Developer
+
 jobs:
   build:
 
@@ -13,9 +16,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: latest-stable
     - name: Build
       run: swift build -v
     - name: Run tests
