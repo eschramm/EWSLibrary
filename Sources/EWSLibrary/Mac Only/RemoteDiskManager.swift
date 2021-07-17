@@ -42,6 +42,15 @@ public class RemoteDiskManager {
     public enum ProcessType {
         case copy
         case move
+        
+        func actionTitle() -> String {
+            switch self {
+            case .copy:
+                return "Copying"
+            case .move:
+                return "Moving"
+            }
+        }
     }
     
     // https://apple.stackexchange.com/questions/249627/programmatically-creating-mount-points-in-macos-10-12
@@ -187,23 +196,29 @@ public class RemoteDiskManager {
         }
     }
     
-    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, progressBar: NSProgressIndicator?, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
+    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
+        
+        var spv: NSViewController?
+        var progress: ObservableProgress?
+        
         mount(presentingVC: presentingViewController) { result in
             switch result {
             case .failure(_):
                 completion(result)
             case .success(()):
                 if let totalFileSize = try? self.fileSize(at: fromURL) {
+                    progress = ObservableProgress(current: 0, total: totalFileSize, title: "\(type.actionTitle()) File", progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
+                    if let pvc = presentingViewController {
+                        spv = SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress!)
+                    }
                     let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { (timer) in
                         // called every 0.1 sec to assess progress of copy operation
                         if let copiedFileSize = try? self.fileSize(at: toURL) {
                             DispatchQueue.main.async {
-                                progressBar?.doubleValue = Double(copiedFileSize) / Double(totalFileSize)
-                                progressBar?.display()
-                                //print(progressBar.doubleValue)
+                                progress?.update(current: copiedFileSize)
                                 if copiedFileSize >= totalFileSize {
                                     timer.invalidate()
-                                    progressBar?.isHidden = true
+                                    spv?.dismiss(nil)
                                     completion(.success(()))
                                 }
                             }
@@ -241,9 +256,6 @@ public class RemoteDiskManager {
                                 completion(.failure(RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)))
                             }
                         }
-                    }
-                    DispatchQueue.main.async {
-                        progressBar?.isHidden = false
                     }
                     timer.fire()
                 }
