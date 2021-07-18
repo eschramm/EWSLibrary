@@ -196,7 +196,7 @@ public class RemoteDiskManager {
         }
     }
     
-    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
+    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
         
         var spv: NSViewController?
         var progress: ObservableProgress?
@@ -207,7 +207,8 @@ public class RemoteDiskManager {
                 completion(result)
             case .success(()):
                 if let totalFileSize = try? self.fileSize(at: fromURL) {
-                    progress = ObservableProgress(current: 0, total: totalFileSize, title: "\(type.actionTitle()) File", progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
+                    let title = actionDetailOverride ?? "\(type.actionTitle()) File"
+                    progress = ObservableProgress(current: 0, total: totalFileSize, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
                     if let pvc = presentingViewController {
                         spv = SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress!)
                     }

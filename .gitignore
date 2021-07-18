@@ -35,3 +35,4 @@ MANIFEST
 dist/
 build/
 .swiftpm
+.build
