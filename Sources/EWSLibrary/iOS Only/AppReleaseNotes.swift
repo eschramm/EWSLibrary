@@ -37,6 +37,11 @@ public class AppReleaseNotesVC : UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        // to enforce view matches size of presentingViewController
+        if let presentingVC = presentingViewController {
+            view.frame = presentingVC.view.frame
+        }
+        
         let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
         let blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView.frame = self.view.frame
