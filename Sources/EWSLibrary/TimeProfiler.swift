@@ -232,7 +232,9 @@ public class ProgressTimeProfiler {
             } else {
                 weightedRate = totalRate
             }
-            secondsRemaining = (1 - lastTimeStamp.fractionComplete) / weightedRate
+            if weightedRate > 0 {
+                secondsRemaining = (1 - lastTimeStamp.fractionComplete) / weightedRate
+            }
         }
         var output = ""
         if let secondsRemaining = secondsRemaining, let secondsSoFar = secondsSoFar {
