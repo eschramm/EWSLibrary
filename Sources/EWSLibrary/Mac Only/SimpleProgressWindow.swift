@@ -9,6 +9,7 @@
 import SwiftUI
 
 
+@MainActor
 public struct SimpleProgressWindow {
     
     public enum PresentationStyle {

@@ -5,6 +5,7 @@
 //  Created by Eric Schramm on 7/7/21.
 //
 
+/*
 #if os(macOS)
 import SwiftUI
 
@@ -210,7 +211,7 @@ public class RemoteDiskManager {
                     let title = actionDetailOverride ?? "\(type.actionTitle()) File"
                     progress = ObservableProgress(current: 0, total: totalFileSize, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
                     if let pvc = presentingViewController {
-                        spv = SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress!)
+                        spv = await SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress!)
                     }
                     let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { (timer) in
                         // called every 0.1 sec to assess progress of copy operation
@@ -350,3 +351,4 @@ struct CredentialsView_Previews: PreviewProvider {
     }
 }
 #endif
+ */
