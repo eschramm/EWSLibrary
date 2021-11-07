@@ -9,6 +9,14 @@
 #if os(iOS)
 import UIKit
 
+
+public extension Notification.Name {
+    /**
+     Post this notification with object of CloudID to trigger a reload if the data model changes
+     */
+    static let TagCloudShouldRefresh = Notification.Name(rawValue: "TagCloudShouldRefresh")
+}
+
 public protocol Tag {
     var title: String { get }
 }
@@ -76,12 +84,16 @@ public class TagCloudChildViewController: UIViewController {
     var tagCloudDataSource: TagCloudDataSource!
     
     public weak var tagCloudDelegate: TagCloudDelegate?
+    let addTagTitle: String
+    let addTagInstructions: String
     
     var collectionView: UICollectionView!
     var collectionViewHeightConstraint: NSLayoutConstraint?
     
-    public init(cloudID: String, parameters: TagCloudParameters, tagCloudDelegate: TagCloudDelegate, resizeStyle: ResizeStyle) {
+    public init(cloudID: String, addTagTitle: String, addTagInstructions: String, parameters: TagCloudParameters, tagCloudDelegate: TagCloudDelegate, resizeStyle: ResizeStyle) {
         self.cloudID = cloudID
+        self.addTagTitle = addTagTitle
+        self.addTagInstructions = addTagInstructions
         self.parameters = parameters
         self.tagCloudDelegate = tagCloudDelegate
         self.resizeStyle = resizeStyle
@@ -194,7 +206,7 @@ public class TagCloudChildViewController: UIViewController {
             }
             tagCloudDelegate.dismissTagAddingViewController()
         }
-        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
+        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, addTagTitle: addTagTitle, addTagInstructions: addTagInstructions, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
         let navController = UINavigationController(rootViewController: tagAddingTVC)
         let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelAdd))
         tagAddingTVC.navigationItem.rightBarButtonItem = cancelButton
@@ -257,17 +269,21 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
     weak var tagCloudDelegate: TagCloudDelegate?
     let parameters: TagCloudParameters
     let cellContext: TagContext
+    let addTagTitle: String
+    let addTagInstructions: String
     let updateItemTagCellHandler: ((Int) -> ())?
     
     var tagCloudDataSource: TagCloudDataSource!
     
     var collectionView: UICollectionView!
     
-    public init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, parameters: TagCloudParameters = TagCloudParameters()) {
+    public init(cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, addTagTitle: String, addTagInstructions: String, parameters: TagCloudParameters = TagCloudParameters()) {
         self.cloudID = cloudID
         self.tagCloudDelegate = tagCloudDelegate
         self.parameters = parameters
         self.cellContext = .item
+        self.addTagTitle = addTagTitle
+        self.addTagInstructions = addTagInstructions
         self.updateItemTagCellHandler = nil
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildDataSource()
@@ -276,13 +292,21 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
             tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
         }
         isAccessibilityElement = false
+        NotificationCenter.default.addObserver(forName: .TagCloudShouldRefresh, object: cloudID, queue: .main) { [weak self] _ in
+            if #available(iOS 13.0, *), let tagCloudDiffDataSource = self?.tagCloudDataSource as? TagCloudDiffDataSource {
+                tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+            }
+            self?.collectionView.reloadData()
+        }
     }
     
-    init(allCell cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
+    init(allCell cloudID: String, tagCloudDelegate: TagCloudDelegate, reuseIdentifier: String, addTagTitle: String, addTagInstructions: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
         self.cloudID = cloudID
         self.tagCloudDelegate = tagCloudDelegate
         self.parameters = parameters
         self.cellContext = .all
+        self.addTagTitle = addTagTitle
+        self.addTagInstructions = addTagInstructions
         self.updateItemTagCellHandler = updateItemTagCellHandler
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         buildDataSource()
@@ -291,6 +315,12 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
             tagCloudDiffDataSource.injectCollectionView(collectionView: collectionView)
         }
         isAccessibilityElement = false
+        NotificationCenter.default.addObserver(forName: .TagCloudShouldRefresh, object: cloudID, queue: .main) { [weak self] _ in
+            if #available(iOS 13.0, *), let tagCloudDiffDataSource = self?.tagCloudDataSource as? TagCloudDiffDataSource {
+                tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+            }
+            self?.collectionView.reloadData()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -390,7 +420,7 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
             }
             tagCloudDelegate.dismissTagAddingViewController()
         }
-        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
+        let tagAddingTVC = TagAddingTVC(tagCloudDelegate: tagCloudDelegate, cloudID: cloudID, addTagTitle: addTagTitle, addTagInstructions: addTagInstructions, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
         let navController = UINavigationController(rootViewController: tagAddingTVC)
         let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelAdd))
         tagAddingTVC.navigationItem.rightBarButtonItem = cancelButton
@@ -490,11 +520,15 @@ class TagAddingTVC : UITableViewController {
     
     let allTagsCell: SettingsTagCloudCell
     weak var tagCloudDelegate: TagCloudDelegate?
+    let addTagTitle: String
+    let addTagInstructions: String
     let updateItemTagCellHandler: (Int) -> ()
     
-    init(tagCloudDelegate: TagCloudDelegate, cloudID: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
-        self.allTagsCell = SettingsTagCloudCell(allCell: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
+    init(tagCloudDelegate: TagCloudDelegate, cloudID: String, addTagTitle: String, addTagInstructions: String, parameters: TagCloudParameters, updateItemTagCellHandler: @escaping (Int) -> ()) {
+        self.allTagsCell = SettingsTagCloudCell(allCell: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: "ExistingTagsCell", addTagTitle: addTagTitle, addTagInstructions: addTagInstructions, parameters: parameters, updateItemTagCellHandler: updateItemTagCellHandler)
         self.tagCloudDelegate = tagCloudDelegate
+        self.addTagTitle = addTagTitle
+        self.addTagInstructions = addTagInstructions
         self.updateItemTagCellHandler = updateItemTagCellHandler
         super.init(style: .grouped)
     }
@@ -506,10 +540,11 @@ class TagAddingTVC : UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableviewHeader()
+        title = addTagTitle
     }
     
     func configureTableviewHeader() {
-        let headerView = AddView(addTagHandler: { (newTagTitle) in
+        let headerView = AddView(instructions: addTagInstructions, addTagHandler: { (newTagTitle) in
             if let delegate = self.tagCloudDelegate {
                 if delegate.shouldCreateTag(with: newTagTitle) {
                     let createdIndex = delegate.indexForCreatedTag(with: newTagTitle)
@@ -524,11 +559,11 @@ class TagAddingTVC : UITableViewController {
     
         headerView.setNeedsLayout()
         headerView.layoutIfNeeded()
-        let height = headerView.systemLayoutSizeFitting(CGSize(width: tableView.frame.width, height: 100), withHorizontalFittingPriority: .defaultHigh, verticalFittingPriority: .defaultHigh).height
+        let height = headerView.systemLayoutSizeFitting(CGSize(width: tableView.frame.width, height: 150), withHorizontalFittingPriority: .defaultHigh, verticalFittingPriority: .defaultLow).height
         var headerFrame = headerView.frame
         headerFrame.size.height = height
         headerView.frame = headerFrame
-         tableView.tableHeaderView = headerView
+        tableView.tableHeaderView = headerView
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -551,12 +586,14 @@ class TagAddingTVC : UITableViewController {
 class AddView : UIView {
     
     let searchBar = UISearchBar()
+    let instructionsLabel = UILabel()
     
     let addTagHandler: (String) -> ()
     
-    init(addTagHandler: @escaping (String) -> ()) {
+    init(instructions: String, addTagHandler: @escaping (String) -> ()) {
         self.addTagHandler = addTagHandler
         super.init(frame: .zero)
+        instructionsLabel.text = instructions
         buildCell()
     }
     
@@ -565,8 +602,8 @@ class AddView : UIView {
     }
     
     func buildCell() {
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(searchBar)
+        //searchBar.translatesAutoresizingMaskIntoConstraints = false
+        //addSubview(searchBar)
         
         let addButton = UIButton(type: .system)
         addButton.setTitle("Add", for: .normal)
@@ -587,11 +624,26 @@ class AddView : UIView {
             }
         }
         
+        let stackView = UIStackView(arrangedSubviews: [searchBar, instructionsLabel])
+        stackView.axis = .vertical
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.spacing = 10
+        instructionsLabel.isHidden = instructionsLabel.text?.isEmpty ?? true
+        instructionsLabel.numberOfLines = 0
+        instructionsLabel.lineBreakMode = .byWordWrapping
+        instructionsLabel.textAlignment = .center
+        let estimatedWidth: CGFloat = 300
+        let size = instructionsLabel.sizeThatFits(CGSize(width: estimatedWidth, height: .greatestFiniteMagnitude))
+        addSubview(stackView)
+        
         NSLayoutConstraint.activate([
-            searchBar.leadingAnchor.constraint(equalToSystemSpacingAfter: safeAreaLayoutGuide.leadingAnchor, multiplier: 1),
-            searchBar.trailingAnchor.constraint(equalToSystemSpacingAfter: safeAreaLayoutGuide.trailingAnchor, multiplier: -1),
-            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            searchBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
+            stackView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 0),
+            stackView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: 0),
+            stackView.heightAnchor.constraint(greaterThanOrEqualToConstant: size.height + 75),
+            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+            instructionsLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            instructionsLabel.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ])
     }
     

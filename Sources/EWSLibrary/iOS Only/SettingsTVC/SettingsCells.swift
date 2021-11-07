@@ -26,7 +26,7 @@ public enum SettingsCellType {
     case iapCell(initialTitle: String, purchasedTitle: String, iapKey: String)
     case textFieldCell(attributes: TextFieldAttributes)
     case dateCell(attributes: DateCellAttributes)
-    case tagCloudCell(cloudID: String, tagCloudDelegate: TagCloudDelegate, parameters: TagCloudParameters = TagCloudParameters())
+    case tagCloudCell(cloudID: String, addTagTitle: String, addTagInstructions: String, tagCloudDelegate: TagCloudDelegate, parameters: TagCloudParameters = TagCloudParameters())
     case photoCell(maxCellHeight: CGFloat?, getImageTitleHandler: () -> (UIImage?, String?), setImageUpdateTitleHandler: (UIImage?) -> (String?))
     case textViewCell(attributes: TextViewAttributes)
 }

@@ -179,8 +179,8 @@ open class SettingsTVC: UITableViewController {
                 }
                 return cell
             }
-        case .tagCloudCell(let cloudID, let tagCloudDelegate, let parameters):
-            let cell = SettingsTagCloudCell(cloudID: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: cellIdentifier, parameters: parameters)
+        case .tagCloudCell(let cloudID, let addTagTitle, let addTagInstructions, let tagCloudDelegate, let parameters):
+            let cell = SettingsTagCloudCell(cloudID: cloudID, tagCloudDelegate: tagCloudDelegate, reuseIdentifier: cellIdentifier, addTagTitle: addTagTitle, addTagInstructions: addTagInstructions, parameters: parameters)
             configure(cell: cell, model: model)
             if let _ = model.visibilityHandler {
                 indexPathsForHidableCells.append(indexPath)
