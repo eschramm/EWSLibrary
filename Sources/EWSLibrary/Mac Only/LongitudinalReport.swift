@@ -4,7 +4,7 @@
 //  Created by Eric Schramm on 1/2/22.
 //
 
-#if os(macOS) && canImport(Charts)
+#if os(macOS)
 import AppKit
 import SwiftUI
 import Charts
