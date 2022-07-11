@@ -16,6 +16,7 @@ public struct SimpleProgressWindow {
         case modalWindow
     }
     
+    @MainActor
     public static func present(presentingVC: NSViewController, presentationStyle: PresentationStyle, progress: ObservableProgress, windowSize: CGSize = CGSize(width: 600, height: 180)) -> NSViewController {
         let sheetVC = NSViewController(nibName: nil, bundle: nil)
         let progressView = NSHostingView(rootView: ESProgressView(observableProgress: progress))
@@ -55,7 +56,7 @@ public class ObservableProgress : ObservableObject {
     private (set) var progressBarTitleStyle: ProgressBarTitleStyle
     
     var profiler: ProgressTimeProfiler
-    var debouncer: Debouncer?
+    let limiter = Limiter(policy: .throttle, duration: 0.5)
     
     public init(current: Int, total: Int, title: String, progressBarTitleStyle: ProgressBarTitleStyle) {
         self.current = current
@@ -71,16 +72,14 @@ public class ObservableProgress : ObservableObject {
         case .custom(let title):
             self.progressBarTitle = title
         }
-        
-        debouncer = Debouncer(delay: 0.5, useDelayAsThrottle: true, callback: {
-            self.applyUpdate()
-        })
     }
     
     public func update(current: Int, total: Int? = nil, title: String? = nil, progressBarTitleStyle: ProgressBarTitleStyle? = nil) {
         DispatchQueue.main.async {
             self.nextUpdate = Update(current: current, total: total ?? self.nextUpdate?.total ?? self.total, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
-            self.debouncer?.call()
+            Task {
+                await self.limiter.submit(operation: { self.applyUpdate() })
+            }
         }
     }
     
