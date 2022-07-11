@@ -196,6 +196,7 @@ public class RemoteDiskManager {
         }
     }
     
+    @MainActor
     public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
         
         var spv: NSViewController?
