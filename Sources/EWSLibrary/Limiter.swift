@@ -9,7 +9,7 @@ import Foundation
 
 // https://codereview.stackexchange.com/questions/269642/debounce-and-throttle-tasks-using-swift-concurrency
 
-
+@available(macOS 12, *)
 public actor Limiter {
     private let policy: Policy
     private let duration: TimeInterval
@@ -30,6 +30,7 @@ public actor Limiter {
 
 // MARK: - Limiter.Policy
 
+@available(macOS 12, *)
 public extension Limiter {
     enum Policy {
         ///will run first task after duration and ignore subsequent until complete
@@ -42,6 +43,7 @@ public extension Limiter {
 
 // MARK: - Private utility methods
 
+@available(macOS 12, *)
 private extension Limiter {
     func throttle(operation: @escaping () async -> Void) {
         guard task == nil else { return }

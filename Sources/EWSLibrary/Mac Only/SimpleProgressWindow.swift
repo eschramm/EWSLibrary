@@ -8,7 +8,7 @@
 #if os(macOS)
 import SwiftUI
 
-
+@available(macOS 12, *)
 public struct SimpleProgressWindow {
     
     public enum PresentationStyle {
@@ -33,6 +33,7 @@ public struct SimpleProgressWindow {
     }
 }
 
+@available(macOS 12, *)
 public class ObservableProgress : ObservableObject {
     
     public enum ProgressBarTitleStyle {
@@ -107,6 +108,7 @@ public class ObservableProgress : ObservableObject {
     }
 }
 
+@available(macOS 12, *)
 public struct ESProgressView: View {
     
     @ObservedObject var observableProgress: ObservableProgress
@@ -120,6 +122,7 @@ public struct ESProgressView: View {
     }
 }
 
+@available(macOS 12, *)
 struct ProgressView_Preview: PreviewProvider {
     
     static var previews: some View {

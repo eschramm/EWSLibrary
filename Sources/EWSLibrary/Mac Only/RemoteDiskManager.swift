@@ -28,6 +28,7 @@ extension KeychainSwift : CredentialsStore {
 }
 */
 
+@available(macOS 12, *)
 public class RemoteDiskManager {
  
     public enum RemoteDiskManagerError : Error {
@@ -299,6 +300,7 @@ public class RemoteDiskManager {
     }
 }
 
+@available(macOS 12, *)
 struct CredentialsView: View {
     
     let title: String
@@ -345,6 +347,7 @@ struct CredentialsView: View {
     }
 }
 
+@available(macOS 12, *)
 struct CredentialsView_Previews: PreviewProvider {
     static var previews: some View {
         CredentialsView(title: "Please provide login information for TimeMachineBackup", usernameTitle: "Username") { creds in print(creds) }
