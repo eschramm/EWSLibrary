@@ -39,6 +39,38 @@ final class EWSLibraryTests: XCTestCase {
             XCTAssertLessThan(fabs(testRun - probability), 0.02)
         }
     }
+    
+    @available(macOS 13.0, *)
+    func testAsyncTimer() async throws {
+        let start = Date()
+        let interval: Double = 1
+        let allowedErrorInterval: TimeInterval = 0.5
+        var firings = [Date]()
+        print("Testing AsyncTimer - expected delay")
+        let timer = AsyncTimer(interval: interval) {
+            print("Timer fired")
+            firings.append(Date())
+        }
+        await timer.start(fireNow: false)
+        try await Task.sleep(for: .seconds(Int(interval) * 8))
+        await timer.stop()
+        let firingsAfterStop = firings.count
+        XCTAssertGreaterThan(firings.count, 6)
+        XCTAssertLessThan(firings.count, 10)
+        var intervals = [TimeInterval]()
+        intervals.append(start.distance(to: firings[0]) - interval)
+        for n in 1..<firings.count {
+            intervals.append(firings[n - 1].distance(to: firings[n]) - interval)
+        }
+        let stats = intervals.stats()
+        stats.printAllStats(count: intervals.count, numberFormatter: nil)
+        try await Task.sleep(for: .seconds(Int(interval) * 2))
+        XCTAssertEqual(firings.count, firingsAfterStop, "AsyncTimer fired additional times after being stopped")
+        XCTAssertEqual(intervals.filter({ abs($0) > allowedErrorInterval }).count, 0, "At least one of the intervals for the AsyncTimer exceeds expected error of \(allowedErrorInterval)")
+        await timer.start(fireNow: true)
+        try await Task.sleep(for: .seconds(Int(interval) * 3))
+        XCTAssertGreaterThan(firings.count, firingsAfterStop + 2, "Async timer failed to make the initial and at least one firing after a restart")
+    }
 
     #if os(macOS)
     static var allTests = [
