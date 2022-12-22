@@ -29,7 +29,7 @@ extension KeychainSwift : CredentialsStore {
 */
 
 @available(macOS 12, *)
-public class RemoteDiskManager {
+public actor RemoteDiskManager {
  
     public enum RemoteDiskManagerError : Error {
         case noPresentingViewControllerToCaptureCredentials
@@ -61,11 +61,10 @@ public class RemoteDiskManager {
     let remoteIP: String
     let remoteDrivePath: String
     let credentialsStore: CredentialsStore
+    let fileCoordinator = AsyncAtomicOperationQueue()
     
     let usernameKeyPrefix = "EWS-RDM-username"
     let passwordKeyPrefix = "EWS-RDM-password"
-    
-    let fileManagerQueue = DispatchQueue(label: "copyWithProgress")
     
     public init(credentialsStore: CredentialsStore, localMountDir: String? = nil, testFile: String? = nil, remoteIP: String? = nil, remoteDrivePath: String? = nil) {
         self.credentialsStore = credentialsStore
@@ -87,34 +86,36 @@ public class RemoteDiskManager {
         return "\(passwordKeyPrefix)-\(localMountDir)-\(remoteDrivePath)"
     }
     
-    func getCreds(presentingVC: NSViewController?, completion: @escaping (Result<Credentials, RemoteDiskManagerError>) -> () ) {
+    func getCreds(presentingVC: NSViewController?) async throws -> Credentials {
         if let username = credentialsStore.get(keychainUsernameKey()), let password = credentialsStore.get(keychainPasswordKey()) {
-            completion(.success(Credentials(username: username, password: password)))
-            return
+            return Credentials(username: username, password: password)
         }
         guard let presentingVC = presentingVC else {
-            completion(.failure(RemoteDiskManagerError.noPresentingViewControllerToCaptureCredentials))
-            return
+            throw RemoteDiskManagerError.noPresentingViewControllerToCaptureCredentials
         }
         
-        let sheetVC = NSViewController(nibName: nil, bundle: nil)
+        let sheetVC = await MainActor.run {
+            return NSViewController(nibName: nil, bundle: nil)
+        }
         
-        let credsView = NSHostingView(rootView: CredentialsView(title: "Enter credentials for remote disk \(self.remoteDrivePath)", handler: { result in
-            switch result {
-            case .failure(let error):
-                completion(.failure(error))
-            case .success(let creds):
-                // save in keychain
-                self.credentialsStore.set(creds.username, for: self.keychainUsernameKey())
-                self.credentialsStore.set(creds.password, for: self.keychainPasswordKey())
-                completion(.success(creds))
+        let credentials = try await withCheckedThrowingContinuation({ checkedContinuation in
+            DispatchQueue.main.async {
+                let credsView = NSHostingView(rootView: CredentialsView(title: "Enter credentials for remote disk \(self.remoteDrivePath)", handler: { result in
+                    checkedContinuation.resume(with: result)
+                    presentingVC.dismiss(sheetVC)
+                }))
+                credsView.frame = CGRect(x: 0, y: 0, width: 300, height: 180)
+                sheetVC.view = credsView
+                
+                presentingVC.presentAsSheet(sheetVC)
             }
-            presentingVC.dismiss(sheetVC)
-        }))
-        credsView.frame = CGRect(x: 0, y: 0, width: 300, height: 180)
-        sheetVC.view = credsView
+        })
+
+        // save in keychain
+        self.credentialsStore.set(credentials.username, for: self.keychainUsernameKey())
+        self.credentialsStore.set(credentials.password, for: self.keychainPasswordKey())
         
-        presentingVC.presentAsSheet(sheetVC)
+        return credentials
     }
     
     public func nukeCreds() {
@@ -126,27 +127,21 @@ public class RemoteDiskManager {
         return FileManager.default.fileExists(atPath: testFilePath())
     }
     
-    public func mount(presentingVC: NSViewController?, completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
+    public func mount(presentingVC: NSViewController?) async throws {
         guard !FileManager.default.fileExists(atPath: testFilePath()) else {
-            completion(.success(()))
             return
         }
         
-        getCreds(presentingVC: presentingVC) { result in
-            switch result {
-            case .failure(let error):
-                completion(.failure(error))
-            case .success(let creds):
-                let shell = Shell()
-                var output = shell.outputOf(commandName: "mkdir", arguments: ["-p", self.localMountDir]) ?? ""
-                output += "; "
-                output += shell.outputOf(commandName: "mount_smbfs", arguments: ["//\(creds.username):\(creds.password)@\(self.remoteIP)/\(self.remoteDrivePath)", self.localMountDir]) ?? ""
-                if FileManager.default.fileExists(atPath: self.testFilePath()) {
-                    completion(.success(()))
-                } else {
-                    completion(.failure(RemoteDiskManagerError.mountingFailure(description: output)))
-                }
-            }
+        let creds = try await getCreds(presentingVC: presentingVC)
+            
+        let shell = Shell()
+        var output = shell.outputOf(commandName: "mkdir", arguments: ["-p", self.localMountDir]) ?? ""
+        output += "; "
+        output += shell.outputOf(commandName: "mount_smbfs", arguments: ["//\(creds.username):\(creds.password)@\(self.remoteIP)/\(self.remoteDrivePath)", self.localMountDir]) ?? ""
+        if FileManager.default.fileExists(atPath: self.testFilePath()) {
+            return
+        } else {
+            throw RemoteDiskManagerError.mountingFailure(description: output)
         }
     }
     
@@ -157,14 +152,28 @@ public class RemoteDiskManager {
         }
     }
     
-    public func processFile(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
-        mount(presentingVC: presentingViewController) { result in
-            switch result {
-            case .failure(_):
-                completion(result)
-            case .success(()):
-                let fileManager = FileManager()
+    public func processFile(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> ()) async throws -> Int64 {
+        try await mount(presentingVC: presentingViewController)
+        
+        guard let totalFileSize = try? self.fileSize(at: fromURL) else {
+            return 0
+        }
+        
+        let fileManager = FileManager()
+        do {
+            switch type {
+            case .copy:
+                statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
+                try fileManager.copyItem(at: fromURL, to: toURL)
+            case .move:
+                statusUpdater("Attempting move from \(fromURL) to \(toURL)")
+                try fileManager.moveItem(at: fromURL, to: toURL)
+            }
+        } catch let error as NSError {
+            if error.code == 516, overwrite {
                 do {
+                    statusUpdater("Attempting removal before copy \(toURL)")
+                    try fileManager.removeItem(at: toURL)
                     switch type {
                     case .copy:
                         statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
@@ -173,96 +182,87 @@ public class RemoteDiskManager {
                         statusUpdater("Attempting move from \(fromURL) to \(toURL)")
                         try fileManager.moveItem(at: fromURL, to: toURL)
                     }
-                } catch let error as NSError {
-                    if error.code == 516, overwrite {
-                        do {
-                            statusUpdater("Attempting removal before copy \(toURL)")
-                            try fileManager.removeItem(at: toURL)
-                            switch type {
-                            case .copy:
-                                statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
-                                try fileManager.copyItem(at: fromURL, to: toURL)
-                            case .move:
-                                statusUpdater("Attempting move from \(fromURL) to \(toURL)")
-                                try fileManager.moveItem(at: fromURL, to: toURL)
-                            }
-                        } catch {
-                            completion(.failure(RemoteDiskManagerError.fileSystemOverwriteFailure(description: error.localizedDescription)))
-                        }
-                    } else {
-                        completion(.failure(RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)))
-                    }
+                } catch {
+                    throw RemoteDiskManagerError.fileSystemOverwriteFailure(description: error.localizedDescription)
                 }
+            } else {
+                throw RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)
             }
         }
+        return Int64(totalFileSize)
     }
     
-    @MainActor
-    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> (), completion: @escaping (Result<Void, RemoteDiskManagerError>) -> () ) {
+    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> ()) async throws -> Int64 {
         
-        var spv: NSViewController?
-        var progress: ObservableProgress?
+        let title = actionDetailOverride ?? "\(type.actionTitle()) File"
+        let progress = ObservableProgress(current: 0, total: 0, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
         
-        mount(presentingVC: presentingViewController) { result in
-            switch result {
-            case .failure(_):
-                completion(result)
-            case .success(()):
-                if let totalFileSize = try? self.fileSize(at: fromURL) {
-                    let title = actionDetailOverride ?? "\(type.actionTitle()) File"
-                    progress = ObservableProgress(current: 0, total: totalFileSize, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
-                    if let pvc = presentingViewController {
-                        spv = SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress!)
-                    }
-                    let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { (timer) in
-                        // called every 0.1 sec to assess progress of copy operation
-                        if let copiedFileSize = try? self.fileSize(at: toURL) {
-                            DispatchQueue.main.async {
-                                progress?.update(current: copiedFileSize)
-                                if copiedFileSize >= totalFileSize {
-                                    timer.invalidate()
-                                    spv?.dismiss(nil)
-                                    completion(.success(()))
-                                }
-                            }
-                        }
-                    }
-                    
-                    self.fileManagerQueue.async {
-                        let fileManager = FileManager()
-                        do {
-                            switch type {
-                            case .copy:
-                                statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
-                                try fileManager.copyItem(at: fromURL, to: toURL)
-                            case .move:
-                                statusUpdater("Attempting move from \(fromURL) to \(toURL)")
-                                try fileManager.moveItem(at: fromURL, to: toURL)
-                            }
-                        } catch let error as NSError {
-                            if error.code == 516, overwrite {
-                                do {
-                                    statusUpdater("Attempting removal before copy \(toURL)")
-                                    try fileManager.removeItem(at: toURL)
-                                    switch type {
-                                    case .copy:
-                                        statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
-                                        try fileManager.copyItem(at: fromURL, to: toURL)
-                                    case .move:
-                                        statusUpdater("Attempting move from \(fromURL) to \(toURL)")
-                                        try fileManager.moveItem(at: fromURL, to: toURL)
-                                    }
-                                } catch {
-                                    completion(.failure(RemoteDiskManagerError.fileSystemOverwriteFailure(description: error.localizedDescription)))
-                                }
-                            } else {
-                                completion(.failure(RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)))
-                            }
-                        }
-                    }
-                    timer.fire()
+        try await mount(presentingVC: presentingViewController)
+        if let totalFileSize = try? self.fileSize(at: fromURL) {
+            progress.update(current: 0, total: totalFileSize)
+            let spv: NSViewController?
+            if let pvc = presentingViewController {
+                spv = await SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress)
+            } else {
+                spv = nil
+            }
+            let timer = AsyncTimer(interval: 0.75) { thisTimer in
+                if let copiedFileSize = try? self.fileSize(at: toURL) {
+                    // don't call on DispatchQueue.main - will not update - maybe because it does it internally, too?
+                    progress.update(current: copiedFileSize)
                 }
             }
+            await timer.start(fireNow: true)
+            await fileCoordinator.takeLock()
+            
+            let fileManager = FileManager()
+            do {
+                switch type {
+                case .copy:
+                    statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
+                    try fileManager.copyItem(at: fromURL, to: toURL)
+                case .move:
+                    statusUpdater("Attempting move from \(fromURL) to \(toURL)")
+                    try fileManager.moveItem(at: fromURL, to: toURL)
+                }
+            } catch let error as NSError {
+                if error.code == 516, overwrite {
+                    do {
+                        statusUpdater("Attempting removal before copy \(toURL)")
+                        try fileManager.removeItem(at: toURL)
+                        switch type {
+                        case .copy:
+                            statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
+                            try fileManager.copyItem(at: fromURL, to: toURL)
+                        case .move:
+                            statusUpdater("Attempting move from \(fromURL) to \(toURL)")
+                            try fileManager.moveItem(at: fromURL, to: toURL)
+                        }
+                    } catch {
+                        await MainActor.run {
+                            spv?.dismiss(nil)
+                        }
+                        await timer.stop()
+                        await fileCoordinator.releaseLock()
+                        throw RemoteDiskManagerError.fileSystemOverwriteFailure(description: error.localizedDescription)
+                    }
+                } else {
+                    await MainActor.run {
+                        spv?.dismiss(nil)
+                    }
+                    await timer.stop()
+                    await fileCoordinator.releaseLock()
+                    throw RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)
+                }
+            }
+            await timer.stop()
+            await fileCoordinator.releaseLock()
+            await MainActor.run {
+                spv?.dismiss(nil)
+            }
+            return Int64(totalFileSize)
+        } else {
+            return 0
         }
     }
     
