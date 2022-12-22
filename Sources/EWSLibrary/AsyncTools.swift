@@ -57,27 +57,27 @@ public actor AsyncTimer {
 }
 
 /*
- The ASyncAtomicOperation is intended to create atomic access to a critical section
+ The AsyncAtomicOperationQueue is intended to create atomic access to a critical section
  in async-await that may yield (await). Order of operations is not guaranteed when
  there is contention. Note: enqueueOperation can be blocked/delayed by a long-running
  synchronous operation.
  
  synchronous closure usage:
  
- let atomicActor = ASyncAtomicOperation()
+ let atomicActor = AsyncAtomicOperationQueue()
  atomicActor.enqueueOperation {
      FileManager.default.removeItem(at: url)
  }
  
  async-await usage:
  
- let atomicActor = ASyncAtomicOperation()
+ let atomicActor = AsyncAtomicOperationQueue()
  await atomicActor.takeLock()
  FileManager.default.remove(at: url)
  await atomicActor.releaseLock()
  */
 
-public actor AsyncAtomicOperation {
+public actor AsyncAtomicOperationQueue {
     
     let randomSleepRange: Range<TimeInterval>
     var sharedOperationInProgress = false
@@ -97,7 +97,7 @@ public actor AsyncAtomicOperation {
         //print("END  : \(ProcessInfo.processInfo.systemUptime)")
     }
     
-    public func takeLock(identifier: String) async {
+    public func takeLock(identifier: String = "") async {
         //print("taking lock")
         while sharedOperationInProgress {
             //print("awaiting - \(identifier)")

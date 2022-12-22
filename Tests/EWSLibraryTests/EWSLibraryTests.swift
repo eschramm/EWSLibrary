@@ -72,7 +72,7 @@ final class EWSLibraryTests: XCTestCase {
     }
     
     func testASyncAtomicOperationWithOperation() async throws {
-        let atomicQueue = AsyncAtomicOperation()
+        let atomicQueue = AsyncAtomicOperationQueue()
         let allStart = ProcessInfo.processInfo.systemUptime
         var operatingIntervals = [(TimeInterval, TimeInterval)]()
         let scaling = 3_000_000
@@ -184,7 +184,7 @@ final class EWSLibraryTests: XCTestCase {
     }
     
     func testASyncAtomicOperationAsyncAwait() async throws {
-        let atomicQueue = AsyncAtomicOperation()
+        let atomicQueue = AsyncAtomicOperationQueue()
         let allStart = ProcessInfo.processInfo.systemUptime
         let intervals = OperatingIntervals()
         let scaling: Double = 3_000_000
