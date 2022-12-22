@@ -16,12 +16,12 @@ public extension TimeInterval {
 public actor AsyncTimer {
     
     let interval: TimeInterval
-    let fireClosure: () -> ()
+    let fireClosure: (AsyncTimer) -> ()
     var fireTask: Task<Void, Never>?
     
     var isRunning = false
     
-    public init(interval: TimeInterval, fireClosure: @escaping () -> ()) {
+    public init(interval: TimeInterval, fireClosure: @escaping (AsyncTimer) -> ()) {
         self.interval = interval
         self.fireClosure = fireClosure
     }
@@ -42,7 +42,7 @@ public actor AsyncTimer {
     
     func fire() {
         guard isRunning else { return }
-        fireTask = Task { fireClosure() }
+        fireTask = Task { fireClosure(self) }
         Task {
             await fireTask?.value
             try? await Task.sleep(nanoseconds: interval.nanoSeconds)
