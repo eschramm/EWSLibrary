@@ -61,11 +61,10 @@ public actor RemoteDiskManager {
     let remoteIP: String
     let remoteDrivePath: String
     let credentialsStore: CredentialsStore
+    let fileCoordinator = AsyncAtomicOperationQueue()
     
     let usernameKeyPrefix = "EWS-RDM-username"
     let passwordKeyPrefix = "EWS-RDM-password"
-    
-    let fileManagerQueue = DispatchQueue(label: "copyWithProgress")
     
     public init(credentialsStore: CredentialsStore, localMountDir: String? = nil, testFile: String? = nil, remoteIP: String? = nil, remoteDrivePath: String? = nil) {
         self.credentialsStore = credentialsStore
@@ -115,6 +114,8 @@ public actor RemoteDiskManager {
         // save in keychain
         self.credentialsStore.set(credentials.username, for: self.keychainUsernameKey())
         self.credentialsStore.set(credentials.password, for: self.keychainPasswordKey())
+        
+        return credentials
     }
     
     public func nukeCreds() {
@@ -151,8 +152,12 @@ public actor RemoteDiskManager {
         }
     }
     
-    public func processFile(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> ()) async throws {
+    public func processFile(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> ()) async throws -> Int64 {
         try await mount(presentingVC: presentingViewController)
+        
+        guard let totalFileSize = try? self.fileSize(at: fromURL) else {
+            return 0
+        }
         
         let fileManager = FileManager()
         do {
@@ -184,79 +189,82 @@ public actor RemoteDiskManager {
                 throw RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)
             }
         }
+        return Int64(totalFileSize)
     }
     
-    @MainActor
-    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> ()) async throws {
+    public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> ()) async throws -> Int64 {
         
-        var spv: NSViewController?
-        var progress: ObservableProgress?
+        let title = actionDetailOverride ?? "\(type.actionTitle()) File"
+        let progress = ObservableProgress(current: 0, total: 0, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
         
         try await mount(presentingVC: presentingViewController)
-        if let totalFileSize = try? await self.fileSize(at: fromURL) {
-            let title = actionDetailOverride ?? "\(type.actionTitle()) File"
-            progress = ObservableProgress(current: 0, total: totalFileSize, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
+        if let totalFileSize = try? self.fileSize(at: fromURL) {
+            progress.update(current: 0, total: totalFileSize)
+            let spv: NSViewController?
             if let pvc = presentingViewController {
-                spv = SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress!)
+                spv = await SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress)
+            } else {
+                spv = nil
             }
-            let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { (timer) in
-                // called every 0.1 sec to assess progress of copy operation
-                Task {
-                    if let copiedFileSize = try? await self.fileSize(at: toURL) {
-                        DispatchQueue.main.async {
-                            progress?.update(current: copiedFileSize)
-                            if copiedFileSize >= totalFileSize {
-                                timer.invalidate()
-                                spv?.dismiss(nil)
-                                return
-                            }
-                        }
-                    }
+            let timer = AsyncTimer(interval: 0.75) { thisTimer in
+                if let copiedFileSize = try? self.fileSize(at: toURL) {
+                    // don't call on DispatchQueue.main - will not update - maybe because it does it internally, too?
+                    progress.update(current: copiedFileSize)
                 }
             }
+            await timer.start(fireNow: true)
+            await fileCoordinator.takeLock()
             
-            self.fileManagerQueue.async {
-                let fileManager = FileManager()
-                do {
-                    switch type {
-                    case .copy:
-                        statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
-                        try fileManager.copyItem(at: fromURL, to: toURL)
-                    case .move:
-                        statusUpdater("Attempting move from \(fromURL) to \(toURL)")
-                        try fileManager.moveItem(at: fromURL, to: toURL)
-                    }
-                } catch let error as NSError {
-                    if error.code == 516, overwrite {
-                        do {
-                            statusUpdater("Attempting removal before copy \(toURL)")
-                            try fileManager.removeItem(at: toURL)
-                            switch type {
-                            case .copy:
-                                statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
-                                try fileManager.copyItem(at: fromURL, to: toURL)
-                            case .move:
-                                statusUpdater("Attempting move from \(fromURL) to \(toURL)")
-                                try fileManager.moveItem(at: fromURL, to: toURL)
-                            }
-                        } catch {
-                            DispatchQueue.main.async {
-                                spv?.dismiss(nil)
-                            }
-                            throw RemoteDiskManagerError.fileSystemOverwriteFailure(description: error.localizedDescription)
+            let fileManager = FileManager()
+            do {
+                switch type {
+                case .copy:
+                    statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
+                    try fileManager.copyItem(at: fromURL, to: toURL)
+                case .move:
+                    statusUpdater("Attempting move from \(fromURL) to \(toURL)")
+                    try fileManager.moveItem(at: fromURL, to: toURL)
+                }
+            } catch let error as NSError {
+                if error.code == 516, overwrite {
+                    do {
+                        statusUpdater("Attempting removal before copy \(toURL)")
+                        try fileManager.removeItem(at: toURL)
+                        switch type {
+                        case .copy:
+                            statusUpdater("Attempting copy from \(fromURL) to \(toURL)")
+                            try fileManager.copyItem(at: fromURL, to: toURL)
+                        case .move:
+                            statusUpdater("Attempting move from \(fromURL) to \(toURL)")
+                            try fileManager.moveItem(at: fromURL, to: toURL)
                         }
-                    } else {
-                        DispatchQueue.main.async {
+                    } catch {
+                        await MainActor.run {
                             spv?.dismiss(nil)
                         }
-                        throw RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)
+                        await timer.stop()
+                        await fileCoordinator.releaseLock()
+                        throw RemoteDiskManagerError.fileSystemOverwriteFailure(description: error.localizedDescription)
                     }
+                } else {
+                    await MainActor.run {
+                        spv?.dismiss(nil)
+                    }
+                    await timer.stop()
+                    await fileCoordinator.releaseLock()
+                    throw RemoteDiskManagerError.fileSystemError(description: error.localizedDescription)
                 }
             }
-            timer.fire()
+            await timer.stop()
+            await fileCoordinator.releaseLock()
+            await MainActor.run {
+                spv?.dismiss(nil)
+            }
+            return Int64(totalFileSize)
+        } else {
+            return 0
         }
     }
-
     
     public func fileSize(at url: URL) throws -> Int {
         var isDirectory: ObjCBool = false
