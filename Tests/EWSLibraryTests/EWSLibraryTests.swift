@@ -46,7 +46,7 @@ final class EWSLibraryTests: XCTestCase {
         let allowedErrorInterval: TimeInterval = 0.5
         var firings = [TimeInterval]()
         print("Testing AsyncTimer - expected delay")
-        let timer = AsyncTimer(interval: interval) {
+        let timer = AsyncTimer(interval: interval) { _ in 
             print("Timer fired")
             firings.append(ProcessInfo.processInfo.systemUptime)
         }
