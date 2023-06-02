@@ -40,7 +40,7 @@ public actor AsyncTimer {
         }
     }
     
-    func fire() {
+    public func fire() {
         guard isRunning else { return }
         fireTask = Task { fireClosure(self) }
         Task {
@@ -50,7 +50,7 @@ public actor AsyncTimer {
         }
     }
     
-    func stop() {
+    public func stop() {
         fireTask?.cancel()
         isRunning = false
     }
