@@ -32,21 +32,22 @@ public actor AsyncTimer {
         }
         isRunning = true
         if fireNow {
-            fire()
+            fire(once: true)
         }
         Task {
             try? await Task.sleep(nanoseconds: interval.nanoSeconds)
-            fire()
+            fire(once: false)
         }
     }
     
-    public func fire() {
+    public func fire(once: Bool) {
         guard isRunning else { return }
         fireTask = Task { fireClosure(self) }
+        guard !once else { return }
         Task {
             await fireTask?.value
             try? await Task.sleep(nanoseconds: interval.nanoSeconds)
-            fire()
+            fire(once: false)
         }
     }
     
