@@ -7,21 +7,46 @@
 
 import Foundation
 
-public extension String {
-    func parseCSV() -> [[String]] {
-        var lines = [[String]]()
+public struct CSVChunk {
+    public let prefix: String
+    public let lineOfFields: [[String]]
+    public let lastLine: String
+}
 
-        let scanner = Scanner(string: self)
+public extension String {
+    
+    func parseCSV() -> [[String]] {
+        var scanner = Scanner(string: self)
         scanner.charactersToBeSkipped = ["\u{FEFF}"]  // otherwise skips whitespace by default, but exclude nonBreakingSpace! ARGH
+        return parseCSV(scanner: &scanner).0
+    }
+    
+    func parseCSVFromChunk() -> CSVChunk {
+        var scanner = Scanner(string: self)
+        scanner.charactersToBeSkipped = ["\u{FEFF}"]  // otherwise skips whitespace by default, but exclude nonBreakingSpace! ARGH
+        let prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
+        _ = scanner.scanCharacter()
+        let (linesOfFields, lastLine) = parseCSV(scanner: &scanner)
+        return .init(prefix: prefix, lineOfFields: linesOfFields.dropLast(), lastLine: lastLine)
+    }
+    
+    fileprivate func parseCSV(scanner: inout Scanner) -> ([[String]], lastLine: String) {
+        var lines = [[String]]()
+        
         let characterSet = CharacterSet([",", "\""]).union(.newlines)  // comma, quote, CRLF
 
         var insideQuotes = false
         var fields = [String]()
         var currentField = ""
+        var lastLine = ""
 
         while !scanner.isAtEnd {
             let text = scanner.scanUpToCharacters(from: characterSet) ?? ""
             let separator = scanner.scanCharacter()
+            lastLine += text
+            if let separator {
+                lastLine += "\(separator)"
+            }
             if separator == "," {
                 if insideQuotes == false {
                     // new field
@@ -38,6 +63,7 @@ public extension String {
                 // scanner item at current index is the next character
                 if !scanner.isAtEnd, self[scanner.currentIndex] == "\"" {
                     _ = scanner.scanCharacter()  // consume next quote
+                    lastLine += "\(separator!)"
                     if currentField.isEmpty && !scanner.isAtEnd {
                         if self[scanner.currentIndex] == "\n" || self[scanner.currentIndex] == "," {
                             // empty string - do nothing
@@ -63,6 +89,9 @@ public extension String {
                     lines.append(fields)
                     fields = []
                     currentField = ""
+                    if !scanner.isAtEnd {
+                        lastLine = ""
+                    }
                 }
             }
         }
@@ -73,7 +102,7 @@ public extension String {
             lines.append(fields)
         }
 
-        return lines
+        return (lines, lastLine: lastLine)
     }
 
     func makeCSVsafe(carriageReturnReplacement: String? = nil) -> String {

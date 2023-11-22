@@ -95,6 +95,18 @@ class CSVTests: XCTestCase {
         let line8fields = parsedFields[7]
         XCTAssert(line8fields[12].hasPrefix("{"))
     }
+    
+    func testCSVChunk() throws {
+        let sampleOneLine = """
+                         "sensorkit-ambient-light-sensor","AppleWatch","MDH-6315-8983","57152181-62DC-463C-AB4B-91ABB7F89235","2023-11-07 21:51:31.000","-0600","2023-11-08 21:25:27.000","-0600","{""name"": ""Eric\\u2019s Apple\\u00a0Watch Series 8"", ""productType"": ""Watch6,15"", ""systemVersion"": ""10.1"", ""model"": ""Apple Watch"", ""systemName"": ""Watch OS""}","{""timestamp"":1699471879000,""sample"":{""lux"":71,""chromaticity"":{""x"":0,""y"":0},""placement"":""FrontTopRight""}}","sensorkit-ambient-light-sensor/AppleWatch/MDH-6315-8983/57152181-62DC-463C-AB4B-91ABB7F89235/2023-11-07T155131-0600_2023-11-08T152527-0600","{exportstartdate=2023-10-01T00:00:00+00:00, s3key=RK.95853084.SK Low Data/4daa074c-b5d8-4286-bb30-e6be5c2f4ef0, updatedate=2023-11-16T17:43:55.361631+00:00, s3bucket=pep-rkstudio-export, appversion=1.0.0, exportenddate=2023-11-17T00:00:00+00:00}"
+                         """
+        
+        let sample = [sampleOneLine, sampleOneLine, sampleOneLine].joined(separator: "\n")
+        let output = sample.parseCSVFromChunk()
+        XCTAssertEqual(output.prefix, sampleOneLine)
+        XCTAssertEqual(output.lineOfFields, sampleOneLine.parseCSV())
+        XCTAssertEqual(output.lastLine, sampleOneLine)
+    }
 
     static var allTests = [
         ("testCSVcreation", testCSVcreation),
