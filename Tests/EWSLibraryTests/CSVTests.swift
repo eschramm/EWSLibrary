@@ -104,8 +104,36 @@ class CSVTests: XCTestCase {
         let sample = [sampleOneLine, sampleOneLine, sampleOneLine].joined(separator: "\n")
         let output = sample.parseCSVFromChunk()
         XCTAssertEqual(output.prefix, sampleOneLine)
-        XCTAssertEqual(output.lineOfFields, sampleOneLine.parseCSV())
+        XCTAssertEqual(output.lineModels, sampleOneLine.parseCSV())
         XCTAssertEqual(output.lastLine, sampleOneLine)
+    }
+    
+    func testHeaders() throws {
+        
+        let csvString = """
+                        "Mailing Address",First,Last,"Dumb, but legal",this is also legal
+                        "371 Oak St",Eric,Schramm,myself,"butthead face"
+                        """
+        XCTAssertEqual(csvString.parseHeaders(),["Mailing Address", "First" , "Last", "Dumb, but legal", "this is also legal"])
+        
+        enum TestFields: String, CaseIterable {
+            case first = "First"
+            case thisIsAlsoLegal = "this is also legal"
+            case mailingAddress = "Mailing Address"
+            case dumbButLegal = "Dumb, but legal"
+            case notInHeader = "not in header"
+        }
+        
+        let expectedOutput: [TestFields : Int] = [
+            .mailingAddress: 0,
+            .first: 1,
+            .dumbButLegal: 3,
+            .thisIsAlsoLegal: 4
+        ]
+        
+        XCTAssertEqual(csvString.headersMayMap(stringEnum: TestFields.self), expectedOutput)
+        
+        XCTAssertThrowsError(try csvString.headersMustMap(stringEnum: TestFields.self))
     }
 
     static var allTests = [

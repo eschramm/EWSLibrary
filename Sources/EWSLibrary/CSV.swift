@@ -13,24 +13,70 @@ public struct CSVChunk<T> {
     public let lastLine: String
 }
 
+public enum CSVError: Error {
+    case expectedHeaderNotFound(String)
+}
+
 public extension String {
     
-    func parseCSV() -> [[String]] {
+    func csvScanner() -> Scanner {
         var scanner = Scanner(string: self)
         scanner.charactersToBeSkipped = ["\u{FEFF}"]  // otherwise skips whitespace by default, but exclude nonBreakingSpace! ARGH
-        return parseCSV(scanner: &scanner).0
+        return scanner
+    }
+    
+    func parseCSV() -> [[String]] {
+        var scanner = csvScanner()
+        return parseCSV(scanner: &scanner, quitAfterLines: nil).0
     }
     
     func parseCSVFromChunk() -> CSVChunk<[String]> {
-        var scanner = Scanner(string: self)
-        scanner.charactersToBeSkipped = ["\u{FEFF}"]  // otherwise skips whitespace by default, but exclude nonBreakingSpace! ARGH
+        var scanner = csvScanner()
         let prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
         _ = scanner.scanCharacter()
-        let (linesOfFields, lastLine) = parseCSV(scanner: &scanner)
+        let (linesOfFields, lastLine) = parseCSV(scanner: &scanner, quitAfterLines: nil)
         return .init(prefix: prefix, lineModels: linesOfFields.dropLast(), lastLine: lastLine)
     }
     
-    fileprivate func parseCSV(scanner: inout Scanner) -> ([[String]], lastLine: String) {
+    func parseHeaders() -> [String] {
+        var scanner = csvScanner()
+        return parseCSV(scanner: &scanner, quitAfterLines: 1).0[0]
+    }
+    
+    func headersMayMap<E: RawRepresentable>(stringEnum: E.Type) -> [E : Int] where E.RawValue == String, E : CaseIterable {
+        let headersDict = parseHeaders().reduce([String : Int]()) { partialResult, header in
+            var dict = partialResult
+            dict[header] = partialResult.count
+            return dict
+        }
+        var output = [E : Int]()
+        for expectedHeader in E.allCases {
+            guard let index = headersDict[expectedHeader.rawValue] else {
+                print("\(expectedHeader.rawValue) not found in headers")
+                continue
+            }
+            output[expectedHeader] = index
+        }
+        return output
+    }
+    
+    func headersMustMap<E: RawRepresentable>(stringEnum: E.Type) throws -> [E : Int] where E.RawValue == String, E : CaseIterable {
+        let headersDict = parseHeaders().reduce([String : Int]()) { partialResult, header in
+            var dict = partialResult
+            dict[header] = partialResult.count
+            return dict
+        }
+        var output = [E : Int]()
+        for expectedHeader in E.allCases {
+            guard let index = headersDict[expectedHeader.rawValue] else {
+                throw CSVError.expectedHeaderNotFound(expectedHeader.rawValue)
+            }
+            output[expectedHeader] = index
+        }
+        return output
+    }
+    
+    fileprivate func parseCSV(scanner: inout Scanner, quitAfterLines: Int?) -> ([[String]], lastLine: String) {
         var lines = [[String]]()
         
         let characterSet = CharacterSet([",", "\""]).union(.newlines)  // comma, quote, CRLF
@@ -87,6 +133,9 @@ public extension String {
                     currentField += text
                     fields.append(currentField)
                     lines.append(fields)
+                    if let quitAfterLines, lines.count >= quitAfterLines {
+                        break
+                    }
                     fields = []
                     currentField = ""
                     if !scanner.isAtEnd {

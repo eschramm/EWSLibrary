@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FileCSVLineChunkerError: Error {
+enum CSVFileParserError: Error {
     case indexRequestedBeyondRange(Int, Int)
     case unableToConvertDataToString
 }
@@ -67,6 +67,37 @@ public class CSVFileParser<T> {
         }
     }
     
+    /// by default looks thru first 1 kB of data for headers, adjust if longer
+    public func headers(readBytes: Int = 1024) throws -> [String] {
+        let string = try headerChunk(readBytes: readBytes)
+        return string.parseHeaders()
+    }
+    
+    /// by default looks thru first 1 kB of data for headers, adjust if longer
+    public func headersMayMap<E: RawRepresentable>(stringEnum: E.Type, readBytes: Int = 1024) -> [E : Int] where E.RawValue == String, E : CaseIterable {
+        do {
+            let string = try headerChunk(readBytes: readBytes)
+            return string.headersMayMap(stringEnum: stringEnum)
+        } catch {
+            print("Unable to create string from data")
+            return [:]
+        }
+    }
+    
+    /// by default looks thru first 1 kB of data for headers, adjust if longer
+    public func headersMustMap<E: RawRepresentable>(stringEnum: E.Type, readBytes: Int = 1024) throws -> [E : Int] where E.RawValue == String, E : CaseIterable {
+        let string = try headerChunk(readBytes: readBytes)
+        return try string.headersMustMap(stringEnum: stringEnum)
+    }
+    
+    private func headerChunk(readBytes: Int) throws -> String {
+        let endFrame = max(1024, data.count)
+        guard let string = String(data: data[0...endFrame], encoding: .utf8) else {
+            throw CSVFileParserError.unableToConvertDataToString
+        }
+        return string
+    }
+    
     public func csvFileToModels() async throws -> [T] {
         try await parseCSVLines()
         var output = [T]()
@@ -119,7 +150,7 @@ public class CSVFileParser<T> {
     
     private func chunk(index: Int) throws -> Chunk {
         guard index <= totalChunks else {
-            throw FileCSVLineChunkerError.indexRequestedBeyondRange(index, lastChunkIndex)
+            throw CSVFileParserError.indexRequestedBeyondRange(index, lastChunkIndex)
         }
         let chunkStart = index * chunkSizeBytes
         return .init(index: index, byteRange: chunkStart..<(min(chunkStart + chunkSizeBytes, data.count)))
@@ -137,7 +168,7 @@ public class CSVFileParser<T> {
         } else {
             print("WARNING: Chunk \(chunkIdx) failed UTF-8 an required ASCII encoding")
             guard let asciiString = String(data: dataChunk, encoding: .ascii) else {
-                throw FileCSVLineChunkerError.unableToConvertDataToString
+                throw CSVFileParserError.unableToConvertDataToString
             }
             string = asciiString
         }
