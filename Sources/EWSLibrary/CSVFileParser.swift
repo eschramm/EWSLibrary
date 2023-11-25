@@ -45,13 +45,13 @@ public class CSVFileParser<T> {
     private let printUpdates: Bool
     private let skipHeaderRow: Bool
     private let profiler = TimeProfiler()
-    private let modelConverter: ([String]) -> T
+    private let modelConverter: ([String]) -> T?
     
     var totalChunks: Int {
         return lastChunkIndex + 1
     }
     
-    public init(url: URL, chunkSizeInMB: Int = 8, printUpdates: Bool = true, skipHeaderRow: Bool = true, modelConverter: @escaping ([String]) -> T) throws {
+    public init(url: URL, chunkSizeInMB: Int = 8, printUpdates: Bool = true, skipHeaderRow: Bool = true, modelConverter: @escaping ([String]) -> T?) throws {
         data = try Data(contentsOf: url, options: [.alwaysMapped, .uncached])
         let chunkSize = 1024 * 1000 * chunkSizeInMB
         chunkSizeBytes = chunkSize
@@ -76,19 +76,19 @@ public class CSVFileParser<T> {
                 if !skipHeaderRow {
                     output += await lineCoordinator.chunkPrefixes[0]!
                         .parseCSV()
-                        .map({ modelConverter($0) })
+                        .compactMap({ modelConverter($0) })
                 }
             } else {
                 let firstLine = await lineCoordinator.chunkSuffixes[chunkIndex - 1]! + lineCoordinator.chunkPrefixes[chunkIndex]!
                 output += firstLine
                     .parseCSV()
-                    .map({ modelConverter($0) })
+                    .compactMap({ modelConverter($0) })
             }
             output += await lineCoordinator.modelsByIndex[chunkIndex]!
             if chunkIndex == lastChunkIndex {
                 output += await lineCoordinator.chunkSuffixes[lastChunkIndex]!
                     .parseCSV()
-                    .map({ modelConverter($0) })
+                    .compactMap({ modelConverter($0) })
             }
         }
         profiler.stamp(tag: "end assembly")
@@ -102,7 +102,7 @@ public class CSVFileParser<T> {
             for idx in 0..<totalChunks {
                 group.addTask {
                     let csvChunk = try self.fieldLinesForChunk(chunkIdx: idx)
-                    let models = csvChunk.lineModels.map({ self.modelConverter($0) })
+                    let models = csvChunk.lineModels.compactMap({ self.modelConverter($0) })
                     return (idx, .init(prefix: csvChunk.prefix, lineModels: models, lastLine: csvChunk.lastLine))
                 }
             }
