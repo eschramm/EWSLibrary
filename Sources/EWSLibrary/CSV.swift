@@ -7,9 +7,9 @@
 
 import Foundation
 
-public struct CSVChunk {
+public struct CSVChunk<T> {
     public let prefix: String
-    public let lineOfFields: [[String]]
+    public let lineModels: [T]
     public let lastLine: String
 }
 
@@ -21,13 +21,13 @@ public extension String {
         return parseCSV(scanner: &scanner).0
     }
     
-    func parseCSVFromChunk() -> CSVChunk {
+    func parseCSVFromChunk() -> CSVChunk<[String]> {
         var scanner = Scanner(string: self)
         scanner.charactersToBeSkipped = ["\u{FEFF}"]  // otherwise skips whitespace by default, but exclude nonBreakingSpace! ARGH
         let prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
         _ = scanner.scanCharacter()
         let (linesOfFields, lastLine) = parseCSV(scanner: &scanner)
-        return .init(prefix: prefix, lineOfFields: linesOfFields.dropLast(), lastLine: lastLine)
+        return .init(prefix: prefix, lineModels: linesOfFields.dropLast(), lastLine: lastLine)
     }
     
     fileprivate func parseCSV(scanner: inout Scanner) -> ([[String]], lastLine: String) {
