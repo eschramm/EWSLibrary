@@ -311,7 +311,7 @@ public class CSVFileParser<T> {
         if let utf8 = String(data: dataChunk, encoding: .utf8) {
             string = utf8
         } else {
-            print("WARNING: Chunk \(chunkIdx) failed UTF-8 an required ASCII encoding")
+            print("WARNING: Chunk \(chunkIdx) failed UTF-8 and required ASCII encoding")
             guard let asciiString = String(data: dataChunk, encoding: .ascii) else {
                 throw CSVFileParserError.unableToConvertDataToString
             }
