@@ -20,7 +20,7 @@ public enum CSVError: Error {
 public extension String {
     
     func csvScanner() -> Scanner {
-        var scanner = Scanner(string: self)
+        let scanner = Scanner(string: self)
         scanner.charactersToBeSkipped = ["\u{FEFF}"]  // otherwise skips whitespace by default, but exclude nonBreakingSpace! ARGH
         return scanner
     }

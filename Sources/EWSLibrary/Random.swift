@@ -82,18 +82,19 @@ public struct EWSStats<T:FloatingPoint> {
         }
     }
     
-    func printAllStats(count: Int, numberFormatter: NumberFormatter?) {
+    func printAllStats(count: Int, numberFormatter: NumberFormatter?) -> String {
         let numberFormatter = numberFormatter ?? {
             let nf = NumberFormatter()
             nf.numberStyle = .decimal
             return nf
         }()
-        print("Count  : \(count)")
-        print("Sum    : \(string(stat: .sum, numberFormatter: numberFormatter))")
-        print("Range  : \(string(stat: .min, numberFormatter: numberFormatter)) - \(string(stat: .max, numberFormatter: numberFormatter))")
-        print("Mean   : \(string(stat: .mean, numberFormatter: numberFormatter))")
-        print("Median : \(string(stat: .median, numberFormatter: numberFormatter))")
-        print("StDev  : \(string(stat: .stDev, numberFormatter: numberFormatter)) (\(string(stat: .relDev, numberFormatter: numberFormatter)))")
+        var output = "Count  : \(count)"
+        output +=  "\nSum    : \(string(stat: .sum, numberFormatter: numberFormatter))"
+        output +=  "\nRange  : \(string(stat: .min, numberFormatter: numberFormatter)) - \(string(stat: .max, numberFormatter: numberFormatter))"
+        output +=  "\nMean   : \(string(stat: .mean, numberFormatter: numberFormatter))"
+        output +=  "\nMedian : \(string(stat: .median, numberFormatter: numberFormatter))"
+        output +=  "\nStDev  : \(string(stat: .stDev, numberFormatter: numberFormatter)) (\(string(stat: .relDev, numberFormatter: numberFormatter)))"
+        return output
     }
 }
 
