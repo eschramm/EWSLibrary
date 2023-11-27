@@ -224,7 +224,19 @@ public class CSVFileParser<T> {
     public func csvFileToModelsWithStats(printReport: Bool, liveUpdatingProgress: ((CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
         let lineCoordinator = LineCoordinator<T>(totalBytes: data.count, liveUpdatingProgress: liveUpdatingProgress)
         self.lineCoordinator = lineCoordinator
-        try await parseCSVLines()
+        if liveUpdatingProgress != nil {
+            let throttledChunkGroupingCount = 20
+            var firstChunk = 0
+            while firstChunk < lastChunkIndex {
+                let endChunk = min(firstChunk + throttledChunkGroupingCount - 1, lastChunkIndex + 1)
+                try await parseCSVLines(throttledChunks: firstChunk..<endChunk)
+                firstChunk = endChunk
+                print("Starting next throttled group...")
+            }
+        } else {
+            try await parseCSVLines(throttledChunks: 0..<(lastChunkIndex + 1))
+        }
+    
         var output = [T]()
         
         for chunkIndex in 0...lastChunkIndex {
@@ -259,9 +271,9 @@ public class CSVFileParser<T> {
         return try await csvFileToModelsWithStats(printReport: false, liveUpdatingProgress: nil).models
     }
     
-    private func parseCSVLines() async throws {
+    private func parseCSVLines(throttledChunks: Range<Int>) async throws {
         return try await withThrowingTaskGroup(of: (Int, CSVChunk<T>).self) { group in
-            for idx in 0..<totalChunks {
+            for idx in throttledChunks {  //0..<totalChunks {
                 group.addTask {
                     let startTime = Date()
                     let csvChunkModel = try self.fieldLinesForChunk(chunkIdx: idx)
