@@ -299,8 +299,8 @@ public class Debouncer: NSObject {
     }
 }
 
-extension Process {
-    class func currentMemory() -> Int {
+public struct AppInfo {
+    public static func currentMemory() -> Int {
         let TASK_VM_INFO_COUNT = MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<natural_t>.size
 
         var vmInfo = task_vm_info_data_t()

@@ -62,7 +62,7 @@ final class EWSLibraryTests: XCTestCase {
             intervals.append(firings[n] - firings[n - 1] - interval)
         }
         let stats = intervals.stats()
-        stats.printAllStats(count: intervals.count, numberFormatter: nil)
+        _ = stats.printAllStats(count: intervals.count, numberFormatter: nil)
         try await Task.sleep(nanoseconds: interval.nanoSeconds * 2)
         XCTAssertEqual(firings.count, firingsAfterStop, "AsyncTimer fired additional times after being stopped")
         XCTAssertEqual(intervals.filter({ abs($0) > allowedErrorInterval }).count, 0, "At least one of the intervals for the AsyncTimer exceeds expected error of \(allowedErrorInterval)")

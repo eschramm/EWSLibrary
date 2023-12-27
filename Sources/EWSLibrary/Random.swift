@@ -41,15 +41,15 @@ public func randomBool(withTrueProbability trueProbability: Double) -> Bool {
 }
 
 public struct EWSStats<T:FloatingPoint> {
-    let sum: T
-    let min: T?
-    let max: T?
-    let mean: T?
-    let median: T?
-    let standardDeviation: T?
-    let relativeDeviation: T?
+    public let sum: T
+    public let min: T?
+    public let max: T?
+    public let mean: T?
+    public let median: T?
+    public let standardDeviation: T?
+    public let relativeDeviation: T?
     
-    enum Stat {
+    public enum Stat {
         case sum
         case min
         case max
@@ -59,7 +59,7 @@ public struct EWSStats<T:FloatingPoint> {
         case relDev
     }
     
-    func string(stat: Stat, numberFormatter: NumberFormatter, naString: String = "--") -> String {
+    public func string(stat: Stat, numberFormatter: NumberFormatter, naString: String = "--") -> String {
         switch stat {
         case .sum:
             return numberFormatter.string(for: sum)!
@@ -82,7 +82,7 @@ public struct EWSStats<T:FloatingPoint> {
         }
     }
     
-    func printAllStats(count: Int, numberFormatter: NumberFormatter?) -> String {
+    public func printAllStats(count: Int, numberFormatter: NumberFormatter?) -> String {
         let numberFormatter = numberFormatter ?? {
             let nf = NumberFormatter()
             nf.numberStyle = .decimal

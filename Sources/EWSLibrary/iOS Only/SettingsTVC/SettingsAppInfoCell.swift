@@ -57,7 +57,7 @@ public class SettingsRatingCell : UITableViewCell, SettingsCell {
             label.bottomAnchor.constraint(equalTo: marginGuide.bottomAnchor)
         ])
         
-        let appInfo = AppInfo(with: appStoreID)
+        let appInfo = CellAppInfo(with: appStoreID)
         appInfo.getData { (dataDict : [AnyHashable : Any]) in
             DispatchQueue.main.async { [weak self] in
                 NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
@@ -78,7 +78,7 @@ public class SettingsRatingCell : UITableViewCell, SettingsCell {
     }
 }
 
-public class AppInfo : NSObject {  // class from NSObject only for Obj-C compatibility for iQIF
+public class CellAppInfo : NSObject {  // class from NSObject only for Obj-C compatibility for iQIF
     
     let appID: String
     let session: URLSession

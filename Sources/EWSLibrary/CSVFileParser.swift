@@ -110,6 +110,7 @@ actor LineCoordinator<T> {
         return .init(wallTime: minDate.distance(to: maxDate), cpuTime: cpuTime, linesProcessed: linesProcessed, bytesProcessed: bytesProcessed, modelsCreated: modelsCreated, peakMemoryBytes: peakMemory, chunksCount: chunkStats.count)
     }
     
+    @available(iOS 15.0, *)
     func statsReport(runStats: CSVRunStats, chunkStats: [CSVChunkStats]) -> String {
         var output =   "CSVFileParser Statistics"
         output +=    "\n------------------------"
@@ -261,7 +262,7 @@ public class CSVFileParser<T> {
         }
         let runStats = await lineCoordinator.runStats()
         let chunks = await lineCoordinator.chunkStats
-        if printReport {
+        if printReport, #available(iOS 15.0, *) {
             print(await lineCoordinator.statsReport(runStats: runStats, chunkStats: chunks))
         }
         return (models: output, stats: (run: runStats, chunks: chunks))
@@ -279,7 +280,7 @@ public class CSVFileParser<T> {
                     let csvChunkModel = try self.fieldLinesForChunk(chunkIdx: idx)
                     let csvChunk = csvChunkModel.chunk
                     let models = csvChunk.lineModels.compactMap({ self.modelConverter($0) })
-                    let stats = CSVChunkStats(chunk: idx, linesProcessed: csvChunk.lineModels.count, modelsCreated: models.count, bytesProcessed: csvChunkModel.byteCount, runInterval: .init(start: startTime, end: Date()), memoryAtCompletion: Process.currentMemory())
+                    let stats = CSVChunkStats(chunk: idx, linesProcessed: csvChunk.lineModels.count, modelsCreated: models.count, bytesProcessed: csvChunkModel.byteCount, runInterval: .init(start: startTime, end: Date()), memoryAtCompletion: AppInfo.currentMemory())
                     await self.lineCoordinator?.add(stats: stats, for: idx)
                     return (idx, .init(prefix: csvChunk.prefix, lineModels: models, lastLine: csvChunk.lastLine))
                 }
