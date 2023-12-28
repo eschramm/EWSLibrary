@@ -139,9 +139,9 @@ actor LineCoordinator<T> {
 }
 
 /// maps file to memory, only loading when data requested for multi-threaded processing
-/// ASSUMES: all new line characters ARE new lines, so CSV content cannot have new lines inside the fields
+/// ASSUMES: ALL new line characters ARE new lines, so CSV content cannot have new lines inside the fields
 /// Memory will balloon to about double the file size at peak
-public class CSVFileParser<T> {
+public class CSVFileParser {
     
     struct Chunk {
         let index: Int
@@ -152,12 +152,8 @@ public class CSVFileParser<T> {
     private let chunkSizeBytes: Int   // ((1024 * 1000) * 24) = 24 MB
     private let lastChunkIndex: Int
     private var lastLineByChunk = [Int : String]()
-    private var lineCoordinator: LineCoordinator<T>?
     private let printUpdates: Bool
     private let skipHeaderRow: Bool
-    private let profiler = TimeProfiler()
-    
-    private let modelConverter: ([String]) -> T?
     
     var totalChunks: Int {
         return lastChunkIndex + 1
@@ -170,12 +166,12 @@ public class CSVFileParser<T> {
     ///   - printUpdates: send messages to console about progress
     ///   - skipHeaderRow: when processing, assume row 0 is headers and skip sending to modelConverter, default = true
     ///   - modelConverter: converts row of fields ([String]) to output model
-    public init(url: URL, chunkSizeInMB: Int = 8, printUpdates: Bool = true, skipHeaderRow: Bool = true, modelConverter: @escaping ([String]) -> T?) throws {
+    public init(url: URL, chunkSizeInMB: Int = 8, printUpdates: Bool = true, skipHeaderRow: Bool = true) throws {
         data = try Data(contentsOf: url, options: [.alwaysMapped, .uncached])
         let chunkSize = 1024 * 1000 * chunkSizeInMB
         chunkSizeBytes = chunkSize
         self.printUpdates = printUpdates
-        self.modelConverter = modelConverter
+        //self.modelConverter = modelConverter
         self.skipHeaderRow = skipHeaderRow
         
         let fullChunks = Int(data.count / chunkSize)
@@ -222,20 +218,19 @@ public class CSVFileParser<T> {
     ///   - printReport: should a report be printed to the console at completion with run statistics
     ///   - liveUpdatingProgress: an optional closure, called on MainActor, that provides updates of progress - can be used for updating UI
     /// - Returns: a tuple of (processedModels, runStatistics)
-    public func csvFileToModelsWithStats(printReport: Bool, liveUpdatingProgress: ((CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
+    public func csvFileToModelsWithStats<T>(printReport: Bool, modelConverter: @escaping ([String]) -> T?, liveUpdatingProgress: ((CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
         let lineCoordinator = LineCoordinator<T>(totalBytes: data.count, liveUpdatingProgress: liveUpdatingProgress)
-        self.lineCoordinator = lineCoordinator
         if liveUpdatingProgress != nil {
             let throttledChunkGroupingCount = 20
             var firstChunk = 0
             while firstChunk < lastChunkIndex {
                 let endChunk = min(firstChunk + throttledChunkGroupingCount - 1, lastChunkIndex + 1)
-                try await parseCSVLines(throttledChunks: firstChunk..<endChunk)
+                try await parseCSVLines(throttledChunks: firstChunk..<endChunk, lineCoordinator: lineCoordinator, modelConverter: modelConverter)
                 firstChunk = endChunk
                 print("Starting next throttled group...")
             }
         } else {
-            try await parseCSVLines(throttledChunks: 0..<(lastChunkIndex + 1))
+            try await parseCSVLines(throttledChunks: 0..<(lastChunkIndex + 1), lineCoordinator: lineCoordinator, modelConverter: modelConverter)
         }
     
         var output = [T]()
@@ -268,25 +263,25 @@ public class CSVFileParser<T> {
         return (models: output, stats: (run: runStats, chunks: chunks))
     }
     
-    public func csvFileToModels() async throws -> [T] {
-        return try await csvFileToModelsWithStats(printReport: false, liveUpdatingProgress: nil).models
+    public func csvFileToModels<T>(modelConverter: @escaping ([String]) -> T?) async throws -> [T] {
+        return try await csvFileToModelsWithStats(printReport: false, modelConverter: modelConverter, liveUpdatingProgress: nil).models
     }
     
-    private func parseCSVLines(throttledChunks: Range<Int>) async throws {
+    private func parseCSVLines<T>(throttledChunks: Range<Int>, lineCoordinator: LineCoordinator<T>, modelConverter: @escaping ([String]) -> T?) async throws {
         return try await withThrowingTaskGroup(of: (Int, CSVChunk<T>).self) { group in
             for idx in throttledChunks {  //0..<totalChunks {
                 group.addTask {
                     let startTime = Date()
                     let csvChunkModel = try self.fieldLinesForChunk(chunkIdx: idx)
                     let csvChunk = csvChunkModel.chunk
-                    let models = csvChunk.lineModels.compactMap({ self.modelConverter($0) })
+                    let models = csvChunk.lineModels.compactMap({ modelConverter($0) })
                     let stats = CSVChunkStats(chunk: idx, linesProcessed: csvChunk.lineModels.count, modelsCreated: models.count, bytesProcessed: csvChunkModel.byteCount, runInterval: .init(start: startTime, end: Date()), memoryAtCompletion: AppInfo.currentMemory())
-                    await self.lineCoordinator?.add(stats: stats, for: idx)
+                    await lineCoordinator.add(stats: stats, for: idx)
                     return (idx, .init(prefix: csvChunk.prefix, lineModels: models, lastLine: csvChunk.lastLine))
                 }
             }
             for try await (chunkIndex, csvChunk) in group {
-                await lineCoordinator?.add(prefix: csvChunk.prefix, models: csvChunk.lineModels, suffix: csvChunk.lastLine, for: chunkIndex)
+                await lineCoordinator.add(prefix: csvChunk.prefix, models: csvChunk.lineModels, suffix: csvChunk.lastLine, for: chunkIndex)
                 if printUpdates {
                     print("Add \(csvChunk.lineModels.count) models from chunk \(chunkIndex)")
                 }
