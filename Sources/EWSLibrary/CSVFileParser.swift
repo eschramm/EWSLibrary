@@ -8,7 +8,6 @@
 import Foundation
 
 enum CSVFileParserError: Error {
-    case indexRequestedBeyondRange(Int, Int)
     case unableToConvertDataToString
 }
 
@@ -110,12 +109,13 @@ actor LineCoordinator<T> {
         return .init(wallTime: minDate.distance(to: maxDate), cpuTime: cpuTime, linesProcessed: linesProcessed, bytesProcessed: bytesProcessed, modelsCreated: modelsCreated, peakMemoryBytes: peakMemory, chunksCount: chunkStats.count)
     }
     
+    @available(macOS 13.0, *)
     @available(iOS 15.0, *)
     func statsReport(runStats: CSVRunStats, chunkStats: [CSVChunkStats]) -> String {
         var output =   "CSVFileParser Statistics"
         output +=    "\n------------------------"
-        output +=    "\nCPU Time       : \(runStats.cpuTime.formatted())"
-        output +=    "\nWall Time      : \(runStats.wallTime.formatted())"
+        output +=    "\nCPU Time       : \(Duration.seconds(runStats.cpuTime).formatted())"
+        output +=    "\nWall Time      : \(Duration.seconds(runStats.wallTime).formatted())"
         output +=    "\nLines Processed: \(runStats.linesProcessed.formatted()) - \(Int(Double(runStats.linesProcessed) / runStats.wallTime).formatted()) / sec"
         output +=    "\nModels Created : \(runStats.modelsCreated.formatted())"
         output +=    "\nBytes Processed: \(runStats.bytesProcessed.formatted(.byteCount(style: .file)))"
@@ -149,36 +149,38 @@ public class CSVFileParser {
     }
     
     private let data: Data
-    private let chunkSizeBytes: Int   // ((1024 * 1000) * 24) = 24 MB
-    private let lastChunkIndex: Int
+    private let chunkRanges: [Range<Int>]
     private var lastLineByChunk = [Int : String]()
     private let printUpdates: Bool
     private let skipHeaderRow: Bool
     
-    var totalChunks: Int {
-        return lastChunkIndex + 1
-    }
-    
     /// Initializes the CSVFileParser
     /// - Parameters:
     ///   - url: file location
-    ///   - chunkSizeInMB: default: 8 MB
+    ///   - chunkSizeInMBMin: default: 8 MB - will randomly choose base-2 amounts between 1 and 256, bounded to this minimum
+    ///   - chunkSizeInMBMax: default: 64 MB - will randomly choose base-2 amounts between 1 and 256, bounded to this maximum
     ///   - printUpdates: send messages to console about progress
     ///   - skipHeaderRow: when processing, assume row 0 is headers and skip sending to modelConverter, default = true
     ///   - modelConverter: converts row of fields ([String]) to output model
-    public init(url: URL, chunkSizeInMB: Int = 8, printUpdates: Bool = true, skipHeaderRow: Bool = true) throws {
+    public init(url: URL, chunkSizeInMBMin: Int = 8, chunkSizeInMBMax: Int = 64, printUpdates: Bool = true, skipHeaderRow: Bool = true) throws {
         data = try Data(contentsOf: url, options: [.alwaysMapped, .uncached])
-        let chunkSize = 1024 * 1000 * chunkSizeInMB
-        chunkSizeBytes = chunkSize
+        
+        var startByte = 0
+        let fullSet = [1, 2, 4, 8, 12, 16, 24, 36, 48, 64, 96, 128, 192, 256]
+        let restrictedSet = fullSet.filter({ $0 >= chunkSizeInMBMin && $0 <= chunkSizeInMBMax })
+        var chunks = [Range<Int>]()
+        while startByte < data.count {
+            let chunkSizeInMB = restrictedSet.randomElement() ?? 8
+            let chunkSizeBytes = 1024 * 1000 * chunkSizeInMB
+            chunks.append(startByte..<(min(startByte + chunkSizeBytes, data.count)))
+            startByte += chunkSizeBytes
+        }
+        self.chunkRanges = chunks
         self.printUpdates = printUpdates
-        //self.modelConverter = modelConverter
         self.skipHeaderRow = skipHeaderRow
         
-        let fullChunks = Int(data.count / chunkSize)
-        lastChunkIndex = fullChunks + (data.count % 1024 != 0 ? 1 : 0) - 1  // zero-indexed
-        
         if printUpdates {
-            print("Total Chunks (\(chunkSizeInMB) MB): \(totalChunks)")
+            print("Total Chunks (\(restrictedSet) MB): \(chunkRanges.count)")
         }
     }
     
@@ -220,6 +222,7 @@ public class CSVFileParser {
     /// - Returns: a tuple of (processedModels, runStatistics)
     public func csvFileToModelsWithStats<T>(printReport: Bool, modelConverter: @escaping ([String]) -> T?, liveUpdatingProgress: ((CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
         let lineCoordinator = LineCoordinator<T>(totalBytes: data.count, liveUpdatingProgress: liveUpdatingProgress)
+        let lastChunkIndex = chunkRanges.count - 1
         if liveUpdatingProgress != nil {
             let throttledChunkGroupingCount = 20
             var firstChunk = 0
@@ -257,7 +260,7 @@ public class CSVFileParser {
         }
         let runStats = await lineCoordinator.runStats()
         let chunks = await lineCoordinator.chunkStats
-        if printReport, #available(iOS 15.0, *) {
+        if printReport, #available(iOS 15.0, *), #available(macOS 13.0, *) {
             print(await lineCoordinator.statsReport(runStats: runStats, chunkStats: chunks))
         }
         return (models: output, stats: (run: runStats, chunks: chunks))
@@ -274,7 +277,15 @@ public class CSVFileParser {
                     let startTime = Date()
                     let csvChunkModel = try self.fieldLinesForChunk(chunkIdx: idx)
                     let csvChunk = csvChunkModel.chunk
+                    if self.printUpdates {
+                        print("Starting model conversion for chunk \(idx) - \(csvChunk.lineModels.count.formatted()) lines")
+                    }
                     let models = csvChunk.lineModels.compactMap({ modelConverter($0) })
+                    if self.printUpdates, #available(iOS 15.0, *), #available(macOS 13.0, *) {
+                        let interval = DateInterval(start: startTime, end: Date())
+                        let chunkByteRange = self.chunkRanges[idx]
+                        print("Model conversion for chunk \(idx) complete - \(csvChunk.lineModels.count.formatted()) lines in \(Duration.seconds(interval.duration).formatted()) (\(Int(Double(csvChunk.lineModels.count) / interval.duration).formatted()) / sec) [\(Int((chunkByteRange.upperBound - chunkByteRange.lowerBound) / (1024 * 1000))) MB]")
+                    }
                     let stats = CSVChunkStats(chunk: idx, linesProcessed: csvChunk.lineModels.count, modelsCreated: models.count, bytesProcessed: csvChunkModel.byteCount, runInterval: .init(start: startTime, end: Date()), memoryAtCompletion: AppInfo.currentMemory())
                     await lineCoordinator.add(stats: stats, for: idx)
                     return (idx, .init(prefix: csvChunk.prefix, lineModels: models, lastLine: csvChunk.lastLine))
@@ -289,19 +300,11 @@ public class CSVFileParser {
         }
     }
     
-    private func chunk(index: Int) throws -> Chunk {
-        guard index <= totalChunks else {
-            throw CSVFileParserError.indexRequestedBeyondRange(index, lastChunkIndex)
-        }
-        let chunkStart = index * chunkSizeBytes
-        return .init(index: index, byteRange: chunkStart..<(min(chunkStart + chunkSizeBytes, data.count)))
-    }
-    
     private func fieldLinesForChunk(chunkIdx: Int) throws -> (chunk: CSVChunk<[String]>, byteCount: Int) {
-        let chunk = try chunk(index: chunkIdx)
+        let chunk = Chunk(index: chunkIdx, byteRange: chunkRanges[chunkIdx])
         let dataChunk = data[chunk.byteRange]
         if printUpdates {
-            print("Chunking data for \(chunkIdx): \(chunk.byteRange)")
+            print("Chunking data for \(chunkIdx): \(chunk.byteRange) [\(Int((chunk.byteRange.upperBound - chunk.byteRange.lowerBound) / (1024 * 1000))) MB]")
         }
         let string: String
         if let utf8 = String(data: dataChunk, encoding: .utf8) {
