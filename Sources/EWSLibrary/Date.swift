@@ -89,6 +89,64 @@ public extension Date {
     }
 }
 
+public extension DateInterval {
+    
+    typealias DateString = String
+    
+    static let dateStringFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        return df
+    }()
+    
+    static let dateFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateStyle = .short
+        df.timeStyle = .long
+        return df
+    }()
+    
+    static let timeFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.timeStyle = .long
+        return df
+    }()
+    
+    func debugDescription(showStartDate: Bool, showInterval: Bool) -> String {
+        let intervalString: String
+        if showInterval {
+            intervalString = "  -  \(Int(duration)) sec"
+        } else {
+            intervalString = ""
+        }
+        if showStartDate {
+            if Calendar.current.isDate(start, inSameDayAs: end) {
+                return "\(trimTZ(string: DateInterval.dateFormatter.string(from: start))) - \(DateInterval.timeFormatter.string(from: end))\(intervalString)"
+            } else {
+                return "\(trimTZ(string: DateInterval.dateFormatter.string(from: start))) - \(DateInterval.dateFormatter.string(from: end))\(intervalString)"
+            }
+        } else {
+            if Calendar.current.isDate(start, inSameDayAs: end) {
+                return "\(trimTZ(string: DateInterval.timeFormatter.string(from: start))) - \(DateInterval.timeFormatter.string(from: end))\(intervalString)"
+            } else {
+                return "\(trimTZ(string: DateInterval.timeFormatter.string(from: start))) - \(DateInterval.dateFormatter.string(from: end))\(intervalString)"
+            }
+        }
+        func trimTZ(string: String) -> String {
+            let pieces = string.components(separatedBy: " ")
+            return pieces.dropLast().joined(separator: " ")
+        }
+    }
+    
+    var dateString: DateString {
+        return DateInterval.dateStringFormatter.string(from: start)
+    }
+    
+    func padInterval(before: TimeInterval, after: TimeInterval) -> DateInterval {
+        return .init(start: start.addingTimeInterval(-before), end: end.addingTimeInterval(after))
+    }
+}
+
 public extension Array where Element == DateInterval {
     
     func hasOverlaps() -> Bool {
@@ -101,7 +159,7 @@ public extension Array where Element == DateInterval {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS ZZZ"
             if printToConsole {
-                print("DateInterval array contains overlaps")
+                print("DateInterval array contains overlaps (only showing consecutive sample overlap, more may exist if a sample has a long duration and overlaps multiple)")
             }
             var overlaps = [(Int, Int)]()
             for idx in 1..<count {
@@ -129,4 +187,75 @@ public extension DateFormatter {
         df.dateStyle = .short
         return df
     }()
+}
+
+public struct DateDay: Codable, Hashable {
+    public let year: Int
+    public let month: Int
+    public let day: Int
+    
+    public init?(string: String) {
+        let pieces = string.components(separatedBy: "-")
+        guard pieces.count == 3,
+              let year = Int(pieces[0]),
+              let month = Int(pieces[1]),
+              let day = Int(pieces[2])
+        else {
+            return nil
+        }
+        self.year = year
+        self.month = month
+        self.day = day
+    }
+    
+    public init(date: Date, calendar: Calendar) {
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        self.year = dateComponents.year!
+        self.month = dateComponents.month!
+        self.day = dateComponents.day!
+    }
+    
+    public var string: String {
+        let monthComp = (month < 10) ? "0\(month)" : "\(month)"
+        let dayComp = (day < 10) ? "0\(day)" : "\(day)"
+        return "\(year)-\(monthComp)-\(dayComp)"
+    }
+    
+    public func date(calendar: Calendar = .current) -> Date {
+        let dateComponents = DateComponents(calendar: calendar, year: year, month: month, day: day)
+        return calendar.date(from: dateComponents)!
+    }
+}
+
+public struct UTCOffset: Codable {
+    public let hours: Int
+    public let minutes: UInt
+    public let seconds: UInt
+    
+    public init?(string: String) {
+        let pieces = string.components(separatedBy: ":")
+        guard pieces.count == 3,
+              let hours = Int(pieces[0]),
+              let minutes = UInt(pieces[1]),
+              let seconds = UInt(pieces[2])
+        else {
+            return nil
+        }
+        self.hours = hours
+        self.minutes = minutes
+        self.seconds = seconds
+    }
+    
+    
+    public var string: String {
+        let absHours = (abs(hours) < 10) ? "0\(abs(hours))" : "\(abs(hours))"
+        let hoursComp = ((hours < 0) ? "-" : "") + absHours
+        let minutesComp = (minutes < 10) ? "0\(minutes)" : "\(minutes)"
+        let secondsComp = (seconds < 10) ? "0\(seconds)" : "\(seconds)"
+        return "\(hoursComp):\(minutesComp):\(secondsComp)"
+    }
+    
+    public var secondsFromGMT: TimeInterval {
+        return Double(hours * (60 * 60)) + Double(minutes * 60) + Double(seconds)
+    }
 }
