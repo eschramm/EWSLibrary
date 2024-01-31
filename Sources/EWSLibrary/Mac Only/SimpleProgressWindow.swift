@@ -113,6 +113,10 @@ public struct ESProgressView: View {
     
     @ObservedObject var observableProgress: ObservableProgress
     
+    public init(observableProgress: ObservableProgress) {
+        self.observableProgress = observableProgress
+    }
+    
     public var body: some View {
         VStack {
             Text(observableProgress.title).padding(.bottom, /*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
