@@ -110,7 +110,7 @@ actor LineCoordinator<T> {
     }
     
     @available(macOS 13.0, *)
-    @available(iOS 15.0, *)
+    @available(iOS 16.0, *)
     func statsReport(runStats: CSVRunStats, chunkStats: [CSVChunkStats]) -> String {
         var output =   "CSVFileParser Statistics"
         output +=    "\n------------------------"
@@ -260,7 +260,7 @@ public class CSVFileParser {
         }
         let runStats = await lineCoordinator.runStats()
         let chunks = await lineCoordinator.chunkStats
-        if printReport, #available(iOS 15.0, *), #available(macOS 13.0, *) {
+        if printReport, #available(iOS 16.0, *), #available(macOS 13.0, *) {
             print(await lineCoordinator.statsReport(runStats: runStats, chunkStats: chunks))
         }
         return (models: output, stats: (run: runStats, chunks: chunks))
@@ -277,11 +277,11 @@ public class CSVFileParser {
                     let startTime = Date()
                     let csvChunkModel = try self.fieldLinesForChunk(chunkIdx: idx)
                     let csvChunk = csvChunkModel.chunk
-                    if self.printUpdates {
+                    if self.printUpdates, #available(iOS 15.0, *) {
                         print("Starting model conversion for chunk \(idx) - \(csvChunk.lineModels.count.formatted()) lines")
                     }
                     let models = csvChunk.lineModels.compactMap({ modelConverter($0) })
-                    if self.printUpdates, #available(iOS 15.0, *), #available(macOS 13.0, *) {
+                    if self.printUpdates, #available(iOS 16.0, *), #available(macOS 13.0, *) {
                         let interval = DateInterval(start: startTime, end: Date())
                         let chunkByteRange = self.chunkRanges[idx]
                         print("Model conversion for chunk \(idx) complete - \(csvChunk.lineModels.count.formatted()) lines in \(Duration.seconds(interval.duration).formatted()) (\(Int(Double(csvChunk.lineModels.count) / interval.duration).formatted()) / sec) [\(Int((chunkByteRange.upperBound - chunkByteRange.lowerBound) / (1024 * 1000))) MB]")
