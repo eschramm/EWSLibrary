@@ -226,7 +226,7 @@ public class CSVFileParser {
         if liveUpdatingProgress != nil {
             let throttledChunkGroupingCount = 20
             var firstChunk = 0
-            while firstChunk < lastChunkIndex {
+            while firstChunk <= lastChunkIndex {
                 let endChunk = min(firstChunk + throttledChunkGroupingCount - 1, lastChunkIndex + 1)
                 try await parseCSVLines(throttledChunks: firstChunk..<endChunk, lineCoordinator: lineCoordinator, modelConverter: modelConverter)
                 firstChunk = endChunk
