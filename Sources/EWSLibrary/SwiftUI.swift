@@ -48,7 +48,9 @@ public class ErrorHandling: ObservableObject {
             message = "\(error)"
         }
         Self.externalErrorLoggerHandler?(.init(error: error, title: title, prefix: prefix))
-        currentAlert = ErrorAlert(title: title ?? "Error", message: message)
+        DispatchQueue.main.async {
+            self.currentAlert = ErrorAlert(title: title ?? "Error", message: message)
+        }
         if let title {
             print("Error: \(title) - \(message)")
         } else {
