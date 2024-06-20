@@ -25,26 +25,30 @@ public extension String {
         return scanner
     }
     
-    func parseCSV() -> [[String]] {
+    func parseCSV(overrideDelimiter: Character? = nil) -> [[String]] {
+        let delimiter = overrideDelimiter ?? ","
         var scanner = csvScanner()
-        return parseCSV(scanner: &scanner, quitAfterLines: nil).0
+        return parseCSV(scanner: &scanner, quitAfterLines: nil, overrideDelimiter: delimiter).0
     }
     
-    func parseCSVFromChunk() -> CSVChunk<[String]> {
+    func parseCSVFromChunk(overrideDelimiter: Character?) -> CSVChunk<[String]> {
+        let delimiter = overrideDelimiter ?? ","
         var scanner = csvScanner()
         let prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
         _ = scanner.scanCharacter()
-        let (linesOfFields, lastLine) = parseCSV(scanner: &scanner, quitAfterLines: nil)
+        let (linesOfFields, lastLine) = parseCSV(scanner: &scanner, quitAfterLines: nil, overrideDelimiter: delimiter)
         return .init(prefix: prefix, lineModels: linesOfFields.dropLast(), lastLine: lastLine)
     }
     
-    func parseHeaders() -> [String] {
+    func parseHeaders(overrideDelimiter: Character?) -> [String] {
+        let delimiter = overrideDelimiter ?? ","
         var scanner = csvScanner()
-        return parseCSV(scanner: &scanner, quitAfterLines: 1).0[0]
+        return parseCSV(scanner: &scanner, quitAfterLines: 1, overrideDelimiter: delimiter).0[0]
     }
     
-    func headersMayMap<E: RawRepresentable>(stringEnum: E.Type) -> [E : Int] where E.RawValue == String, E : CaseIterable {
-        let headersDict = parseHeaders().reduce([String : Int]()) { partialResult, header in
+    func headersMayMap<E: RawRepresentable>(stringEnum: E.Type, overrideDelimiter: Character?) -> [E : Int] where E.RawValue == String, E : CaseIterable {
+        let delimiter = overrideDelimiter ?? ","
+        let headersDict = parseHeaders(overrideDelimiter: delimiter).reduce([String : Int]()) { partialResult, header in
             var dict = partialResult
             dict[header] = partialResult.count
             return dict
@@ -60,8 +64,9 @@ public extension String {
         return output
     }
     
-    func headersMustMap<E: RawRepresentable>(stringEnum: E.Type) throws -> [E : Int] where E.RawValue == String, E : CaseIterable {
-        let headersDict = parseHeaders().reduce([String : Int]()) { partialResult, header in
+    func headersMustMap<E: RawRepresentable>(stringEnum: E.Type, overrideDelimiter: Character?) throws -> [E : Int] where E.RawValue == String, E : CaseIterable {
+        let delimiter = overrideDelimiter ?? ","
+        let headersDict = parseHeaders(overrideDelimiter: delimiter).reduce([String : Int]()) { partialResult, header in
             var dict = partialResult
             dict[header] = partialResult.count
             return dict
@@ -76,10 +81,11 @@ public extension String {
         return output
     }
     
-    fileprivate func parseCSV(scanner: inout Scanner, quitAfterLines: Int?) -> ([[String]], lastLine: String) {
+    fileprivate func parseCSV(scanner: inout Scanner, quitAfterLines: Int?, overrideDelimiter: Character?) -> ([[String]], lastLine: String) {
         var lines = [[String]]()
         
-        let characterSet = CharacterSet([",", "\""]).union(.newlines)  // comma, quote, CRLF
+        let delimiter = overrideDelimiter ?? ","
+        let characterSet = CharacterSet([delimiter.unicodeScalars.first!, "\""]).union(.newlines)  // comma, quote, CRLF
 
         var insideQuotes = false
         var fields = [String]()
@@ -93,7 +99,7 @@ public extension String {
             if let separator {
                 lastLine += "\(separator)"
             }
-            if separator == "," {
+            if separator == delimiter {
                 if insideQuotes == false {
                     // new field
                     currentField += text
@@ -111,7 +117,7 @@ public extension String {
                     _ = scanner.scanCharacter()  // consume next quote
                     lastLine += "\(separator!)"
                     if currentField.isEmpty && !scanner.isAtEnd {
-                        if self[scanner.currentIndex] == "\n" || self[scanner.currentIndex] == "," {
+                        if self[scanner.currentIndex] == "\n" || self[scanner.currentIndex] == delimiter {
                             // empty string - do nothing
                         } else {
                             currentField = "\(text)\""
@@ -154,11 +160,12 @@ public extension String {
         return (lines, lastLine: lastLine)
     }
 
-    func makeCSVsafe(carriageReturnReplacement: String? = nil) -> String {
+    func makeCSVsafe(carriageReturnReplacement: String? = nil, overrideDelimiter: Character? = nil) -> String {
         // https://tools.ietf.org/html/rfc4180 - CRs should be allowed in-line if enclosed in outer quotes, double-quotes to escape quotes, Excel abides by this
+        let delimiter = overrideDelimiter ?? Character(",")
         let scanner = Scanner(string: self)
         scanner.charactersToBeSkipped = nil  // otherwise skips whitespace by default
-        let characterSet = CharacterSet([",", "\""]).union(.newlines)
+        let characterSet = CharacterSet([delimiter.unicodeScalars.first!, "\""]).union(.newlines)
         var hasCharactersRequiringQuotes = false
         var output = ""
         while !scanner.isAtEnd {
@@ -251,11 +258,13 @@ public extension String {
 }
 
 public extension Array where Element == String {
-    mutating func linesAppendingCSVFields(fields: [String]) {
-        self.append(fields.map({ $0.makeCSVsafe() }).joined(separator: ","))
+    mutating func linesAppendingCSVFields(fields: [String], overrideDelimiter: Character? = nil) {
+        let delimiter = overrideDelimiter ?? ","
+        self.append(fields.map({ $0.makeCSVsafe(overrideDelimiter: overrideDelimiter) }).joined(separator: String(delimiter)))
     }
 
-    func flattenFieldsToCSVLine() -> String {
-        return self.map({ $0.makeCSVsafe() }).joined(separator: ",")
+    func flattenFieldsToCSVLine(overrideDelimiter: Character? = nil) -> String {
+        let delimiter = overrideDelimiter ?? ","
+        return self.map({ $0.makeCSVsafe(overrideDelimiter: delimiter) }).joined(separator: String(delimiter))
     }
 }

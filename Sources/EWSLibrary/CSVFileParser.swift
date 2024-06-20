@@ -153,6 +153,7 @@ public class CSVFileParser {
     private var lastLineByChunk = [Int : String]()
     private let printUpdates: Bool
     private let skipHeaderRow: Bool
+    private let delimiter: Character
     
     /// Initializes the CSVFileParser
     /// - Parameters:
@@ -162,7 +163,7 @@ public class CSVFileParser {
     ///   - printUpdates: send messages to console about progress
     ///   - skipHeaderRow: when processing, assume row 0 is headers and skip sending to modelConverter, default = true
     ///   - modelConverter: converts row of fields ([String]) to output model
-    public init(url: URL, chunkSizeInMBMin: Int = 8, chunkSizeInMBMax: Int = 64, printUpdates: Bool = true, skipHeaderRow: Bool = true) throws {
+    public init(url: URL, chunkSizeInMBMin: Int = 8, chunkSizeInMBMax: Int = 64, printUpdates: Bool = true, skipHeaderRow: Bool = true, overrideDelimiter: Character? = nil) throws {
         data = try Data(contentsOf: url, options: [.alwaysMapped, .uncached])
         
         var startByte = 0
@@ -178,6 +179,7 @@ public class CSVFileParser {
         self.chunkRanges = chunks
         self.printUpdates = printUpdates
         self.skipHeaderRow = skipHeaderRow
+        self.delimiter = overrideDelimiter ?? ","
         
         if printUpdates {
             print("Total Chunks (\(restrictedSet) MB): \(chunkRanges.count)")
@@ -187,14 +189,14 @@ public class CSVFileParser {
     /// by default looks thru first 1 kB of data for headers, adjust if longer
     public func headers(readBytes: Int = 1024) throws -> [String] {
         let string = try headerChunk(readBytes: readBytes)
-        return string.parseHeaders()
+        return string.parseHeaders(overrideDelimiter: delimiter)
     }
     
     /// by default looks thru first 1 kB of data for headers, adjust if longer
     public func headersMayMap<E: RawRepresentable>(stringEnum: E.Type, readBytes: Int = 1024) -> [E : Int] where E.RawValue == String, E : CaseIterable {
         do {
             let string = try headerChunk(readBytes: readBytes)
-            return string.headersMayMap(stringEnum: stringEnum)
+            return string.headersMayMap(stringEnum: stringEnum, overrideDelimiter: delimiter)
         } catch {
             print("Unable to create string from data")
             return [:]
@@ -204,7 +206,7 @@ public class CSVFileParser {
     /// by default looks thru first 1 kB of data for headers, adjust if longer
     public func headersMustMap<E: RawRepresentable>(stringEnum: E.Type, readBytes: Int = 1024) throws -> [E : Int] where E.RawValue == String, E : CaseIterable {
         let string = try headerChunk(readBytes: readBytes)
-        return try string.headersMustMap(stringEnum: stringEnum)
+        return try string.headersMustMap(stringEnum: stringEnum, overrideDelimiter: delimiter)
     }
     
     private func headerChunk(readBytes: Int) throws -> String {
@@ -242,19 +244,20 @@ public class CSVFileParser {
             if chunkIndex == 0 {
                 if !skipHeaderRow {
                     output += await lineCoordinator.chunkPrefixes[0]!
-                        .parseCSV()
+                        .parseCSV(overrideDelimiter: delimiter)
                         .compactMap({ modelConverter($0) })
                 }
             } else {
                 let firstLine = await lineCoordinator.chunkSuffixes[chunkIndex - 1]! + lineCoordinator.chunkPrefixes[chunkIndex]!
                 output += firstLine
-                    .parseCSV()
+                    .parseCSV(overrideDelimiter: delimiter)
                     .compactMap({ modelConverter($0) })
             }
             output += await lineCoordinator.modelsByIndex[chunkIndex]!
             if chunkIndex == lastChunkIndex {
                 output += await lineCoordinator.chunkSuffixes[lastChunkIndex]!
-                    .parseCSV()
+                    .parseCSV(overrideDelimiter: delimiter
+                    )
                     .compactMap({ modelConverter($0) })
             }
         }
@@ -316,6 +319,6 @@ public class CSVFileParser {
             }
             string = asciiString
         }
-        return (chunk: string.parseCSVFromChunk(), byteCount: dataChunk.count)
+        return (chunk: string.parseCSVFromChunk(overrideDelimiter: delimiter), byteCount: dataChunk.count)
     }
 }
