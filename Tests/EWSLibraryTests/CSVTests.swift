@@ -21,6 +21,15 @@ class CSVTests: XCTestCase {
         let testCR = "make me\nCSV safe"
         XCTAssertEqual("\"\(testCR)\"", testCR.makeCSVsafe())
         XCTAssertEqual("make me<CR>CSV safe", testCR.makeCSVsafe(carriageReturnReplacement: "<CR>"))
+        
+        let testSimpleTab = "make me CSV safe"
+        XCTAssertEqual(testSimpleTab, testSimple.makeCSVsafe(overrideDelimiter: "\t"))
+        
+        let testTab = "make me\t CSV safe"
+        XCTAssertEqual("\"\(testTab)\"", testTab.makeCSVsafe(overrideDelimiter: "\t"))
+        
+        XCTAssertEqual("\"\(testCR)\"", testCR.makeCSVsafe(overrideDelimiter: "\t"))
+        XCTAssertEqual("make me<CR>CSV safe", testCR.makeCSVsafe(carriageReturnReplacement: "<CR>", overrideDelimiter: "\t"))
     }
     
     func testCSVLineParsing() throws {
@@ -39,20 +48,35 @@ class CSVTests: XCTestCase {
     
     func testCSVParsing() throws {
         let quadQuotes = "\"\"\"\""
+        var separator = ","
         let csvString =
         """
-        this line starts with no quote,"safely escaped , comma",plain,""quotes around me in output"",line ending without quotes
-        "this line starts with a quote","safely escaped , comma",plain,""quotes around me in output"","line ending with quotes"
-        field1,"field2 contains a CRLF here
-        should still be in field","testing",lineEnd
-        some empty fields,"",,""
-        now test,last,""
-        test,end,ofline,
-        ParticipantIdentifier,GlobalKey,EmailAddress,FirstName,MiddleName,LastName,Gender,DateOfBirth,SecondaryIdentifier,PostalCode,EnrollmentDate,EventDates,CustomFields
-        19608,9816babc,,Eric,,Schramm,W,,x,,2021-08-23T15:29:47Z,{},"{""BreatheDayOfWeek"":\(quadQuotes),""BreatheHourOfDay"":\(quadQuotes),""BreatheLastPush"":\(quadQuotes),""CurrentStepGoal"":\(quadQuotes),""LastDateWithStandHours"":\(quadQuotes),""LastDateWithSteps"":\(quadQuotes),""CoupleID"":""C127"",""LivesWithAnotherParticipant"":""False"",""Over75"":""False"",""SurveyDevice"":""iPhone"",""HasAppleWatch"":""True"",""ParticipatingAsCouple"":""True""}"
+        this line starts with no quote\(separator)"safely escaped \(separator) comma"\(separator)plain\(separator)""quotes around me in output""\(separator)line ending without quotes
+        "this line starts with a quote"\(separator)"safely escaped \(separator) comma"\(separator)plain\(separator)""quotes around me in output""\(separator)"line ending with quotes"
+        field1\(separator)"field2 contains a CRLF here
+        should still be in field"\(separator)"testing"\(separator)lineEnd
+        some empty fields\(separator)""\(separator)\(separator)""
+        now test\(separator)last\(separator)""
+        test\(separator)end\(separator)ofline\(separator)
+        ParticipantIdentifier\(separator)GlobalKey\(separator)EmailAddress\(separator)FirstName\(separator)MiddleName\(separator)LastName\(separator)Gender\(separator)DateOfBirth\(separator)SecondaryIdentifier\(separator)PostalCode\(separator)EnrollmentDate\(separator)EventDates\(separator)CustomFields
+        19608\(separator)9816babc\(separator)\(separator)Eric\(separator)\(separator)Schramm\(separator)W\(separator)\(separator)x\(separator)\(separator)2021-08-23T15:29:47Z\(separator){}\(separator)"{""BreatheDayOfWeek"":\(quadQuotes),""BreatheHourOfDay"":\(quadQuotes),""BreatheLastPush"":\(quadQuotes),""CurrentStepGoal"":\(quadQuotes),""LastDateWithStandHours"":\(quadQuotes),""LastDateWithSteps"":\(quadQuotes),""CoupleID"":""C127"",""LivesWithAnotherParticipant"":""False"",""Over75"":""False"",""SurveyDevice"":""iPhone"",""HasAppleWatch"":""True"",""ParticipatingAsCouple"":""True""}"
         """
         
-        let parsedFields = csvString.parseCSV()
+        separator = "\t"
+        let csvStringTab =
+        """
+        this line starts with no quote\(separator)"safely escaped \(separator) comma"\(separator)plain\(separator)""quotes around me in output""\(separator)line ending without quotes
+        "this line starts with a quote"\(separator)"safely escaped \(separator) comma"\(separator)plain\(separator)""quotes around me in output""\(separator)"line ending with quotes"
+        field1\(separator)"field2 contains a CRLF here
+        should still be in field"\(separator)"testing"\(separator)lineEnd
+        some empty fields\(separator)""\(separator)\(separator)""
+        now test\(separator)last\(separator)""
+        test\(separator)end\(separator)ofline\(separator)
+        ParticipantIdentifier\(separator)GlobalKey\(separator)EmailAddress\(separator)FirstName\(separator)MiddleName\(separator)LastName\(separator)Gender\(separator)DateOfBirth\(separator)SecondaryIdentifier\(separator)PostalCode\(separator)EnrollmentDate\(separator)EventDates\(separator)CustomFields
+        19608\(separator)9816babc\(separator)\(separator)Eric\(separator)\(separator)Schramm\(separator)W\(separator)\(separator)x\(separator)\(separator)2021-08-23T15:29:47Z\(separator){}\(separator)"{""BreatheDayOfWeek"":\(quadQuotes),""BreatheHourOfDay"":\(quadQuotes),""BreatheLastPush"":\(quadQuotes),""CurrentStepGoal"":\(quadQuotes),""LastDateWithStandHours"":\(quadQuotes),""LastDateWithSteps"":\(quadQuotes),""CoupleID"":""C127"",""LivesWithAnotherParticipant"":""False"",""Over75"":""False"",""SurveyDevice"":""iPhone"",""HasAppleWatch"":""True"",""ParticipatingAsCouple"":""True""}"
+        """
+        
+        var parsedFields = csvString.parseCSV()
         
         // overall check
         XCTAssertEqual(parsedFields.count, 8)
@@ -60,9 +84,9 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(parsedFields[1].count, 5)
         XCTAssertEqual(parsedFields[2].count, 4)
         
-        let line1fields = parsedFields[0]
+        var line1fields = parsedFields[0]
         XCTAssertEqual(line1fields[0], "this line starts with no quote")
-        let line2fields = parsedFields[1]
+        var line2fields = parsedFields[1]
         XCTAssertEqual(line2fields[0], "this line starts with a quote")
         
         XCTAssertEqual(line1fields[1], "safely escaped , comma")
@@ -77,22 +101,68 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(line1fields[4], "line ending without quotes")
         XCTAssertEqual(line2fields[4], "line ending with quotes")
         
-        let line3fields = parsedFields[2]
+        var line3fields = parsedFields[2]
         XCTAssertEqual(line3fields[1], "field2 contains a CRLF here\nshould still be in field")
         
-        let line4fields = parsedFields[3]
+        var line4fields = parsedFields[3]
         XCTAssertEqual(line4fields[1], "")
         XCTAssertEqual(line4fields[2], "")
         XCTAssertEqual(line4fields[3], "")
         
-        let line5fields = parsedFields[4]
+        var line5fields = parsedFields[4]
         XCTAssertEqual(line5fields[2], "")
         XCTAssertEqual(line5fields.count, 3)
         
-        let line6fields = parsedFields[5]
+        var line6fields = parsedFields[5]
         XCTAssertEqual(line6fields.count, 4)
         
-        let line8fields = parsedFields[7]
+        var line8fields = parsedFields[7]
+        XCTAssert(line8fields[12].hasPrefix("{"))
+        
+        // repeat
+        
+        parsedFields = csvStringTab.parseCSV(overrideDelimiter: "\t")
+        
+        // overall check
+        XCTAssertEqual(parsedFields.count, 8)
+        XCTAssertEqual(parsedFields[0].count, 5)
+        XCTAssertEqual(parsedFields[1].count, 5)
+        XCTAssertEqual(parsedFields[2].count, 4)
+        
+        line1fields = parsedFields[0]
+        XCTAssertEqual(line1fields[0], "this line starts with no quote")
+        line2fields = parsedFields[1]
+        XCTAssertEqual(line2fields[0], "this line starts with a quote")
+        
+        print(line1fields)
+        XCTAssertEqual(line1fields[1], "safely escaped , comma")
+        XCTAssertEqual(line2fields[1], "safely escaped , comma")
+        
+        XCTAssertEqual(line1fields[2], "plain")
+        XCTAssertEqual(line2fields[2], "plain")
+        
+        XCTAssertEqual(line1fields[3], "\"quotes around me in output\"")
+        XCTAssertEqual(line2fields[3], "\"quotes around me in output\"")
+        
+        XCTAssertEqual(line1fields[4], "line ending without quotes")
+        XCTAssertEqual(line2fields[4], "line ending with quotes")
+        
+        line3fields = parsedFields[2]
+        XCTAssertEqual(line3fields[1], "field2 contains a CRLF here\nshould still be in field")
+        
+        line4fields = parsedFields[3]
+        XCTAssertEqual(line4fields[1], "")
+        XCTAssertEqual(line4fields[2], "")
+        XCTAssertEqual(line4fields[3], "")
+        
+        line5fields = parsedFields[4]
+        XCTAssertEqual(line5fields[2], "")
+        XCTAssertEqual(line5fields.count, 3)
+        
+        line6fields = parsedFields[5]
+        XCTAssertEqual(line6fields.count, 4)
+        
+        line8fields = parsedFields[7]
         XCTAssert(line8fields[12].hasPrefix("{"))
     }
     
@@ -102,7 +172,7 @@ class CSVTests: XCTestCase {
                          """
         
         let sample = [sampleOneLine, sampleOneLine, sampleOneLine].joined(separator: "\n")
-        let output = sample.parseCSVFromChunk()
+        let output = sample.parseCSVFromChunk(overrideDelimiter: ",")
         XCTAssertEqual(output.prefix, sampleOneLine)
         XCTAssertEqual(output.lineModels, sampleOneLine.parseCSV())
         XCTAssertEqual(output.lastLine, sampleOneLine)
@@ -114,7 +184,7 @@ class CSVTests: XCTestCase {
                         "Mailing Address",First,Last,"Dumb, but legal",this is also legal
                         "371 Oak St",Eric,Schramm,myself,"butthead face"
                         """
-        XCTAssertEqual(csvString.parseHeaders(),["Mailing Address", "First" , "Last", "Dumb, but legal", "this is also legal"])
+        XCTAssertEqual(csvString.parseHeaders(overrideDelimiter: ","),["Mailing Address", "First" , "Last", "Dumb, but legal", "this is also legal"])
         
         enum TestFields: String, CaseIterable {
             case first = "First"
@@ -131,9 +201,9 @@ class CSVTests: XCTestCase {
             .thisIsAlsoLegal: 4
         ]
         
-        XCTAssertEqual(csvString.headersMayMap(stringEnum: TestFields.self), expectedOutput)
+        XCTAssertEqual(csvString.headersMayMap(stringEnum: TestFields.self, overrideDelimiter: ","), expectedOutput)
         
-        XCTAssertThrowsError(try csvString.headersMustMap(stringEnum: TestFields.self))
+        XCTAssertThrowsError(try csvString.headersMustMap(stringEnum: TestFields.self, overrideDelimiter: ","))
     }
 
     static var allTests = [
