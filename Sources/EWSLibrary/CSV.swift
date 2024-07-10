@@ -14,6 +14,7 @@ public struct CSVChunk<T> {
 }
 
 public enum CSVError: Error {
+    case cannotMakeUTF8StringFromData
     case expectedHeaderNotFound(String)
 }
 
