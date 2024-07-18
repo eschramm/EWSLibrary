@@ -20,7 +20,7 @@ public actor Limiter {
         self.duration = duration
     }
 
-    public func submit(operation: @escaping () async -> Void) {
+    public func submit(operation: @escaping @Sendable () async -> Void) {
         switch policy {
         case .throttle: throttle(operation: operation)
         case .debounce: debounce(operation: operation)
@@ -45,7 +45,7 @@ public extension Limiter {
 
 @available(macOS 12, *)
 private extension Limiter {
-    func throttle(operation: @escaping () async -> Void) {
+    func throttle(operation: @escaping @Sendable () async -> Void) {
         guard task == nil else { return }
 
         task = Task {

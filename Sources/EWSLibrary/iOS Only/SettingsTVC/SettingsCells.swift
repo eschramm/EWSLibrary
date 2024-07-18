@@ -94,6 +94,7 @@ public enum SettingsCellSelectionType {
     case cellButtonAction(action: (_ presentingViewController: UIViewController)->())
     case handledByCell
     
+    @MainActor
     func action() -> (_ presentingViewController: UIViewController) -> () {
         switch self {
         case .helpText(let title, let message):
@@ -146,6 +147,7 @@ public struct SettingsCellModel {
 public enum SettingsCellProperties {
     case gestureRecognizers(gestureRecognizers: [UIGestureRecognizer])
     
+    @MainActor
     func addProperties(cell: UITableViewCell) {
         switch self {
         case .gestureRecognizers(let gestureRecognizers):
@@ -156,6 +158,7 @@ public enum SettingsCellProperties {
     }
 }
 
+@MainActor
 protocol SettingsCell {
     func selectAction(presentingViewController: UIViewController)
 }

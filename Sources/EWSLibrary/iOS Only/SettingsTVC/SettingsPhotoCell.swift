@@ -61,7 +61,7 @@ public class SettingsPhotoCell : UITableViewCell, SettingsCell {
     }
 }
 
-extension SettingsPhotoCell: PhotoViewControllerDelegate {
+extension SettingsPhotoCell: @preconcurrency PhotoViewControllerDelegate {
     func photoViewController(photoViewController: PhotoViewController, didUpdate image: UIImage?) {
         photoViewController.dismiss(animated: true) {
             self.imageView?.image = image

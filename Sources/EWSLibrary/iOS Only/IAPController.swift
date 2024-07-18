@@ -10,7 +10,7 @@
 import Foundation
 import StoreKit
 
-
+@MainActor
 public class IAPCoordinator {
     
     var iapController: IAPController?
@@ -48,7 +48,8 @@ public class IAPCoordinator {
     }
 }
 
-class IAPController: NSObject, SKPaymentTransactionObserver, SKProductsRequestDelegate {
+@MainActor
+class IAPController: NSObject, @preconcurrency SKPaymentTransactionObserver, @preconcurrency SKProductsRequestDelegate {
     
     let productIdentifiers: Set<String>
     var purchasedProductIdentifiers: Set<String>
@@ -161,15 +162,17 @@ class IAPController: NSObject, SKPaymentTransactionObserver, SKProductsRequestDe
         completionHandler = nil;
     }
     
-    func request(_ request: SKRequest, didFailWithError error: Error) {
-        print("Failed to load list of products")
-        productsRequest = nil
-        completionHandler?(false, nil)
-        completionHandler = nil
-        
-        let alert = UIAlertController(title: "Request Failed", message: "Failed to load In App Purchase", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        presentHandler(alert)
+    nonisolated func request(_ request: SKRequest, didFailWithError error: Error) {
+        DispatchQueue.main.async {
+            print("Failed to load list of products")
+            self.productsRequest = nil
+            self.completionHandler?(false, nil)
+            self.completionHandler = nil
+            
+            let alert = UIAlertController(title: "Request Failed", message: "Failed to load In App Purchase", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.presentHandler(alert)
+        }
     }
     
 }

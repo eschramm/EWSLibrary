@@ -38,9 +38,9 @@ public class ErrorHandling: ObservableObject {
     
     @Published var currentAlert: ErrorAlert?
 
-    public static var externalErrorLoggerHandler: ((ErrorLoggerModel) -> ())? = nil
+    @MainActor public static var externalErrorLoggerHandler: ((ErrorLoggerModel) -> ())? = nil
     
-    public func handle(error: Error, title: String?, prefix: String?) {
+    @MainActor public func handle(error: Error, title: String?, prefix: String?) {
         let message: String
         if let prefix {
             message = "\(prefix) - \(error)"

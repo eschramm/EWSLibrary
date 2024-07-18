@@ -11,7 +11,7 @@ enum CSVFileParserError: Error {
     case unableToConvertDataToString
 }
 
-public struct CSVChunkStats {
+public struct CSVChunkStats: Sendable {
     public let chunk: Int
     public let linesProcessed: Int
     public let modelsCreated: Int
@@ -20,7 +20,7 @@ public struct CSVChunkStats {
     public let memoryAtCompletion: Int
 }
 
-public struct CSVRunStats {
+public struct CSVRunStats: Sendable {
     let wallTime: TimeInterval
     let cpuTime: TimeInterval
     let linesProcessed: Int
@@ -30,7 +30,7 @@ public struct CSVRunStats {
     let chunksCount: Int
 }
 
-public struct CSVRunProgress {
+public struct CSVRunProgress: Sendable {
     public let totalBytes: Int
     public let bytesProcessed: Int
     public let linesProcessed: Int
@@ -57,7 +57,7 @@ public struct CSVRunProgress {
 
 actor LineCoordinator<T> {
     
-    let liveUpdatingProgress: ((CSVRunProgress) -> ())?
+    let liveUpdatingProgress: (@Sendable (CSVRunProgress) -> ())?
     let totalBytes: Int
     
     var chunkPrefixes = [Int : String]()
@@ -65,7 +65,7 @@ actor LineCoordinator<T> {
     var chunkSuffixes = [Int: String]()
     var chunkStats = [CSVChunkStats]()
     
-    init(totalBytes: Int, liveUpdatingProgress: ((CSVRunProgress) -> Void)?) {
+    init(totalBytes: Int, liveUpdatingProgress: (@Sendable (CSVRunProgress) -> Void)?) {
         self.totalBytes = totalBytes
         self.liveUpdatingProgress = liveUpdatingProgress
     }
@@ -141,7 +141,7 @@ actor LineCoordinator<T> {
 /// maps file to memory, only loading when data requested for multi-threaded processing
 /// ASSUMES: ALL new line characters ARE new lines, so CSV content cannot have new lines inside the fields
 /// Memory will balloon to about double the file size at peak
-public class CSVFileParser {
+public actor CSVFileParser {
     
     struct Chunk {
         let index: Int
@@ -222,7 +222,7 @@ public class CSVFileParser {
     ///   - printReport: should a report be printed to the console at completion with run statistics
     ///   - liveUpdatingProgress: an optional closure, called on MainActor, that provides updates of progress - can be used for updating UI
     /// - Returns: a tuple of (processedModels, runStatistics)
-    public func csvFileToModelsWithStats<T>(printReport: Bool, modelConverter: @escaping ([String]) -> T?, liveUpdatingProgress: ((CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
+    public func csvFileToModelsWithStats<T: Sendable>(printReport: Bool, modelConverter: @escaping @Sendable ([String]) -> T?, liveUpdatingProgress: (@Sendable (CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
         let lineCoordinator = LineCoordinator<T>(totalBytes: data.count, liveUpdatingProgress: liveUpdatingProgress)
         let lastChunkIndex = chunkRanges.count - 1
         if liveUpdatingProgress != nil {
@@ -269,16 +269,16 @@ public class CSVFileParser {
         return (models: output, stats: (run: runStats, chunks: chunks))
     }
     
-    public func csvFileToModels<T>(modelConverter: @escaping ([String]) -> T?) async throws -> [T] {
+    public func csvFileToModels<T : Sendable>(modelConverter: @escaping @Sendable ([String]) -> T?) async throws -> [T] {
         return try await csvFileToModelsWithStats(printReport: false, modelConverter: modelConverter, liveUpdatingProgress: nil).models
     }
     
-    private func parseCSVLines<T>(throttledChunks: Range<Int>, lineCoordinator: LineCoordinator<T>, modelConverter: @escaping ([String]) -> T?) async throws {
+    private func parseCSVLines<T : Sendable>(throttledChunks: Range<Int>, lineCoordinator: LineCoordinator<T>, modelConverter: @escaping @Sendable ([String]) -> T?) async throws {
         return try await withThrowingTaskGroup(of: (Int, CSVChunk<T>).self) { group in
             for idx in throttledChunks {  //0..<totalChunks {
                 group.addTask {
                     let startTime = Date()
-                    let csvChunkModel = try self.fieldLinesForChunk(chunkIdx: idx)
+                    let csvChunkModel = try await self.fieldLinesForChunk(chunkIdx: idx)
                     let csvChunk = csvChunkModel.chunk
                     if self.printUpdates, #available(iOS 15.0, *) {
                         print("Starting model conversion for chunk \(idx) - \(csvChunk.lineModels.count.formatted()) lines")

@@ -171,7 +171,11 @@ public class TagCloudChildViewController: UIViewController {
         }
         
         NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: nil, queue: .main) { [weak self] (_) in
-            self?.collectionView.reloadData()
+            if let self {
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
         }
     }
     
@@ -293,10 +297,14 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
         }
         isAccessibilityElement = false
         NotificationCenter.default.addObserver(forName: .TagCloudShouldRefresh, object: cloudID, queue: .main) { [weak self] _ in
-            if #available(iOS 13.0, *), let tagCloudDiffDataSource = self?.tagCloudDataSource as? TagCloudDiffDataSource {
-                tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+            if let self {
+                DispatchQueue.main.async {
+                    if let tagCloudDiffDataSource = self.tagCloudDataSource as? TagCloudDiffDataSource {
+                        tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+                    }
+                    self.collectionView.reloadData()
+                }
             }
-            self?.collectionView.reloadData()
         }
     }
     
@@ -316,10 +324,14 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
         }
         isAccessibilityElement = false
         NotificationCenter.default.addObserver(forName: .TagCloudShouldRefresh, object: cloudID, queue: .main) { [weak self] _ in
-            if #available(iOS 13.0, *), let tagCloudDiffDataSource = self?.tagCloudDataSource as? TagCloudDiffDataSource {
-                tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+            if let self {
+                DispatchQueue.main.async {
+                    if let tagCloudDiffDataSource = self.tagCloudDataSource as? TagCloudDiffDataSource {
+                        tagCloudDiffDataSource.rebuildCacheAndUpdateSnapshot()
+                    }
+                    self.collectionView.reloadData()
+                }
             }
-            self?.collectionView.reloadData()
         }
     }
     
@@ -371,7 +383,11 @@ public class SettingsTagCloudCell : UITableViewCell, TagCloudController {
         NSLayoutConstraint.activate(constraints)
         
         NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: nil, queue: .main) { [weak self] (_) in
-            self?.collectionView.reloadData()
+            if let self {
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
         }
     }
     
@@ -587,6 +603,7 @@ class AddView : UIView {
     
     let searchBar = UISearchBar()
     let instructionsLabel = UILabel()
+    let addButton = UIButton(type: .system)
     
     let addTagHandler: (String) -> ()
     
@@ -605,7 +622,6 @@ class AddView : UIView {
         //searchBar.translatesAutoresizingMaskIntoConstraints = false
         //addSubview(searchBar)
         
-        let addButton = UIButton(type: .system)
         addButton.setTitle("Add", for: .normal)
         addButton.isHidden = true
         addButton.translatesAutoresizingMaskIntoConstraints = false
@@ -613,13 +629,12 @@ class AddView : UIView {
         
         searchBar.inputAccessoryView = addButton
         
+        let key = TagCloudTraditionalDataSource.TagFieldTextIsUnique
+        
         NotificationCenter.default.addObserver(forName: .TagTextFieldChanged, object: searchBar, queue: .main) { [weak self] (notification) in
-            if let userInfo = notification.userInfo, let isUnique = userInfo[TagCloudTraditionalDataSource.TagFieldTextIsUnique] as? Bool {
-                if isUnique, let searchText = self?.searchBar.text, !searchText.isEmpty {
-                    addButton.setTitle("Add \"\(searchText)\"", for: .normal)
-                    addButton.isHidden = false
-                } else {
-                    addButton.isHidden = true
+            if let userInfo = notification.userInfo, let isUnique = userInfo[key] as? Bool, let self {
+                DispatchQueue.main.async {
+                    self.tagTextFieldChanged(isUnique: isUnique)
                 }
             }
         }
@@ -647,6 +662,15 @@ class AddView : UIView {
         ])
     }
     
+    func tagTextFieldChanged(isUnique: Bool) {
+        if isUnique, let searchText = self.searchBar.text, !searchText.isEmpty {
+            addButton.setTitle("Add \"\(searchText)\"", for: .normal)
+            addButton.isHidden = false
+        } else {
+            addButton.isHidden = true
+        }
+    }
+    
     @objc func addTag() {
         guard let addText = searchBar.text, !addText.isEmpty else { return }
         addTagHandler(addText)
@@ -666,6 +690,7 @@ enum Section {
     case main
 }
 
+@MainActor
 protocol TagCloudDataSource: UICollectionViewDataSource, UISearchBarDelegate {
     
     var tagCloudDelegate: TagCloudDelegate? { get }
@@ -741,7 +766,7 @@ extension TagCloudDataSource {
     }
 }
 
-
+@MainActor
 class TagCloudTraditionalDataSource : NSObject, TagCloudDataSource {
 
     static let TagFieldTextIsUnique = "TagFieldTextIsUnique"

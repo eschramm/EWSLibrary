@@ -308,7 +308,7 @@ public struct AppInfo {
 
         let kern: kern_return_t = withUnsafeMutablePointer(to: &vmInfo) {
                 $0.withMemoryRebound(to: integer_t.self, capacity: 1) {
-                    task_info(mach_task_self_,
+                    task_info(machTaskSelf,
                               task_flavor_t(TASK_VM_INFO),
                               $0,
                               &vmInfoSize)

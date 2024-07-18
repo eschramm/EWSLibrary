@@ -9,6 +9,7 @@
 #if os(iOS)
 import UIKit
 
+@MainActor
 public protocol TableViewCell {
     func configureCell(with configuration: TableViewCellConfiguration)
 }
@@ -26,6 +27,7 @@ public struct TextFieldCellConfiguration: TableViewCellConfiguration {
     }
 }
 
+@MainActor
 public class TextFieldCell: UITableViewCell, TableViewCell {
     
     weak var gestureRecognizerToDismissFirstResponder: UITapGestureRecognizer?

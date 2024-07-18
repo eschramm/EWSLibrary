@@ -157,3 +157,11 @@ public extension Collection where Element: FloatingPoint {
         return stDev / mean
     }
 }
+
+public struct AnyHashableAndSendable: @unchecked Sendable, Hashable {
+    private let wrapped: AnyHashable
+    
+    public init(wrapped: some Hashable & Sendable) {
+        self.wrapped = .init(wrapped)
+    }
+}

@@ -9,7 +9,7 @@
 #if os(iOS)
 import UIKit
 
-
+@MainActor 
 public class ConnectionController {
     
     let appName: String

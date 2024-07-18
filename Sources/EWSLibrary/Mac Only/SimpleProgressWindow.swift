@@ -48,13 +48,13 @@ public class ObservableProgress : ObservableObject {
         let progressBarTitleStyle: ProgressBarTitleStyle
     }
     
-    @Published private (set) var current: Int
-    @Published private (set) var total: Int
-    @Published private (set) var title: String
-    @Published private (set) var progressBarTitle: String
+    @Published private(set) var current: Int
+    @Published private(set) var total: Int
+    @Published private(set) var title: String
+    @Published private(set) var progressBarTitle: String
 
     var nextUpdate: Update?
-    private (set) var progressBarTitleStyle: ProgressBarTitleStyle
+    private(set) var progressBarTitleStyle: ProgressBarTitleStyle
     
     var profiler: ProgressTimeProfiler
     let limiter = Limiter(policy: .throttle, duration: 0.5)

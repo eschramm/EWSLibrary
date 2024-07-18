@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct CSVChunk<T> {
+public struct CSVChunk<T : Sendable>: Sendable {
     public let prefix: String
     public let lineModels: [T]
     public let lastLine: String

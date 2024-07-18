@@ -10,12 +10,11 @@
 import UIKit
 import StoreKit
 
-
 public class SettingsRatingCell : UITableViewCell, SettingsCell {
     
     let initialText: String
     let ratingsTextColor: UIColor
-    let updateTitleHandler: (_ appInfoDict: [AnyHashable : Any]) -> (String)
+    let updateTitleHandler: (_ appInfoDict: [AnyHashableAndSendable : Sendable]) -> (String)
     let appStoreID: String
     let selectAction: (_ presentingViewController: UIViewController) -> ()
     
@@ -58,7 +57,7 @@ public class SettingsRatingCell : UITableViewCell, SettingsCell {
         ])
         
         let appInfo = CellAppInfo(with: appStoreID)
-        appInfo.getData { (dataDict : [AnyHashable : Any]) in
+        appInfo.getData { (dataDict : [AnyHashableAndSendable : Sendable]) in
             DispatchQueue.main.async { [weak self] in
                 NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
                 label.text = self?.updateTitleHandler(dataDict)
@@ -92,7 +91,7 @@ public class CellAppInfo : NSObject {  // class from NSObject only for Obj-C com
         self.session = URLSession(configuration: sessionConfig)
     }
     
-    public func getData(completion: @escaping (_ dataDict: [AnyHashable : Any]) -> Void) {
+    public func getData(completion: @escaping @Sendable (_ dataDict: [AnyHashableAndSendable : Sendable]) -> Void) {
         
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
@@ -115,7 +114,7 @@ public class CellAppInfo : NSObject {  // class from NSObject only for Obj-C com
             
             guard let data = data else { return }
             
-            if let possibleDict = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [AnyHashable : Any]) as [AnyHashable : Any]??), let dict = possibleDict {
+            if let possibleDict = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [AnyHashableAndSendable : Sendable]) as [AnyHashableAndSendable : Sendable]??), let dict = possibleDict {
                 completion(dict)
                 //print(possibleDict)
             }
