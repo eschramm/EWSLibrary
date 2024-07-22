@@ -28,6 +28,7 @@ struct ErrorAlert: Identifiable {
     var dismissAction: (() -> Void)?
 }
 
+@MainActor
 public class ErrorHandling: ObservableObject {
     
     public struct ErrorLoggerModel {
@@ -38,9 +39,9 @@ public class ErrorHandling: ObservableObject {
     
     @Published var currentAlert: ErrorAlert?
 
-    @MainActor public static var externalErrorLoggerHandler: ((ErrorLoggerModel) -> ())? = nil
+    public static var externalErrorLoggerHandler: ((ErrorLoggerModel) -> ())? = nil
     
-    @MainActor public func handle(error: Error, title: String?, prefix: String?) {
+    public func handle(error: Error, title: String?, prefix: String?) {
         let message: String
         if let prefix {
             message = "\(prefix) - \(error)"
