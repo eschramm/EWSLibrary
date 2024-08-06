@@ -219,7 +219,7 @@ public class ProgressTimeProfiler {
         // assumes called at symmetric intervals, e.g. every 10,000, etc.
         var secondsRemaining: Double?
         var secondsSoFar: Double?
-        if timeSum > 0, timeStamps.count > 1, let firstFractionComplete = firstFractionComplete, let lastTimeStamp = timeStamps.last {
+        if timeSum > 0, timeStamps.count > 1, let firstFractionComplete, let lastTimeStamp = timeStamps.last {
             secondsSoFar = Double(timeSum) / (lastTimeStamp.fractionComplete - firstFractionComplete) * lastTimeStamp.fractionComplete
             let totalRate = lastTimeStamp.fractionComplete / secondsSoFar!
             let secondToLastTimeStamp = timeStamps[timeStamps.count - 2]
@@ -237,18 +237,22 @@ public class ProgressTimeProfiler {
             }
         }
         var output = ""
-        if let secondsRemaining = secondsRemaining, let secondsSoFar = secondsSoFar {
-            output = "Elapsed: \(timeFormatter.string(from: secondsSoFar)!) - Est left: \(timeFormatter.string(from: secondsRemaining)!) - "
-            if showEstTotalTime {
-                let estimatedTotalTime = secondsSoFar + secondsRemaining
-                output += " [Est total: \(timeFormatter.string(from: estimatedTotalTime)!)] "
+        if let lastTimeStamp = timeStamps.last, lastTimeStamp.fractionComplete >= 1, let secondsSoFar {
+            output = "COMPLETE - Total time: \(timeFormatter.string(from: secondsSoFar)!) [\(numberFormatter.string(for: totalWork)!)]"
+        } else {
+            if let secondsRemaining , let secondsSoFar {
+                output = "Elapsed: \(timeFormatter.string(from: secondsSoFar)!) - Est left: \(timeFormatter.string(from: secondsRemaining)!) - "
+                if showEstTotalTime {
+                    let estimatedTotalTime = secondsSoFar + secondsRemaining
+                    output += " [Est total: \(timeFormatter.string(from: estimatedTotalTime)!)] "
+                }
             }
-        }
-        if let lastTimeStamp = timeStamps.last {
-            let percentComplete = lastTimeStamp.fractionComplete * 100
-            output += "\(numberFormatter.string(for: percentComplete)!) %"
-            if showRawUnits {
-                output += " (\(numberFormatter.string(for: lastTimeStamp.workComplete)!) of \(numberFormatter.string(for: totalWork)!))"
+            if let lastTimeStamp = timeStamps.last {
+                let percentComplete = lastTimeStamp.fractionComplete * 100
+                output += "\(numberFormatter.string(for: percentComplete)!) %"
+                if showRawUnits {
+                    output += " (\(numberFormatter.string(for: lastTimeStamp.workComplete)!) of \(numberFormatter.string(for: totalWork)!))"
+                }
             }
         }
 
