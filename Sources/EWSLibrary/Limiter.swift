@@ -14,6 +14,7 @@ public actor Limiter {
     private let policy: Policy
     private let duration: TimeInterval
     private var task: Task<Void, Error>?
+    private var lastTask: Task<Void, Error>?
 
     public init(policy: Policy, duration: TimeInterval) {
         self.policy = policy
@@ -24,6 +25,7 @@ public actor Limiter {
         switch policy {
         case .throttle: throttle(operation: operation)
         case .debounce: debounce(operation: operation)
+        case .throttleThenDebounce: throttleThenDebounce(operation: operation)
         }
     }
 }
@@ -38,6 +40,9 @@ public extension Limiter {
         
         ///will run last task after duration, resetting every duration
         case debounce
+        
+        ///will run first task after duration and ignore subsequent until complete, but ensures the last update
+        case throttleThenDebounce
     }
 }
 
@@ -65,6 +70,36 @@ private extension Limiter {
             try await sleep()
             await operation()
             task = nil
+        }
+    }
+    
+    func throttleThenDebounce(operation: @escaping @Sendable () async -> Void) {
+        guard task == nil else {
+            if let lastTask {
+                lastTask.cancel()
+            }
+            lastTask = Task {
+                guard !Task.isCancelled else {
+                    return
+                }
+                try? await sleep()
+                guard !Task.isCancelled else {
+                    return
+                }
+                await operation()
+                task = nil
+                lastTask = nil
+            }
+            return
+        }
+
+        task = Task {
+            try? await sleep()
+            task = nil
+        }
+
+        Task {
+            await operation()
         }
     }
 
