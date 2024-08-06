@@ -25,7 +25,7 @@ public class Shell
         return bash(commandName: commandName, arguments:arguments, runFromPath: runFromPath)
     }
     
-    public func streaming(commandName: String, arguments: [String] = [], runFromPath: String = "", handler: @escaping (StreamingOutput) -> ()) {
+    public func streaming(commandName: String, arguments: [String] = [], runFromPath: String = "", handler: @escaping @Sendable (StreamingOutput) -> ()) {
         guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "") else {
             handler(.error("\(commandName) not found"))
             return
@@ -64,7 +64,7 @@ public class Shell
         return output
     }
     
-    private func streamingExecuteShell(command: String, arguments: [String] = [], runFromPath: String, handler: @escaping (StreamingOutput) -> ()) {
+    private func streamingExecuteShell(command: String, arguments: [String] = [], runFromPath: String, handler: @escaping @Sendable (StreamingOutput) -> ()) {
         let task = Process()
         task.launchPath = command
         task.arguments = arguments

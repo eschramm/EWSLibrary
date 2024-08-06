@@ -34,6 +34,7 @@ public struct SimpleProgressWindow {
 }
 
 @available(macOS 12, *)
+@MainActor
 public class ObservableProgress : ObservableObject {
     
     public enum ProgressBarTitleStyle {
@@ -57,7 +58,7 @@ public class ObservableProgress : ObservableObject {
     private(set) var progressBarTitleStyle: ProgressBarTitleStyle
     
     var profiler: ProgressTimeProfiler
-    let limiter = Limiter(policy: .throttle, duration: 0.5)
+    let limiter = Limiter(policy: .throttleThenDebounce, duration: 0.5)
     
     public init(current: Int, total: Int, title: String, progressBarTitleStyle: ProgressBarTitleStyle) {
         self.current = current
@@ -79,7 +80,7 @@ public class ObservableProgress : ObservableObject {
         DispatchQueue.main.async {
             self.nextUpdate = Update(current: current, total: total ?? self.nextUpdate?.total ?? self.total, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
             Task {
-                await self.limiter.submit(operation: { self.applyUpdate() })
+                await self.limiter.submit(operation: { await self.applyUpdate() })
             }
         }
     }
@@ -126,11 +127,38 @@ public struct ESProgressView: View {
     }
 }
 
-@available(macOS 12, *)
-struct ProgressView_Preview: PreviewProvider {
+#if DEBUG
+
+struct TestProgressView: View {
     
-    static var previews: some View {
-        ESProgressView(observableProgress: ObservableProgress(current: 23, total: 100, title: "This is the title", progressBarTitleStyle: .custom("Downloading...")))
+    @StateObject var observableProgress = ObservableProgress(current: 0, total: 0, title: "Test Example", progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
+    
+    var body: some View {
+        VStack {
+            //ESProgressView(observableProgress: ObservableProgress(current: 23, total: 100, title: "This is the title", progressBarTitleStyle: .custom("Downloading...")))
+            ESProgressView(observableProgress: observableProgress)
+            Button {
+                Task {
+                    await startJob()
+                }
+            } label: {
+                Text("Start")
+            }
+
+        }.padding()
+    }
+    
+    func startJob() async {
+        for n in 0..<100 {
+            try! await Task.sleep(nanoseconds: 100_000_000)
+            observableProgress.update(current: n + 1, total: 100)
+        }
     }
 }
+
+@available(macOS 12, *)
+#Preview {
+    TestProgressView()
+}
+#endif
 #endif

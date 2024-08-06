@@ -9,7 +9,7 @@
 import SwiftUI
 
 
-public struct Credentials {
+public struct Credentials: Sendable {
     let username: String
     let password: String
 }
@@ -102,7 +102,9 @@ public actor RemoteDiskManager {
             DispatchQueue.main.async {
                 let credsView = NSHostingView(rootView: CredentialsView(title: "Enter credentials for remote disk \(self.remoteDrivePath)", handler: { result in
                     checkedContinuation.resume(with: result)
-                    presentingVC.dismiss(sheetVC)
+                    DispatchQueue.main.async {
+                        presentingVC.dismiss(sheetVC)
+                    }
                 }))
                 credsView.frame = CGRect(x: 0, y: 0, width: 300, height: 180)
                 sheetVC.view = credsView
@@ -155,7 +157,7 @@ public actor RemoteDiskManager {
     public func processFile(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, statusUpdater: @escaping (String) -> ()) async throws -> Int64 {
         try await mount(presentingVC: presentingViewController)
         
-        guard let totalFileSize = try? self.fileSize(at: fromURL) else {
+        guard let totalFileSize = try? Self.fileSize(at: fromURL) else {
             return 0
         }
         
@@ -195,11 +197,11 @@ public actor RemoteDiskManager {
     public func processFileUpdatingProgressBar(presentingViewController: NSViewController?, type: ProcessType, overwrite: Bool, fromURL: URL, toURL: URL, actionDetailOverride: String?, statusUpdater: @escaping (String) -> ()) async throws -> Int64 {
         
         let title = actionDetailOverride ?? "\(type.actionTitle()) File"
-        let progress = ObservableProgress(current: 0, total: 0, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
+        let progress = await ObservableProgress(current: 0, total: 0, title: title, progressBarTitleStyle: .automatic(showRawUnits: true, showEstTotalTime: true))
         
         try await mount(presentingVC: presentingViewController)
-        if let totalFileSize = try? self.fileSize(at: fromURL) {
-            progress.update(current: 0, total: totalFileSize)
+        if let totalFileSize = try? Self.fileSize(at: fromURL) {
+            await progress.update(current: 0, total: totalFileSize)
             let spv: NSViewController?
             if let pvc = presentingViewController {
                 spv = await SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress)
@@ -207,13 +209,15 @@ public actor RemoteDiskManager {
                 spv = nil
             }
             let timer = AsyncTimer(interval: 0.75) { thisTimer in
-                if let copiedFileSize = try? self.fileSize(at: toURL) {
+                if let copiedFileSize = try? Self.fileSize(at: toURL) {
                     // don't call on DispatchQueue.main - will not update - maybe because it does it internally, too?
-                    progress.update(current: copiedFileSize)
+                    Task {
+                        await progress.update(current: copiedFileSize)
+                    }
                 }
             }
             await timer.start(fireNow: true)
-            await fileCoordinator.takeLock()
+            await fileCoordinator.takeLock(identifier: "")
             
             let fileManager = FileManager()
             do {
@@ -266,7 +270,7 @@ public actor RemoteDiskManager {
         }
     }
     
-    public func fileSize(at url: URL) throws -> Int {
+    public static func fileSize(at url: URL) throws -> Int {
         var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) else {
             throw RemoteDiskManagerError.fileSizeCalculationError(description: "No file exists for \(url.path), returning zero bytes")
@@ -306,12 +310,12 @@ struct CredentialsView: View {
     let title: String
     let usernameTitle: String
     let buttonTitle: String
-    let handler: (Result<Credentials, RemoteDiskManager.RemoteDiskManagerError>) -> ()
+    let handler: @Sendable (Result<Credentials, RemoteDiskManager.RemoteDiskManagerError>) -> ()
     
     @State private var username: String = ""
     @State private var password: String = ""
     
-    init(title: String, usernameTitle: String = "Username", buttonTitle: String = "Log in", handler: @escaping (Result<Credentials, RemoteDiskManager.RemoteDiskManagerError>) -> ()) {
+    init(title: String, usernameTitle: String = "Username", buttonTitle: String = "Log in", handler: @escaping @Sendable (Result<Credentials, RemoteDiskManager.RemoteDiskManagerError>) -> ()) {
         self.title = title
         self.usernameTitle = usernameTitle
         self.buttonTitle = buttonTitle
