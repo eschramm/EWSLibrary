@@ -189,11 +189,13 @@ public extension DateFormatter {
     }()
 }
 
-public struct DateDay: Codable, Hashable {
+public struct DateDay: Codable, Hashable, Sendable {
     public let year: Int
     public let month: Int
     public let day: Int
     
+    /// Create a simple DateDay from a string
+    /// - Parameter string: e.g., 2024-08-07
     public init?(string: String) {
         let pieces = string.components(separatedBy: "-")
         guard pieces.count == 3,
@@ -227,7 +229,7 @@ public struct DateDay: Codable, Hashable {
     }
 }
 
-public struct UTCOffset: Codable {
+public struct UTCOffset: Codable, Sendable {
     public let hours: Int
     public let minutes: UInt
     public let seconds: UInt
