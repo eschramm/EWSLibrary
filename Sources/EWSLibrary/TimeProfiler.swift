@@ -209,7 +209,7 @@ public class ProgressTimeProfiler {
                 timeSum += (timeStamp.timeStamp - lastInstant)
                 countSum += (timeStamp.workComplete - lastCount)
             }
-            if firstFractionComplete == nil {
+            if firstFractionComplete == nil, !timeStamp.fractionComplete.isNaN {
                 firstFractionComplete = timeStamp.fractionComplete
             }
             lastInstant = timeStamp.timeStamp
