@@ -77,11 +77,9 @@ public class ObservableProgress : ObservableObject {
     }
     
     public func update(current: Int, total: Int? = nil, title: String? = nil, progressBarTitleStyle: ProgressBarTitleStyle? = nil) {
-        DispatchQueue.main.async {
-            self.nextUpdate = Update(current: current, total: total ?? self.nextUpdate?.total ?? self.total, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
-            Task {
-                await self.limiter.submit(operation: { await self.applyUpdate() })
-            }
+        self.nextUpdate = Update(current: current, total: total ?? self.nextUpdate?.total ?? self.total, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
+        Task {
+            await self.limiter.submit(operation: { await self.applyUpdate() })
         }
     }
     
@@ -90,20 +88,18 @@ public class ObservableProgress : ObservableObject {
     }
     
     func applyUpdate() {
-        DispatchQueue.main.async {
-            if let next = self.nextUpdate {
-                self.total = next.total
-                self.current = next.current
-                self.profiler.totalWork = next.total
-                self.title = next.title
-                
-                switch next.progressBarTitleStyle {
-                case .automatic(showRawUnits: let showRawUnits, showEstTotalTime: let showEstTotalTime):
-                    self.profiler.stamp(withWorkUnitsComplete: Int(next.current))
-                    self.progressBarTitle = self.profiler.progress(showRawUnits: showRawUnits, showEstTotalTime: showEstTotalTime)
-                case .custom(let title):
-                    self.progressBarTitle = title
-                }
+        if let next = self.nextUpdate {
+            self.total = next.total
+            self.current = next.current
+            self.profiler.totalWork = next.total
+            self.title = next.title
+            
+            switch next.progressBarTitleStyle {
+            case .automatic(showRawUnits: let showRawUnits, showEstTotalTime: let showEstTotalTime):
+                self.profiler.stamp(withWorkUnitsComplete: Int(next.current))
+                self.progressBarTitle = self.profiler.progress(showRawUnits: showRawUnits, showEstTotalTime: showEstTotalTime)
+            case .custom(let title):
+                self.progressBarTitle = title
             }
         }
     }

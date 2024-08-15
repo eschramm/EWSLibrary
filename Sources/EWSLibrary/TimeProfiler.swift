@@ -8,15 +8,15 @@
 
 import Foundation
 
-
-public class TimeProfiler {
+@MainActor
+public final class TimeProfiler: Sendable {
     
     public enum Granularity {
         case automatic
         case manual(NSCalendar.Unit)
     }
     
-    struct TimeStamp {
+    struct TimeStamp: Sendable {
         let timeStamp: TimeInterval
         let tag: String
     }
@@ -36,10 +36,12 @@ public class TimeProfiler {
         }
     }
     
-    public func stamp(tag: String, trial: Int = 0) {
-        var trialTimeStamps = timeStamps[trial] ?? [TimeStamp]()
-        trialTimeStamps.append(TimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, tag: tag))
-        timeStamps[trial] = trialTimeStamps
+    nonisolated public func stamp(tag: String, trial: Int = 0) {
+        Task { @MainActor in
+            var trialTimeStamps = timeStamps[trial] ?? [TimeStamp]()
+            trialTimeStamps.append(TimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, tag: tag))
+            timeStamps[trial] = trialTimeStamps
+        }
     }
     
     public func report(trial: Int? = nil) -> String {
@@ -219,7 +221,7 @@ public class ProgressTimeProfiler {
         // assumes called at symmetric intervals, e.g. every 10,000, etc.
         var secondsRemaining: Double?
         var secondsSoFar: Double?
-        if timeSum > 0, timeStamps.count > 1, let firstFractionComplete, let lastTimeStamp = timeStamps.last {
+        if timeSum > 0, timeStamps.count > 1, let firstFractionComplete, let lastTimeStamp = timeStamps.last, lastTimeStamp.fractionComplete - firstFractionComplete > 0 {
             secondsSoFar = Double(timeSum) / (lastTimeStamp.fractionComplete - firstFractionComplete) * lastTimeStamp.fractionComplete
             let totalRate = lastTimeStamp.fractionComplete / secondsSoFar!
             let secondToLastTimeStamp = timeStamps[timeStamps.count - 2]
