@@ -189,7 +189,8 @@ public extension DateFormatter {
     }()
 }
 
-public struct DateDay: Codable, Hashable, Sendable {
+public struct DateDay: Codable, Hashable, Comparable, Sendable {
+    
     public let year: Int
     public let month: Int
     public let day: Int
@@ -226,6 +227,16 @@ public struct DateDay: Codable, Hashable, Sendable {
     public func date(calendar: Calendar = .current) -> Date {
         let dateComponents = DateComponents(calendar: calendar, year: year, month: month, day: day)
         return calendar.date(from: dateComponents)!
+    }
+    
+    public static func < (lhs: DateDay, rhs: DateDay) -> Bool {
+        if lhs.year != rhs.year {
+            return lhs.year < rhs.year
+        } else if lhs.month != rhs.month {
+            return lhs.month < rhs.month
+        } else {
+            return lhs.day < rhs.day
+        }
     }
 }
 
