@@ -33,6 +33,9 @@ public struct SimpleProgressWindow {
     }
 }
 
+/// NOTE: for the tree to work, only end children can truly update their own progress - i.e., any node with a child must never update its own progress and depend upon its chidlren to do so
+/// Add known children as early as possible, even if run serially, so that the root parent can properly show true estimated progress
+
 @available(macOS 12, *)
 @MainActor
 public class ObservableProgress : ObservableObject, Identifiable, @preconcurrency Equatable, @preconcurrency Hashable {
@@ -57,6 +60,8 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     
     weak var parent: ObservableProgress?
     @Published public private(set) var children: [ObservableProgress] = []
+    private var childrenFractionSum: Double = 0
+    static let parentResolution = 1000
 
     var nextUpdate: Update?
     private(set) var progressBarTitleStyle: ProgressBarTitleStyle
@@ -81,13 +86,17 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
         }
     }
     
+    convenience public init(asParentWithTitle: String, progressBarTitleStyle: ProgressBarTitleStyle = .automatic(showRawUnits: false, showEstTotalTime: true)) {
+        self.init(current: 0, total: Self.parentResolution, title: asParentWithTitle, progressBarTitleStyle: progressBarTitleStyle)
+    }
+    
     public func update(current: Int, total: Int? = nil, title: String? = nil, progressBarTitleStyle: ProgressBarTitleStyle? = nil) {
         let superTotal = nextUpdate?.total ?? self.total
         if let parent {
             let superCurrent = nextUpdate?.current ?? self.current
-            let currentDiff = current - superCurrent
-            let totalDiff = (total == nil) ? 0 : (total! - superTotal)
-            parent.updateDiff(currentDiff: currentDiff, totalDiff: totalDiff)
+            let lastFraction = (superTotal > 0) ? Double(superCurrent) / Double(superTotal) : 0
+            let currentFraction = Double(current) / Double(total ?? superTotal)
+            parent.updateWithChildFraction(fractionDiff: currentFraction - lastFraction)
         }
         
         self.nextUpdate = Update(current: current, total: total ?? superTotal, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
@@ -96,18 +105,17 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
         }
     }
     
-    public func updateDiff(currentDiff: Int, totalDiff: Int) {
-        let nextCurrent = (nextUpdate?.current ?? self.current) + currentDiff
-        let nextTotal = (nextUpdate?.total ?? self.total) + totalDiff
-        update(current: nextCurrent, total: nextTotal)
+    public func updateWithChildFraction(fractionDiff: Double) {
+        childrenFractionSum += fractionDiff
+        update(current: Int(childrenFractionSum / Double(children.count) * Double(Self.parentResolution)))
     }
     
     public func addChild(_ child: ObservableProgress) {
         self.children.append(child)
-        //current += child.current
-        //total += child.total
         child.parent = self
-        updateDiff(currentDiff: child.current, totalDiff: child.total)
+        if child.total > 0 {
+            updateWithChildFraction(fractionDiff: Double(child.current) / Double(child.total))
+        }
     }
     
     func applyUpdate() {
@@ -131,7 +139,7 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     public func resetForReuse() {
         profiler = ProgressTimeProfiler(totalWorkUnits: Int(total), lastResultWeight: 0)
         current = 0
-        total = 0
+        total = children.isEmpty ? 0 : Self.parentResolution
         nextUpdate = nil
         isActive = false
         for child in children {
@@ -152,6 +160,12 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     }
 }
 
+extension ObservableProgress: @preconcurrency CustomDebugStringConvertible {
+    public var debugDescription: String {
+        "\(self) current: \(current), total: \(total), children: \(children)"
+    }
+}
+
 @available(macOS 12, *)
 public struct ESProgressView: View {
     
@@ -164,7 +178,7 @@ public struct ESProgressView: View {
     }
     
     public var body: some View {
-        if observableProgress.total > 0 {
+        if (observableProgress.children.isEmpty && observableProgress.total > 0 && observableProgress.total != ObservableProgress.parentResolution) || !observableProgress.children.isEmpty {
             VStack {
                 Text(observableProgress.title).padding(.bottom, /*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
                 ProgressView(observableProgress.progressBarTitle, value: Double(observableProgress.current), total: Double(observableProgress.total))
