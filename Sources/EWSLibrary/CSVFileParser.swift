@@ -68,6 +68,14 @@ actor LineCoordinator<T> {
     init(totalBytes: Int, liveUpdatingProgress: (@Sendable (CSVRunProgress) -> Void)?) {
         self.totalBytes = totalBytes
         self.liveUpdatingProgress = liveUpdatingProgress
+        if let liveUpdatingProgress {
+            let runProgress = CSVRunProgress(totalBytes: totalBytes, bytesProcessed: 0, linesProcessed: 0, modelsCreated: 0, peakMemeory: 0, wallTime: 0, cpuTime: 0)
+            Task {
+                await MainActor.run {
+                    liveUpdatingProgress(runProgress)
+                }
+            }
+        }
     }
     
     func add(stats: CSVChunkStats, for index: Int) {
