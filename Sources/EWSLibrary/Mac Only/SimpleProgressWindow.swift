@@ -111,7 +111,11 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     }
     
     public func addChild(_ child: ObservableProgress) {
-        self.children.append(child)
+        if children.contains(where: { $0 == child }) {
+            assertionFailure("WARNING: Duplicate child - \(child) - skipping readdition which would violate uniqueness for SwiftUI ForEach Identifiable semantics")
+        } else {
+            children.append(child)
+        }
         child.parent = self
         if child.total > 0 {
             updateWithChildFraction(fractionDiff: Double(child.current) / Double(child.total))
@@ -124,6 +128,10 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
             current = nextUpdate.current
             profiler.totalWork = nextUpdate.total
             title = nextUpdate.title
+            
+            if current > total {
+                print("Out of bounds - total: \(total), current: \(current) - runtime will throw a warning that this is being capped to 100 %")
+            }
             
             switch nextUpdate.progressBarTitleStyle {
             case .automatic(showRawUnits: let showRawUnits, showEstTotalTime: let showEstTotalTime):
@@ -162,7 +170,7 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
 
 extension ObservableProgress: @preconcurrency CustomDebugStringConvertible {
     public var debugDescription: String {
-        "\(self) current: \(current), total: \(total), children: \(children)"
+        "\(self) current: \(current), total: \(total), childrenCount: \(children.count)"
     }
 }
 
