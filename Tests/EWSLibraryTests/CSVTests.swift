@@ -172,7 +172,7 @@ class CSVTests: XCTestCase {
                          """
         
         let sample = [sampleOneLine, sampleOneLine, sampleOneLine].joined(separator: "\n")
-        let output = sample.parseCSVFromChunk(overrideDelimiter: ",")
+        let output = sample.parseCSVFromChunk(overrideDelimiter: ",", range: nil)
         XCTAssertEqual(output.prefix, sampleOneLine)
         XCTAssertEqual(output.lineModels, sampleOneLine.parseCSV())
         XCTAssertEqual(output.lastLine, sampleOneLine)

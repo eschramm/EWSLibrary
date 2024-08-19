@@ -9,6 +9,11 @@ import Foundation
 
 enum CSVFileParserError: Error {
     case unableToConvertDataToString
+    case dataIntegrityIssues
+}
+
+public enum CSVLineError: Error {
+    case error(line: [String], error: Error)
 }
 
 public struct CSVChunkStats: Sendable {
@@ -18,16 +23,17 @@ public struct CSVChunkStats: Sendable {
     public let bytesProcessed: Int
     public let runInterval: DateInterval
     public let memoryAtCompletion: Int
+    public let chunkRange: Range<Int>
 }
 
 public struct CSVRunStats: Sendable {
-    let wallTime: TimeInterval
-    let cpuTime: TimeInterval
-    let linesProcessed: Int
-    let bytesProcessed: Int
-    let modelsCreated: Int
-    let peakMemoryBytes: Int
-    let chunksCount: Int
+    public let wallTime: TimeInterval
+    public let cpuTime: TimeInterval
+    public let linesProcessed: Int
+    public let bytesProcessed: Int
+    public let modelsCreated: Int
+    public let peakMemoryBytes: Int
+    public let chunksCount: Int
 }
 
 public struct CSVRunProgress: Sendable {
@@ -61,7 +67,7 @@ actor LineCoordinator<T> {
     let totalBytes: Int
     
     var chunkPrefixes = [Int : String]()
-    var modelsByIndex = [Int : [T]]()
+    var resultsByIndex = [Int : [Result<T, CSVLineError>]]()
     var chunkSuffixes = [Int: String]()
     var chunkStats = [CSVChunkStats]()
     
@@ -91,9 +97,9 @@ actor LineCoordinator<T> {
         }
     }
     
-    func add(prefix: String, models: [T], suffix: String, for index: Int) {
+    func add(prefix: String, results: [Result<T, CSVLineError>], suffix: String, for index: Int) {
         chunkPrefixes[index] = prefix
-        modelsByIndex[index] = models
+        resultsByIndex[index] = results
         chunkSuffixes[index] = suffix
     }
     
@@ -144,6 +150,18 @@ actor LineCoordinator<T> {
         
         return output
     }
+    
+    func hasIntegrityIssue() -> Bool {
+        let ranges = chunkStats.map { $0.chunkRange }.sorted(by: { $0.lowerBound < $1.lowerBound })
+        print("Checking integrity of chunk ranges...")
+        for i in 1..<ranges.count {
+            if ranges[i - 1].upperBound != ranges[i].lowerBound {
+                print("INTEGRITY ISSUE! - ranges are not perfecty adjacent as expected")
+                return true
+            }
+        }
+        return false
+    }
 }
 
 /// maps file to memory, only loading when data requested for multi-threaded processing
@@ -184,6 +202,7 @@ public actor CSVFileParser {
             chunks.append(startByte..<(min(startByte + chunkSizeBytes, data.count)))
             startByte += chunkSizeBytes
         }
+        
         self.chunkRanges = chunks
         self.printUpdates = printUpdates
         self.skipHeaderRow = skipHeaderRow
@@ -230,7 +249,7 @@ public actor CSVFileParser {
     ///   - printReport: should a report be printed to the console at completion with run statistics
     ///   - liveUpdatingProgress: an optional closure, called on MainActor, that provides updates of progress - can be used for updating UI
     /// - Returns: a tuple of (processedModels, runStatistics)
-    public func csvFileToModelsWithStats<T: Sendable>(printReport: Bool, modelConverter: @escaping @Sendable ([String]) -> T?, liveUpdatingProgress: (@Sendable (CSVRunProgress) -> ())?) async throws -> (models: [T], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
+    public func csvFileToModelsWithStats<T: Sendable>(printReport: Bool, modelConverter: @escaping @Sendable ([String]) -> Result<T, CSVLineError>, liveUpdatingProgress: (@Sendable (CSVRunProgress) -> ())?) async throws -> (models: [T], errors: [Error], stats: (run: CSVRunStats, chunks: [CSVChunkStats])) {
         let lineCoordinator = LineCoordinator<T>(totalBytes: data.count, liveUpdatingProgress: liveUpdatingProgress)
         let lastChunkIndex = chunkRanges.count - 1
         if liveUpdatingProgress != nil {
@@ -246,27 +265,27 @@ public actor CSVFileParser {
             try await parseCSVLines(throttledChunks: 0..<(lastChunkIndex + 1), lineCoordinator: lineCoordinator, modelConverter: modelConverter)
         }
     
-        var output = [T]()
+        var output = [Result<T, CSVLineError>]()
         
         for chunkIndex in 0...lastChunkIndex {
             if chunkIndex == 0 {
                 if !skipHeaderRow {
                     output += await lineCoordinator.chunkPrefixes[0]!
                         .parseCSV(overrideDelimiter: delimiter)
-                        .compactMap({ modelConverter($0) })
+                        .map({ modelConverter($0) })
                 }
             } else {
                 let firstLine = await lineCoordinator.chunkSuffixes[chunkIndex - 1]! + lineCoordinator.chunkPrefixes[chunkIndex]!
                 output += firstLine
                     .parseCSV(overrideDelimiter: delimiter)
-                    .compactMap({ modelConverter($0) })
+                    .map({ modelConverter($0) })
             }
-            output += await lineCoordinator.modelsByIndex[chunkIndex]!
+            output += await lineCoordinator.resultsByIndex[chunkIndex]!
             if chunkIndex == lastChunkIndex {
                 output += await lineCoordinator.chunkSuffixes[lastChunkIndex]!
                     .parseCSV(overrideDelimiter: delimiter
                     )
-                    .compactMap({ modelConverter($0) })
+                    .map({ modelConverter($0) })
             }
         }
         let runStats = await lineCoordinator.runStats()
@@ -274,15 +293,30 @@ public actor CSVFileParser {
         if printReport, #available(iOS 16.0, *), #available(macOS 13.0, *) {
             print(await lineCoordinator.statsReport(runStats: runStats, chunkStats: chunks))
         }
-        return (models: output, stats: (run: runStats, chunks: chunks))
+        var models = [T]()
+        var errors = [Error]()
+        for result in output {
+            if case let .success(model) = result {
+                models.append(model)
+            } else if case let .failure(error) = result {
+                errors.append(error)
+            }
+        }
+        
+        // integrity check
+        if await lineCoordinator.hasIntegrityIssue() {
+            throw CSVFileParserError.dataIntegrityIssues
+        }
+        
+        return (models: models, errors: errors, stats: (run: runStats, chunks: chunks))
     }
     
-    public func csvFileToModels<T : Sendable>(modelConverter: @escaping @Sendable ([String]) -> T?) async throws -> [T] {
+    public func csvFileToModels<T : Sendable>(modelConverter: @escaping @Sendable ([String]) -> Result<T, CSVLineError>) async throws -> [T] {
         return try await csvFileToModelsWithStats(printReport: false, modelConverter: modelConverter, liveUpdatingProgress: nil).models
     }
     
-    private func parseCSVLines<T : Sendable>(throttledChunks: Range<Int>, lineCoordinator: LineCoordinator<T>, modelConverter: @escaping @Sendable ([String]) -> T?) async throws {
-        return try await withThrowingTaskGroup(of: (Int, CSVChunk<T>).self) { group in
+    private func parseCSVLines<T : Sendable>(throttledChunks: Range<Int>, lineCoordinator: LineCoordinator<T>, modelConverter: @escaping @Sendable ([String]) -> Result<T, CSVLineError>) async throws {
+        return try await withThrowingTaskGroup(of: (Int, CSVChunk<Result<T, CSVLineError>>).self) { group in
             for idx in throttledChunks {  //0..<totalChunks {
                 group.addTask {
                     let startTime = Date()
@@ -291,19 +325,20 @@ public actor CSVFileParser {
                     if self.printUpdates, #available(iOS 15.0, *) {
                         print("Starting model conversion for chunk \(idx) - \(csvChunk.lineModels.count.formatted()) lines")
                     }
-                    let models = csvChunk.lineModels.compactMap({ modelConverter($0) })
+                    let models = csvChunk.lineModels.map({ modelConverter($0) })
                     if self.printUpdates, #available(iOS 16.0, *), #available(macOS 13.0, *) {
                         let interval = DateInterval(start: startTime, end: Date())
                         let chunkByteRange = self.chunkRanges[idx]
                         print("Model conversion for chunk \(idx) complete - \(csvChunk.lineModels.count.formatted()) lines in \(Duration.seconds(interval.duration).formatted()) (\(Int(Double(csvChunk.lineModels.count) / interval.duration).formatted()) / sec) [\(Int((chunkByteRange.upperBound - chunkByteRange.lowerBound) / (1024 * 1000))) MB]")
                     }
-                    let stats = CSVChunkStats(chunk: idx, linesProcessed: csvChunk.lineModels.count, modelsCreated: models.count, bytesProcessed: csvChunkModel.byteCount, runInterval: .init(start: startTime, end: Date()), memoryAtCompletion: AppInfo.currentMemory())
+                    // adding one to the counts due to partial records at the ends of chunks?
+                    let stats = CSVChunkStats(chunk: idx, linesProcessed: csvChunk.lineModels.count + 1, modelsCreated: models.count + 1, bytesProcessed: csvChunkModel.byteCount, runInterval: .init(start: startTime, end: Date()), memoryAtCompletion: AppInfo.currentMemory(), chunkRange: csvChunk.range!)
                     await lineCoordinator.add(stats: stats, for: idx)
-                    return (idx, .init(prefix: csvChunk.prefix, lineModels: models, lastLine: csvChunk.lastLine))
+                    return (idx, .init(prefix: csvChunk.prefix, lineModels: models, lastLine: csvChunk.lastLine, range: csvChunk.range))
                 }
             }
             for try await (chunkIndex, csvChunk) in group {
-                await lineCoordinator.add(prefix: csvChunk.prefix, models: csvChunk.lineModels, suffix: csvChunk.lastLine, for: chunkIndex)
+                await lineCoordinator.add(prefix: csvChunk.prefix, results: csvChunk.lineModels, suffix: csvChunk.lastLine, for: chunkIndex)
                 if printUpdates {
                     print("Add \(csvChunk.lineModels.count) models from chunk \(chunkIndex)")
                 }
@@ -314,19 +349,57 @@ public actor CSVFileParser {
     private func fieldLinesForChunk(chunkIdx: Int) throws -> (chunk: CSVChunk<[String]>, byteCount: Int) {
         let chunk = Chunk(index: chunkIdx, byteRange: chunkRanges[chunkIdx])
         let dataChunk = data[chunk.byteRange]
+        var byteRange = chunk.byteRange
         if printUpdates {
             print("Chunking data for \(chunkIdx): \(chunk.byteRange) [\(Int((chunk.byteRange.upperBound - chunk.byteRange.lowerBound) / (1024 * 1000))) MB]")
         }
-        let string: String
+        var string: String? = nil
         if let utf8 = String(data: dataChunk, encoding: .utf8) {
             string = utf8
         } else {
-            print("WARNING: Chunk \(chunkIdx) failed UTF-8 and required ASCII encoding")
-            guard let asciiString = String(data: dataChunk, encoding: .ascii) else {
-                throw CSVFileParserError.unableToConvertDataToString
+            // so UTF-8 can consist of 1-2-3-4- or 8-byte characters, if this is encountered, we need to try shifting the boundary
+            
+            print("WARNING: Chunk \(chunkIdx) failed UTF-8 and required bit-shift strategy")
+            let shifts = [1, 2, 3, 4, 8]
+            // shift end
+            for shift in shifts {
+                let newRange = chunk.byteRange.lowerBound..<(chunk.byteRange.upperBound + shift)
+                print("- attempt \(shift)-byte shift END... \(newRange)")
+                let newDataChunk = data[newRange]
+                if let newUtf8 = String(data: newDataChunk, encoding: .utf8) {
+                    string = newUtf8
+                    byteRange = newRange
+                    print("  - success!")
+                    // print the last 100 characters of the string
+                    print(newUtf8[newUtf8.index(newUtf8.endIndex, offsetBy: -200)...])
+                    break
+                }
             }
-            string = asciiString
+            if string == nil {
+                // shift start
+                
+                for shift in shifts {
+                    let newRange = (chunk.byteRange.lowerBound + shift)..<chunk.byteRange.upperBound
+                    print("- attempt \(shift)-byte shift START... \(newRange)")
+                    let newDataChunk = data[newRange]
+                    if let newUtf8 = String(data: newDataChunk, encoding: .utf8) {
+                        string = newUtf8
+                        byteRange = newRange
+                        print("  - success!")
+                        print(newUtf8[newUtf8.startIndex...newUtf8.index(newUtf8.startIndex, offsetBy: 200)])
+                        break
+                    }
+                }
+                
+                if string == nil {
+                    guard let asciiString = String(data: dataChunk, encoding: .ascii) else {
+                        throw CSVFileParserError.unableToConvertDataToString
+                    }
+                    print("WARNING: using ASCII encoding to work")
+                    string = asciiString
+                }
+            }
         }
-        return (chunk: string.parseCSVFromChunk(overrideDelimiter: delimiter), byteCount: dataChunk.count)
+        return (chunk: string!.parseCSVFromChunk(overrideDelimiter: delimiter, range: byteRange), byteCount: dataChunk.count)
     }
 }

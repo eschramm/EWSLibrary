@@ -11,6 +11,7 @@ public struct CSVChunk<T : Sendable>: Sendable {
     public let prefix: String
     public let lineModels: [T]
     public let lastLine: String
+    public let range: Range<Int>?
 }
 
 public enum CSVError: Error {
@@ -32,13 +33,13 @@ public extension String {
         return parseCSV(scanner: &scanner, quitAfterLines: nil, overrideDelimiter: delimiter).0
     }
     
-    func parseCSVFromChunk(overrideDelimiter: Character?) -> CSVChunk<[String]> {
+    func parseCSVFromChunk(overrideDelimiter: Character?, range: Range<Int>?) -> CSVChunk<[String]> {
         let delimiter = overrideDelimiter ?? ","
         var scanner = csvScanner()
         let prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
         _ = scanner.scanCharacter()
         let (linesOfFields, lastLine) = parseCSV(scanner: &scanner, quitAfterLines: nil, overrideDelimiter: delimiter)
-        return .init(prefix: prefix, lineModels: linesOfFields.dropLast(), lastLine: lastLine)
+        return .init(prefix: prefix, lineModels: linesOfFields.dropLast(), lastLine: lastLine, range: range)
     }
     
     func parseHeaders(overrideDelimiter: Character?) -> [String] {
