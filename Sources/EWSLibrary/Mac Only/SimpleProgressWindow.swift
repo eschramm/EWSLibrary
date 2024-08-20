@@ -62,6 +62,7 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     @Published public private(set) var children: [ObservableProgress] = []
     private var childrenFractionSum: Double = 0
     static let parentResolution = 1000
+    public let createdAsParent: Bool
 
     var nextUpdate: Update?
     private(set) var progressBarTitleStyle: ProgressBarTitleStyle
@@ -69,11 +70,12 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     var profiler: ProgressTimeProfiler
     let limiter = Limiter(policy: .throttleThenDebounce, duration: 0.5)
     
-    public init(current: Int, total: Int, title: String, progressBarTitleStyle: ProgressBarTitleStyle) {
+    public init(current: Int, total: Int, title: String, progressBarTitleStyle: ProgressBarTitleStyle = .automatic(showRawUnits: true, showEstTotalTime: true), createdAsParent: Bool = false) {
         self.current = current
         self.total = total
         self.title = title
         self.isActive = (total > 0)
+        self.createdAsParent = createdAsParent
         
         self.profiler = ProgressTimeProfiler(totalWorkUnits: Int(total), lastResultWeight: 0)
         
@@ -87,7 +89,7 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     }
     
     convenience public init(asParentWithTitle: String, progressBarTitleStyle: ProgressBarTitleStyle = .automatic(showRawUnits: false, showEstTotalTime: true)) {
-        self.init(current: 0, total: Self.parentResolution, title: asParentWithTitle, progressBarTitleStyle: progressBarTitleStyle)
+        self.init(current: 0, total: Self.parentResolution, title: asParentWithTitle, progressBarTitleStyle: progressBarTitleStyle, createdAsParent: true)
     }
     
     public func update(current: Int, total: Int? = nil, title: String? = nil, progressBarTitleStyle: ProgressBarTitleStyle? = nil) {
@@ -147,7 +149,12 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
     public func resetForReuse() {
         profiler = ProgressTimeProfiler(totalWorkUnits: Int(total), lastResultWeight: 0)
         current = 0
-        total = children.isEmpty ? 0 : Self.parentResolution
+        childrenFractionSum = 0
+        if createdAsParent {
+            total = Self.parentResolution
+        } else {
+            total = 0
+        }
         nextUpdate = nil
         isActive = false
         for child in children {
