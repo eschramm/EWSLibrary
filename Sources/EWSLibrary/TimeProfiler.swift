@@ -44,6 +44,9 @@ public final class TimeProfiler: Sendable {
         }
     }
     
+    /// Return a simple multi-line report as a String of stats
+    /// - Parameter trial: if empty, will perform combined stats for all trials, otherwise only for the trial provided
+    /// - Returns: if no trials used, a simple timeStamp-to-timeStamp time intervals, otherwise mean/stDev for each step for all trials
     public func report(trial: Int? = nil) -> String {
         var lastTimeStamp: TimeStamp?
         var lines = [String]()
@@ -73,6 +76,11 @@ public final class TimeProfiler: Sendable {
                         intervals.append(interval)
                         dataDict[key] = intervals
                     }
+                    // full run
+                    let key = "[FULL RUN]"
+                    var intervals = dataDict[key] ?? [TimeInterval]()
+                    intervals.append(timeStamps[timeStamps.count - 1].timeStamp - timeStamps[0].timeStamp)
+                    dataDict[key] = intervals
                 }
                 let sortedKeys = dataDict.keys.sorted()
                 lines = sortedKeys.map({ (key) -> String in
@@ -160,9 +168,10 @@ extension String {
     }
 }
 
-public class ProgressTimeProfiler {
+@MainActor
+public final class ProgressTimeProfiler: Sendable {
 
-    struct ProgressTimeStamp {
+    struct ProgressTimeStamp: Sendable {
         let timeStamp: TimeInterval
         let workComplete: Int
         let fractionComplete: Double
@@ -196,8 +205,10 @@ public class ProgressTimeProfiler {
         self.lastResultWeight = lastResultWeight
     }
     
-    public func stamp(withWorkUnitsComplete workUnitsComplete: Int) {
-        timeStamps.append(ProgressTimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
+    nonisolated public func stamp(withWorkUnitsComplete workUnitsComplete: Int) {
+        Task { @MainActor in
+            timeStamps.append(ProgressTimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
+        }
     }
     
     public func progress(showRawUnits: Bool, showEstTotalTime: Bool) -> String {
