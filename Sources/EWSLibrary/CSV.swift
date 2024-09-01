@@ -33,11 +33,16 @@ public extension String {
         return parseCSV(scanner: &scanner, quitAfterLines: nil, overrideDelimiter: delimiter).0
     }
     
-    func parseCSVFromChunk(overrideDelimiter: Character?, range: Range<Int>?) -> CSVChunk<[String]> {
+    func parseCSVFromChunk(overrideDelimiter: Character?, range: Range<Int>?, forceFromStart: Bool = false) -> CSVChunk<[String]> {
         let delimiter = overrideDelimiter ?? ","
         var scanner = csvScanner()
-        let prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
-        _ = scanner.scanCharacter()
+        let prefix: String
+        if !forceFromStart {
+            prefix = scanner.scanUpToCharacters(from: .newlines) ?? ""
+            _ = scanner.scanCharacter()
+        } else {
+            prefix = ""
+        }
         let (linesOfFields, lastLine) = parseCSV(scanner: &scanner, quitAfterLines: nil, overrideDelimiter: delimiter)
         return .init(prefix: prefix, lineModels: linesOfFields.dropLast(), lastLine: lastLine, range: range)
     }
