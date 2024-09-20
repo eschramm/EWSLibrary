@@ -25,15 +25,36 @@ public enum CSVImporterError: Error {
     case cannotCreateDate(dateString: String, field: String)
     case cannotCreateEnum(rawString: String, field: String, type: String)
     case cannotCreateInt(rawString: String, field: String)
-    case cannotCreateDateDay(rawString: String, field: String)
-    case cannotCreateUTCOffset(rawString: String, field: String)
-    case cannotCreateTimeZone(rawString: String, field: String)
+}
+
+/// can be used to collect items inside the CSVFileParser processor closure
+public actor AsyncArray<T : Sendable> {
+    
+    public var items: [T]
+    
+    public init() {
+        self.items = []
+    }
+    
+    public nonisolated func addItem(_ item: T) {
+        Task {
+            await self.addItem(item: item)
+        }
+    }
+    
+    private func addItem(item: T) {
+        items.append(item)
+    }
 }
 
 public extension Array where Element == String {
     
-    func i<E: RawRepresentable>(mapping: [E : Int], field: E) -> String where E.RawValue == String {
-        return self[mapping[field]!]
+    func i<E: RawRepresentable>(mapping: [E : Int], field: E, emptyStringIfNotMapped: Bool = false) -> String where E.RawValue == String {
+        if emptyStringIfNotMapped, !mapping.keys.contains(field) {
+            return ""
+        } else {
+            return self[mapping[field]!]
+        }
     }
     func iDate<E: RawRepresentable>(mapping: [E : Int], field: E) throws -> Date where E.RawValue == String {
         let stringValue = self[mapping[field]!]
@@ -42,6 +63,20 @@ public extension Array where Element == String {
         }
         return date
     }
+    func iDateOpt<E: RawRepresentable>(mapping: [E : Int], field: E, nilIfNotMapped: Bool = false) throws -> Date? where E.RawValue == String {
+        if nilIfNotMapped, !mapping.keys.contains(field) {
+            return nil
+        } else {
+            let stringValue = self[mapping[field]!]
+            guard !stringValue.isEmpty else {
+                return nil
+            }
+            guard let date = DateFormatter.exportExplorer.date(from: stringValue) else {
+                throw CSVImporterError.cannotCreateDate(dateString: stringValue, field: field.rawValue)
+            }
+            return date
+        }
+    }
     func iUUID<E: RawRepresentable>(mapping: [E : Int], field: E) throws -> UUID where E.RawValue == String {
         let stringValue = self[mapping[field]!]
         guard let uuid = UUID(uuidString: stringValue) else {
@@ -49,15 +84,19 @@ public extension Array where Element == String {
         }
         return uuid
     }
-    func iUUIDOpt<E: RawRepresentable>(mapping: [E : Int], field: E) throws -> UUID? where E.RawValue == String {
-        let stringValue = self[mapping[field]!]
-        if stringValue.isEmpty {
+    func iUUIDOpt<E: RawRepresentable>(mapping: [E : Int], field: E, nilIfNotMapped: Bool = false) throws -> UUID? where E.RawValue == String {
+        if nilIfNotMapped, !mapping.keys.contains(field) {
             return nil
+        } else {
+            let stringValue = self[mapping[field]!]
+            if stringValue.isEmpty {
+                return nil
+            }
+            guard let uuid = UUID(uuidString: stringValue) else {
+                throw CSVImporterError.cannotCreateUUID(uuidString: stringValue, field: field.rawValue)
+            }
+            return uuid
         }
-        guard let uuid = UUID(uuidString: stringValue) else {
-            throw CSVImporterError.cannotCreateUUID(uuidString: stringValue, field: field.rawValue)
-        }
-        return uuid
     }
     func iSEnum<E: RawRepresentable, T: RawRepresentable>(mapping: [E : Int], field: E) throws -> T where E.RawValue == String, T.RawValue == String {
         let stringValue = self[mapping[field]!]
@@ -65,6 +104,20 @@ public extension Array where Element == String {
             throw CSVImporterError.cannotCreateEnum(rawString: stringValue, field: field.rawValue, type: "\(T.self)")
         }
         return enumValue
+    }
+    func iSEnumOpt<E: RawRepresentable, T: RawRepresentable>(mapping: [E : Int], field: E, nilIfNotMapped: Bool = false) throws -> T? where E.RawValue == String, T.RawValue == String {
+        if nilIfNotMapped, !mapping.keys.contains(field) {
+            return nil
+        } else {
+            let stringValue = self[mapping[field]!]
+            guard !stringValue.isEmpty else {
+                return nil
+            }
+            guard let enumValue = T.init(rawValue: stringValue) else {
+                throw CSVImporterError.cannotCreateEnum(rawString: stringValue, field: field.rawValue, type: "\(T.self)")
+            }
+            return enumValue
+        }
     }
     func iIEnum<E: RawRepresentable, T: StringConvertableEnum>(mapping: [E : Int], field: E) throws -> T where E.RawValue == String, T.RawValue == Int {
         let stringValue = self[mapping[field]!]
@@ -83,6 +136,18 @@ public extension Array where Element == String {
     func iData<E: RawRepresentable>(mapping: [E : Int], field: E) -> Data where E.RawValue == String {
         let stringValue = self[mapping[field]!]
         return stringValue.data(using: .utf8)!
+    }
+    func iBool<E: RawRepresentable>(mapping: [E : Int], field: E) -> Bool where E.RawValue == String {
+        let stringValue = self[mapping[field]!].lowercased() as NSString
+        return stringValue.boolValue
+    }
+    func iBoolOpt<E: RawRepresentable>(mapping: [E : Int], field: E, nilIfNotMapped: Bool = false) -> Bool? where E.RawValue == String {
+        if nilIfNotMapped, !mapping.keys.contains(field) {
+            return nil
+        } else {
+            let stringValue = self[mapping[field]!].lowercased() as NSString
+            return stringValue.boolValue
+        }
     }
 }
 
