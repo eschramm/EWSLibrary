@@ -446,7 +446,7 @@ public actor CSVFileParser {
         liveUpdatingProgress?(.init(totalBytes: runStats.bytesProcessed, bytesProcessed: runStats.bytesProcessed, linesProcessed: runStats.linesProcessed, modelsCreated: runStats.modelsCreated, peakMemeory: runStats.peakMemoryBytes, wallTime: runStats.wallTime, cpuTime: runStats.cpuTime))
         
         // to let any progress updates complete before cleanup of lineCoordinator
-        if #available(macOS 13.0, *) {
+        if #available(macOS 13.0, *), #available(iOS 16.0, *) {
             try await Task.sleep(for: .seconds(1))
         }
         
