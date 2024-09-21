@@ -37,9 +37,10 @@ public final class TimeProfiler: Sendable {
     }
     
     nonisolated public func stamp(tag: String, trial: Int = 0) {
+        let timeStamp = ProcessInfo.processInfo.systemUptime
         Task { @MainActor in
             var trialTimeStamps = timeStamps[trial] ?? [TimeStamp]()
-            trialTimeStamps.append(TimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, tag: tag))
+            trialTimeStamps.append(TimeStamp(timeStamp: timeStamp, tag: tag))
             timeStamps[trial] = trialTimeStamps
         }
     }
@@ -206,8 +207,9 @@ public final class ProgressTimeProfiler: Sendable {
     }
     
     nonisolated public func stamp(withWorkUnitsComplete workUnitsComplete: Int) {
+        let timeStamp = ProcessInfo.processInfo.systemUptime
         Task { @MainActor in
-            timeStamps.append(ProgressTimeStamp(timeStamp: ProcessInfo.processInfo.systemUptime, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
+            timeStamps.append(ProgressTimeStamp(timeStamp: timeStamp, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
         }
     }
     
