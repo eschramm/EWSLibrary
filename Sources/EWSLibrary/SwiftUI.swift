@@ -38,6 +38,9 @@ public class ErrorHandling: ObservableObject {
     }
     
     @Published var currentAlert: ErrorAlert?
+    
+    /// can use this to prevent an error doom loop where using onChange of appearsActive to trigger an event that is erroring out
+    public var lastErrorClosed: Date?
 
     public static var externalErrorLoggerHandler: ((ErrorLoggerModel) -> ())? = nil
     
@@ -77,6 +80,7 @@ struct HandleErrorsByShowingAlertViewModifier: ViewModifier {
                             title: Text(currentAlert.title),
                             message: Text(currentAlert.message),
                             dismissButton: .default(Text("OK")) {
+                                errorHandling.lastErrorClosed = Date()
                                 currentAlert.dismissAction?()
                             }
                         )
