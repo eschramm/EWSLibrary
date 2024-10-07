@@ -137,9 +137,9 @@ public actor RemoteDiskManager {
         let creds = try await getCreds(presentingVC: presentingVC)
             
         let shell = Shell()
-        var output = shell.outputOf(commandName: "mkdir", arguments: ["-p", self.localMountDir]) ?? ""
+        var output = shell.outputOf(commandName: "mkdir", arguments: ["-p", self.localMountDir]).output ?? ""
         output += "; "
-        output += shell.outputOf(commandName: "mount_smbfs", arguments: ["//\(creds.username):\(creds.password)@\(self.remoteIP)/\(self.remoteDrivePath)", self.localMountDir]) ?? ""
+        output += shell.outputOf(commandName: "mount_smbfs", arguments: ["//\(creds.username):\(creds.password)@\(self.remoteIP)/\(self.remoteDrivePath)", self.localMountDir]).output ?? ""
         if FileManager.default.fileExists(atPath: self.testFilePath()) {
             return
         } else {

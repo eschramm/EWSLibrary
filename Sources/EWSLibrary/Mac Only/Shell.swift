@@ -21,12 +21,12 @@ public class Shell
     
     public init() {}
     
-    public func outputOf(commandName: String, arguments: [String] = [], runFromPath: String = "") -> String? {
+    public func outputOf(commandName: String, arguments: [String] = [], runFromPath: String = "") -> (output: String?, returnValue: Int32) {
         return bash(commandName: commandName, arguments:arguments, runFromPath: runFromPath)
     }
     
     public func streaming(commandName: String, arguments: [String] = [], runFromPath: String = "", handler: @escaping @Sendable (StreamingOutput) -> ()) {
-        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "") else {
+        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "").output else {
             handler(.error("\(commandName) not found"))
             return
         }
@@ -36,15 +36,15 @@ public class Shell
     
     // MARK: private
     
-    private func bash(commandName: String, arguments: [String], runFromPath: String) -> String? {
-        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "") else {
-            return "\(commandName) not found"
+    private func bash(commandName: String, arguments: [String], runFromPath: String) -> (output: String?, returnValue: Int32) {
+        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "").output else {
+            return ("\(commandName) not found", -1)
         }
         whichPathForCommand = whichPathForCommand.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
         return executeShell(command: whichPathForCommand, arguments: arguments, runFromPath: runFromPath)
     }
     
-    private func executeShell(command: String, arguments: [String] = [], runFromPath: String) -> String? {
+    private func executeShell(command: String, arguments: [String] = [], runFromPath: String) -> (output: String?, returnValue: Int32) {
         let task = Process()
         task.launchPath = command
         task.arguments = arguments
@@ -60,8 +60,9 @@ public class Shell
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output: String? = String(data: data, encoding: String.Encoding.utf8)
+        task.waitUntilExit()
         
-        return output
+        return (output: output, returnValue: task.terminationStatus)
     }
     
     private func streamingExecuteShell(command: String, arguments: [String] = [], runFromPath: String, handler: @escaping @Sendable (StreamingOutput) -> ()) {
