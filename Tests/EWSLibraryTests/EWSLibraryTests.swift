@@ -6,7 +6,7 @@ final class EWSLibraryTests: XCTestCase {
     #if os(macOS)
     func testShell() {
         let shell = Shell()
-        XCTAssert(shell.outputOf(commandName: "echo", arguments: ["testing the shell"]) == "testing the shell\n")
+        XCTAssert(shell.outputOf(commandName: "echo", arguments: ["testing the shell"]).output == "testing the shell\n")
     }
     #endif
     
