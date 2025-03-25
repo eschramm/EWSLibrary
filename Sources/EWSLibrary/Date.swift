@@ -100,6 +100,11 @@ public extension Date {
         
         return (false, .init(iterations: iterations, closestIntervals: [sortedIntervals[min(left, right)], sortedIntervals[max(left, right)]]))
     }
+    
+    var lastDateOfMonth: Date {
+        let range = Calendar.current.range(of: .day, in: .month, for: self)!
+        return Calendar.current.date(bySetting: .day, value: range.count, of: self)!
+    }
 }
 
 public extension DateInterval {
@@ -125,27 +130,37 @@ public extension DateInterval {
         return df
     }()
     
-    func debugDescription(showStartDate: Bool, showInterval: Bool) -> String {
+    static let dateOnlyFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateStyle = .short
+        return df
+    }()
+    
+    func debugDescription(showStartDate: Bool, showInterval: Bool, hideTimes: Bool) -> String {
         let intervalString: String
         if showInterval {
             intervalString = "  -  \(Int(duration)) sec"
         } else {
             intervalString = ""
         }
+        let dateFormatter = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
         if showStartDate {
             if Calendar.current.isDate(start, inSameDayAs: end) {
-                return "\(trimTZ(string: DateInterval.dateFormatter.string(from: start))) - \(DateInterval.timeFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: dateFormatter.string(from: start))) - \(Self.timeFormatter.string(from: end))\(intervalString)"
             } else {
-                return "\(trimTZ(string: DateInterval.dateFormatter.string(from: start))) - \(DateInterval.dateFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: dateFormatter.string(from: start))) - \(dateFormatter.string(from: end))\(intervalString)"
             }
         } else {
             if Calendar.current.isDate(start, inSameDayAs: end) {
-                return "\(trimTZ(string: DateInterval.timeFormatter.string(from: start))) - \(DateInterval.timeFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: Self.timeFormatter.string(from: start))) - \(Self.timeFormatter.string(from: end))\(intervalString)"
             } else {
-                return "\(trimTZ(string: DateInterval.timeFormatter.string(from: start))) - \(DateInterval.dateFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: Self.timeFormatter.string(from: start))) - \(Self.dateFormatter.string(from: end))\(intervalString)"
             }
         }
         func trimTZ(string: String) -> String {
+            guard !hideTimes else {
+                return string
+            }
             let pieces = string.components(separatedBy: " ")
             return pieces.dropLast().joined(separator: " ")
         }
