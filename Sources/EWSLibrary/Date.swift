@@ -8,12 +8,25 @@
 import Foundation
 
 public extension Date {
+    /*
+     NOTE about Calendar. Don't store and pass it around. Always attempt to pull it fresh.
+     It should only be injected into these when performing tests where one may want to set
+     the calendar a certain way (e.g., DST vs ST)
+     */
     
-    func truncateToNoon(calendar: Calendar = .current) -> Date {
+    var truncateToNoon: Date {
+        return Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: self)!
+    }
+    
+    private func truncateToNoonTesting(calendar: Calendar) -> Date {
         return calendar.date(bySettingHour: 12, minute: 0, second: 0, of: self)!
     }
     
-    func truncateToMidnight(calendar: Calendar = .current) -> Date? {
+    var truncateToMidnight: Date? {
+        return Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: self)
+    }
+    
+    private func truncateToMidnight(calendar: Calendar = .current) -> Date? {
         return calendar.date(bySettingHour: 0, minute: 0, second: 0, of: self)
     }
     
