@@ -61,6 +61,12 @@ public class ErrorHandling: ObservableObject {
             print("Error: \(message)")
         }
     }
+    
+    public func handleMessage(title: String, message: String) {
+        DispatchQueue.main.async {
+            self.currentAlert = ErrorAlert(title: title, message: message)
+        }
+    }
 }
 
 @available(iOS 14.0, *)
