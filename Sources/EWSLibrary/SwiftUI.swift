@@ -102,6 +102,169 @@ extension View {
     }
 }
 
+public struct AsyncText: View {
+
+    public enum LoadingStyle {
+        case empty
+        case loadingIndicator
+    }
+    
+    public let loadingStyle: LoadingStyle
+    
+    /// used to ensure ASyncText is reconstructed if linked item changes
+    public let uniqueKey: String
+    @State private var string: String? = nil
+    
+    public let loadingClosure: () async -> String
+    
+    public init(loadingStyle: LoadingStyle, string: String? = nil, uniqueKey: String, loadingClosure: @escaping () async -> String) {
+        self.loadingStyle = loadingStyle
+        self.string = string
+        self.uniqueKey = uniqueKey
+        self.loadingClosure = loadingClosure
+    }
+    
+    public var body: some View {
+        VStack {
+            if let string {
+                Text(string)
+            } else {
+                switch loadingStyle {
+                case .empty:
+                    EmptyView()
+                case .loadingIndicator:
+                    ProgressView()
+                }
+            }
+        }
+        .task(id: uniqueKey) {
+            string = await loadingClosure()
+        }
+    }
+}
+
+/*
+ Order of superSet is stable.
+ Order of subSet is stable to the sort order of superSet.
+ */
+
+@available(macOS 14.0, *)
+public struct SubsetPickerView<T : Identifiable>: View {
+    
+    let fullSuperSet: [T]
+    let setDict: [T.ID : T]
+    let display: (T) -> String
+    
+    @State private var currentSuperSet: [T]
+    @Binding var currentSubSet: [T]
+    
+    let superSetTitle: String
+    let subSetTitle: String
+    
+    @State private var superSetSelection: T.ID? = nil
+    @State private var subSetSelection: T.ID? = nil
+    
+    public init(fullSuperSet: [T], subSet: Binding<[T]>, superSetTitle: String, subSetTitle: String, display: @escaping (T) -> String) {
+        self.fullSuperSet = fullSuperSet
+        self.setDict = fullSuperSet.reduce([T.ID : T](), { partialResult, item in
+            var dict = partialResult
+            dict[item.id] = item
+            return dict
+        })
+        self._currentSubSet = subSet
+        self.currentSuperSet = fullSuperSet
+            .filter({ !Set(subSet.wrappedValue.map(\.id)).contains($0.id) })
+        self.superSetTitle = superSetTitle
+        self.subSetTitle = subSetTitle
+        self.display = display
+    }
+    
+    public var body: some View {
+        VStack {
+            HStack {
+                Table(currentSuperSet, selection: $superSetSelection) {
+                    TableColumn(superSetTitle) { item in
+                        Text(display(item))
+                    }
+                }
+                VStack {
+                    Spacer()
+                    
+                    Button {
+                        let selectedItem = setDict[superSetSelection!]!
+                        // to keep sort order, refilter
+                        currentSubSet.append(selectedItem)
+                        currentSubSet = fullSuperSet
+                            .filter({ Set(currentSubSet.map(\.id)).contains($0.id) })
+                        currentSuperSet = currentSuperSet.filter { $0.id != selectedItem.id }
+                    } label: {
+                        Image(systemName: "chevron.right.2")
+                    }
+                    .disabled(superSetSelection == nil)
+                    
+                    Button {
+                        let selectedItem = setDict[subSetSelection!]!
+                        // to keep sort order, refilter
+                        currentSubSet = currentSubSet.filter { $0.id != selectedItem.id }
+                        currentSuperSet = fullSuperSet
+                            .filter({ !Set(currentSubSet.map(\.id)).contains($0.id) })
+                    } label: {
+                        Image(systemName: "chevron.left.2")
+                    }
+                    .disabled(subSetSelection == nil)
+                    
+                    Spacer()
+                }
+                Table(currentSubSet, selection: $subSetSelection) {
+                    TableColumn(subSetTitle) { item in
+                        Text(display(item))
+                    }
+                }
+            }
+        }
+        .padding()
+        .onChange(of: superSetSelection) { oldValue, newValue in
+            if newValue != nil {
+                subSetSelection = nil
+            }
+        }
+        .onChange(of: subSetSelection) { oldValue, newValue in
+            if newValue != nil {
+                superSetSelection = nil
+            }
+        }
+    }
+}
+
+extension View {
+    /// Applies the given transform if the given condition evaluates to `true`.
+    /// - Parameters:
+    ///   - condition: The condition to evaluate.
+    ///   - transform: The transform to apply to the source `View`.
+    /// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
+    @ViewBuilder public func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+    
+    /// Applies the given transform if the given condition evaluates to `true` and applies an alternate if `false`
+    /// - Parameters:
+    ///   - condition: The condition to evaluate.
+    ///   - transform: The transform to apply to the source `View`.
+    ///   - elseTransform: The transform to apply if conidition false
+    /// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
+    @ViewBuilder public func ifElse<Content: View>(_ condition: Bool, transform: (Self) -> Content, elseTransform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            elseTransform(self)
+        }
+    }
+}
+
 #if os(iOS)
 // https://stackoverflow.com/questions/59745663/is-there-a-swiftui-equivalent-for-viewwilldisappear-or-detect-when-a-view-is
 struct WillDisappearHandler: UIViewControllerRepresentable {
