@@ -217,11 +217,13 @@ public extension DateFormatter {
     }()
 }
 
-public struct DateDay: Codable, Hashable, Comparable, Sendable {
+public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
     
     public let year: Int
     public let month: Int
     public let day: Int
+    
+    static let epoch = Date(timeIntervalSince1970: 0)  // January 1, 1970
     
     /// Create a simple DateDay from a string
     /// - Parameter string: e.g., 2024-08-07
@@ -239,11 +241,23 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable {
         self.day = day
     }
     
-    public init(date: Date, calendar: Calendar) {
-        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+    public init(date: Date) {
+        let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
         self.year = dateComponents.year!
         self.month = dateComponents.month!
         self.day = dateComponents.day!
+    }
+    
+    public init(dayNumber: Int) {
+        let components = DateComponents(day: dayNumber, hour: 12)
+        let date = Calendar.current.date(byAdding: components, to: Self.epoch)!
+        self.init(date: date)
+    }
+    
+    public init(year: Int, month: Int, day: Int) {
+        self.year = year
+        self.month = month
+        self.day = day
     }
     
     public var string: String {
@@ -252,9 +266,17 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable {
         return "\(year)-\(monthComp)-\(dayComp)"
     }
     
-    public func date(calendar: Calendar = .current) -> Date {
-        let dateComponents = DateComponents(calendar: calendar, year: year, month: month, day: day)
-        return calendar.date(from: dateComponents)!
+    public var date: Date {
+        let dateComponents = DateComponents(calendar: .current, year: year, month: month, day: day)
+        return Calendar.current.date(from: dateComponents)!
+    }
+    
+    public var id: String {
+        return "\(year)|\(month)|\(day)"
+    }
+    
+    public var dayNumber: Int {
+        return Calendar.current.dateComponents([.day], from: Self.epoch, to: date).day!
     }
     
     public static func < (lhs: DateDay, rhs: DateDay) -> Bool {
