@@ -68,7 +68,11 @@ public class SettingsRatingCell : UITableViewCell, SettingsCell {
     
     public static func defaultSelectAction() -> SettingsCellSelectionType {
         return .cellButtonAction(action: { (_) in
-            SKStoreReviewController.requestReview()
+            if let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                
+                SKStoreReviewController.requestReview(in: windowScene)
+            }
         })
     }
     

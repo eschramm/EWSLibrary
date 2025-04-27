@@ -49,7 +49,7 @@ public class IAPCoordinator {
 }
 
 @MainActor
-class IAPController: NSObject, @preconcurrency SKPaymentTransactionObserver, @preconcurrency SKProductsRequestDelegate {
+class IAPController: NSObject, @preconcurrency SKPaymentTransactionObserver, SKProductsRequestDelegate {
     
     let productIdentifiers: Set<String>
     var purchasedProductIdentifiers: Set<String>
@@ -150,16 +150,18 @@ class IAPController: NSObject, @preconcurrency SKPaymentTransactionObserver, @pr
     
     // MARK: - SKProductsRequestDelegate
     
-    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+    nonisolated func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         print("Loaded list of products ...")
-        productsRequest = nil
         
         let skProducts = response.products
         for skProduct in skProducts {
             print("Found product: \(skProduct.productIdentifier) \(skProduct.localizedTitle) \(skProduct.price)")
         }
-        completionHandler?(true, skProducts)
-        completionHandler = nil;
+        Task { @MainActor in
+            productsRequest = nil
+            completionHandler?(true, skProducts)
+            completionHandler = nil
+        }
     }
     
     nonisolated func request(_ request: SKRequest, didFailWithError error: Error) {

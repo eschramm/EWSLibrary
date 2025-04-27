@@ -148,6 +148,7 @@ public struct AsyncText: View {
  Order of subSet is stable to the sort order of superSet.
  */
 
+@available(iOS 17.0, *)
 @available(macOS 14.0, *)
 public struct SubsetPickerView<T : Identifiable>: View {
     

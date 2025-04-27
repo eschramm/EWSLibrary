@@ -5,7 +5,6 @@
 //  Created by Eric Schramm on 7/14/21.
 //
 
-#if os(macOS)
 import SwiftUI
 
 @available(macOS 12, *)
@@ -16,6 +15,7 @@ public struct SimpleProgressWindow {
         case modalWindow
     }
     
+#if os(macOS)
     @MainActor
     public static func present(presentingVC: NSViewController, presentationStyle: PresentationStyle, progress: ObservableProgress, windowSize: CGSize = CGSize(width: 600, height: 180)) -> NSViewController {
         let sheetVC = NSViewController(nibName: nil, bundle: nil)
@@ -31,6 +31,7 @@ public struct SimpleProgressWindow {
         }
         return sheetVC
     }
+#endif
 }
 
 /// NOTE: for the tree to work, only end children can truly update their own progress - i.e., any node with a child must never update its own progress and depend upon its chidlren to do so
@@ -297,5 +298,4 @@ struct TestProgressView: View {
 #Preview {
     TestProgressView()
 }
-#endif
 #endif
