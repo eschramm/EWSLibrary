@@ -267,7 +267,7 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
     }
     
     public var date: Date {
-        let dateComponents = DateComponents(calendar: .current, year: year, month: month, day: day)
+        let dateComponents = DateComponents(calendar: .current, year: year, month: month, day: day, hour: 12)
         return Calendar.current.date(from: dateComponents)!
     }
     
@@ -279,6 +279,10 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
         return Calendar.current.dateComponents([.day], from: Self.epoch, to: date).day!
     }
     
+    public static var today: DateDay {
+        return DateDay(date: Date())
+    }
+    
     public static func < (lhs: DateDay, rhs: DateDay) -> Bool {
         if lhs.year != rhs.year {
             return lhs.year < rhs.year
@@ -287,6 +291,32 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
         } else {
             return lhs.day < rhs.day
         }
+    }
+    
+    public func offsetByDays(_ days: Int) -> DateDay {
+        return DateDay(dayNumber: dayNumber + days)
+    }
+    
+    public static func + (lhs: DateDay, rhs: Int) -> DateDay {
+        return lhs.offsetByDays(rhs)
+    }
+    
+    public static func - (lhs: DateDay, rhs: Int) -> DateDay {
+        return lhs.offsetByDays(-rhs)
+    }
+    
+    public static func - (lhs: DateDay, rhs: DateDay) -> Int {
+        return lhs.dayNumber - rhs.dayNumber
+    }
+    
+    public var lastDateDayOfMonth: DateDay {
+        let date = self.date
+        let range = Calendar.current.range(of: .day, in: .month, for: date)!
+        return .init(date: Calendar.current.date(bySetting: .day, value: range.count, of: date)!)
+    }
+    
+    public var weekday: Int {
+        return Calendar.current.component(.weekday, from: date)
     }
 }
 
