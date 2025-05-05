@@ -58,6 +58,34 @@ public extension Date {
         return (foundIndex + 1, iterations)
     }
     
+    /// Binary search of dates array for performance
+    /// - Parameter sortedDates: list of dates sorted ascending
+    /// - Returns: index of date preceding or matching self, `nil` if date precedes all sortedDates
+    func previousIndex(for sortedDates: [Date]) -> Int? {
+        // binary search
+        var left = 0
+        var right = sortedDates.count - 1
+        var middle = -1
+        var foundIndex: Int? = -1
+        
+        while left <= right {
+            middle = (left + right) / 2
+            if sortedDates[middle] < self {
+                left = middle + 1
+            } else if sortedDates[middle] > self {
+                right = middle - 1
+            } else {
+                foundIndex = middle
+                break
+            }
+        }
+        
+        if foundIndex == -1 {
+            foundIndex = (right != -1) ? right : nil
+        }
+        return foundIndex
+    }
+    
     struct InsideIntervalsRunInfo {
         public let iterations: Int
         public let closestIntervals: [DateInterval]

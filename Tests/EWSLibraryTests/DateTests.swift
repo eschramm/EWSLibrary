@@ -279,6 +279,28 @@ final class DateIntervalSearchTests: XCTestCase {
             }
         }
     }
+}
 
+import Testing
+
+struct DateTests2 {
+    @Test func previousIndex() {
+        let indexDate = Date()
+        let dates = [
+            indexDate,                          // 0
+            indexDate.addingTimeInterval(100),  // 1
+            indexDate.addingTimeInterval(200),  // 2
+            indexDate.addingTimeInterval(300),  // 3
+            indexDate.addingTimeInterval(400)   // 4
+        ]
+        
+        #expect(indexDate.addingTimeInterval(250).previousIndex(for: dates) == 2)
+        #expect(indexDate.addingTimeInterval(50).previousIndex(for: dates) == 0)
+        
+        // edges
+        #expect(indexDate.previousIndex(for: dates) == 0, "equals")
+        #expect(indexDate.addingTimeInterval(-10).previousIndex(for: dates) == nil, "before any date in array")
+        #expect(indexDate.addingTimeInterval(500).previousIndex(for: dates) == 4, "after all dates in array")
+    }
 }
 
