@@ -41,117 +41,117 @@ final class EWSLibraryTests: XCTestCase {
     }
     
     func testAsyncTimer() async throws {
-        let start = ProcessInfo.processInfo.systemUptime
-        let interval: Double = 1
+        let start = ContinuousClock.now
+        let interval: Duration = .seconds(1)
         let allowedErrorInterval: TimeInterval = 0.5
-        var firings = [TimeInterval]()
+        var firings = [ContinuousClock.Instant]()
         print("Testing AsyncTimer - expected delay")
-        let timer = AsyncTimer(interval: interval) { _ in 
+        let timer = AsyncTimer(interval: interval.timeInterval) { _ in
             print("Timer fired")
-            firings.append(ProcessInfo.processInfo.systemUptime)
+            firings.append(ContinuousClock.now)
         }
         await timer.start(fireNow: false)
-        try await Task.sleep(nanoseconds: interval.nanoSeconds * 8)
+        try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 8)
         await timer.stop()
         let firingsAfterStop = firings.count
         XCTAssertGreaterThan(firings.count, 6)
         XCTAssertLessThan(firings.count, 10)
         var intervals = [TimeInterval]()
-        intervals.append(firings[0] - start - interval)
+        intervals.append((firings[0] - start).timeInterval - interval.timeInterval)
         for n in 1..<firings.count {
-            intervals.append(firings[n] - firings[n - 1] - interval)
+            intervals.append((firings[n] - firings[n - 1]).timeInterval - interval.timeInterval)
         }
         let stats = intervals.stats()
         _ = stats.printAllStats(count: intervals.count, numberFormatter: nil)
-        try await Task.sleep(nanoseconds: interval.nanoSeconds * 2)
+        try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 2)
         XCTAssertEqual(firings.count, firingsAfterStop, "AsyncTimer fired additional times after being stopped")
         XCTAssertEqual(intervals.filter({ abs($0) > allowedErrorInterval }).count, 0, "At least one of the intervals for the AsyncTimer exceeds expected error of \(allowedErrorInterval)")
         await timer.start(fireNow: true)
-        try await Task.sleep(nanoseconds: interval.nanoSeconds * 3)
+        try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 3)
         XCTAssertGreaterThan(firings.count, firingsAfterStop + 2, "Async timer failed to make the initial and at least one firing after a restart")
     }
     
     func testASyncAtomicOperationWithOperation() async throws {
         let atomicQueue = AsyncAtomicOperationQueue()
-        let allStart = ProcessInfo.processInfo.systemUptime
-        var operatingIntervals = [(TimeInterval, TimeInterval)]()
+        let allStart = ContinuousClock.now
+        var operatingIntervals = [(Duration, Duration)]()
         let scaling = 3_000_000
-        print("enqueuing 1 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 1 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "1") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 1 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 1 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...scaling {
                 p += n
             }
-            print("Done Performing 1 : \(scaling) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 1 : \(scaling) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
-        print("enqueuing 2 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 2 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "2") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 2 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 2 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(Double(scaling) * 0.25) {
                 p += n
             }
-            print("Done Performing 2 : \(Double(scaling) * 0.25) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 2 : \(Double(scaling) * 0.25) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
-        print("enqueuing 3 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 3 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "3") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 3 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 3 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(Double(scaling) * 0.4) {
                 p += n
             }
-            print("Done Performing 3 : \(Double(scaling) * 0.4) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 3 : \(Double(scaling) * 0.4) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
-        print("enqueuing 4 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 4 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "4") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 4 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 4 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(Double(scaling) * 0.1) {
                 p += n
             }
-            print("Done Performing 4 : \(Double(scaling) * 0.1) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 4 : \(Double(scaling) * 0.1) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
-        print("enqueuing 5 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 5 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "5") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 5 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 5 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(Double(scaling) * 0.05) {
                 p += n
             }
-            print("Done Performing 5 : \(Double(scaling) * 0.05) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 5 : \(Double(scaling) * 0.05) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
-        print("enqueuing 6 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 6 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "6") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 6 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 6 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(Double(scaling) * 0.3) {
                 p += n
             }
-            print("Done Performing 6 : \(Double(scaling) * 0.3) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 6 : \(Double(scaling) * 0.3) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
-        print("enqueuing 7 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+        print("enqueuing 7 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "7") {
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 7 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 7 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(Double(scaling) * 0.05) {
                 p += n
             }
-            print("Done Performing 7 : \(Double(scaling) * 0.05) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            operatingIntervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 7 : \(Double(scaling) * 0.05) - \(ContinuousClock.now - allStart)")
+            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
         }
         try await Task.sleep(nanoseconds: 5.0.nanoSeconds)
         for interval in operatingIntervals {
@@ -160,123 +160,123 @@ final class EWSLibraryTests: XCTestCase {
         for n in 1..<operatingIntervals.count {
             XCTAssertTrue(operatingIntervals[n-1].1 < operatingIntervals[n].0, "Intervals overlap - cannot guarantee atomicity")
         }
-        var delaysBetweenTasks = [TimeInterval]()
+        var delaysBetweenTasks = [Duration]()
         for n in 1..<operatingIntervals.count {
             delaysBetweenTasks.append(operatingIntervals[n].0 - operatingIntervals[n-1].1)
         }
         print(delaysBetweenTasks)
         for delay in delaysBetweenTasks {
-            XCTAssertLessThan(delay, 0.6, "performance of waiting could be problematic")
+            XCTAssertLessThan(delay.timeInterval, 0.6, "performance of waiting could be problematic")
         }
         XCTAssertEqual(operatingIntervals.count, 7, "all 7 operations should have finished, if older hardware, may need to adjust scaling")
     }
     
     actor OperatingIntervals {
-        private var operatingIntervals = [(TimeInterval, TimeInterval)]()
+        private var operatingIntervals = [(Duration, Duration)]()
         
-        func append(_ interval: (TimeInterval, TimeInterval)) {
+        func append(_ interval: (Duration, Duration)) {
             operatingIntervals.append(interval)
         }
         
-        func allIntervals() -> [(TimeInterval, TimeInterval)] {
+        func allIntervals() -> [(Duration, Duration)] {
             return operatingIntervals
         }
     }
     
     func testASyncAtomicOperationAsyncAwait() async throws {
         let atomicQueue = AsyncAtomicOperationQueue()
-        let allStart = ProcessInfo.processInfo.systemUptime
+        let allStart = ContinuousClock.now
         let intervals = OperatingIntervals()
         let scaling: Double = 3_000_000
         Task {
-            print("enqueuing 1 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 1 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "1")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 1 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 1 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling) {
                 p += n
             }
-            print("Done Performing 1 : \(scaling) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 1 : \(scaling) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         Task {
-            print("enqueuing 2 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 2 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "2")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 2 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 2 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling * 0.25) {
                 p += n
             }
-            print("Done Performing 2 : \(scaling * 0.25) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 2 : \(scaling * 0.25) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         Task {
-            print("enqueuing 3 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 3 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "3")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 3 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 3 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling * 0.4) {
                 p += n
             }
-            print("Done Performing 3 : \(scaling * 0.4) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 3 : \(scaling * 0.4) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         Task {
-            print("enqueuing 4 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 4 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "4")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 4 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 4 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling * 0.1) {
                 p += n
             }
-            print("Done Performing 4 : \(scaling * 0.1) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 4 : \(scaling * 0.1) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         Task {
-            print("enqueuing 5 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 5 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "5")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 5 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 5 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling * 0.05) {
                 p += n
             }
-            print("Done Performing 5 : \(scaling * 0.05) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 5 : \(scaling * 0.05) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         Task {
-            print("enqueuing 6 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 6 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "6")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 6 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 6 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling * 0.3) {
                 p += n
             }
-            print("Done Performing 6 : \(scaling * 0.3) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 6 : \(scaling * 0.3) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         Task {
-            print("enqueuing 7 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            print("enqueuing 7 - \(ContinuousClock.now - allStart)")
             await atomicQueue.takeLock(identifier: "7")
-            let start = ProcessInfo.processInfo.systemUptime
-            print("Start Performing 7 - \(ProcessInfo.processInfo.systemUptime - allStart)")
+            let start = ContinuousClock.now
+            print("Start Performing 7 - \(ContinuousClock.now - allStart)")
             var p = 0
             for n in 0...Int(scaling * 0.05) {
                 p += n
             }
-            print("Done Performing 7 : \(scaling * 0.05) - \(ProcessInfo.processInfo.systemUptime - allStart)")
-            await intervals.append((start - allStart, ProcessInfo.processInfo.systemUptime - allStart))
+            print("Done Performing 7 : \(scaling * 0.05) - \(ContinuousClock.now - allStart)")
+            await intervals.append((start - allStart, ContinuousClock.now - allStart))
             await atomicQueue.releaseLock()
         }
         try await Task.sleep(nanoseconds: 5.0.nanoSeconds)
@@ -289,7 +289,7 @@ final class EWSLibraryTests: XCTestCase {
         }
         var delaysBetweenTasks = [TimeInterval]()
         for n in 1..<operatingIntervals.count {
-            delaysBetweenTasks.append(operatingIntervals[n].0 - operatingIntervals[n-1].1)
+            delaysBetweenTasks.append((operatingIntervals[n].0 - operatingIntervals[n-1].1).timeInterval)
         }
         print(delaysBetweenTasks)
         for delay in delaysBetweenTasks {

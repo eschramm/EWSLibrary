@@ -164,25 +164,40 @@ public extension DateInterval {
         return df
     }()
     
-    func debugDescription(showStartDate: Bool, showInterval: Bool, hideTimes: Bool) -> String {
+    func debugDescription(showStartDate: Bool, showInterval: Bool, hideTimes: Bool, overrideTimeZone: TimeZone? = nil) -> String {
         let intervalString: String
         if showInterval {
             intervalString = "  -  \(Int(duration)) sec"
         } else {
             intervalString = ""
         }
-        let dateFormatter = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
+        let dateFormatter: DateFormatter
+        if let overrideTimeZone {
+            var df = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
+            df.timeZone = overrideTimeZone
+            dateFormatter = df
+        } else {
+            dateFormatter = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
+        }
+        let timeFormatter: DateFormatter
+        if let overrideTimeZone {
+            var df = Self.timeFormatter
+            df.timeZone = overrideTimeZone
+            timeFormatter = df
+        } else {
+            timeFormatter = Self.timeFormatter
+        }
         if showStartDate {
             if Calendar.current.isDate(start, inSameDayAs: end) {
-                return "\(trimTZ(string: dateFormatter.string(from: start))) - \(Self.timeFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: dateFormatter.string(from: start))) - \(timeFormatter.string(from: end))\(intervalString)"
             } else {
                 return "\(trimTZ(string: dateFormatter.string(from: start))) - \(dateFormatter.string(from: end))\(intervalString)"
             }
         } else {
             if Calendar.current.isDate(start, inSameDayAs: end) {
-                return "\(trimTZ(string: Self.timeFormatter.string(from: start))) - \(Self.timeFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: timeFormatter.string(from: start))) - \(timeFormatter.string(from: end))\(intervalString)"
             } else {
-                return "\(trimTZ(string: Self.timeFormatter.string(from: start))) - \(Self.dateFormatter.string(from: end))\(intervalString)"
+                return "\(trimTZ(string: timeFormatter.string(from: start))) - \(dateFormatter.string(from: end))\(intervalString)"
             }
         }
         func trimTZ(string: String) -> String {
@@ -235,6 +250,44 @@ public extension Array where Element == DateInterval {
             return []
         }
     }
+    
+    func groupedByDateDay(offset: UTCOffset?, splitIntervalsSpanningMultipleDays: Bool) -> [DateDay: [DateInterval]] {
+        let output = NSMutableDictionary()  // [DateDay: [DateInterval]]()
+        let calendar: Calendar
+        if let offset {
+            var c = Calendar.current
+            c.timeZone = TimeZone(secondsFromGMT: Int(offset.secondsFromGMT))!
+            calendar = c
+        } else {
+            calendar = .current
+        }
+        for interval in self.sorted() {
+            let startDay = DateDay(date: interval.start)
+            let endDay = DateDay(date: interval.end)
+            let startDayArray: NSMutableArray
+            if let array = output[startDay] as? NSMutableArray {
+                startDayArray = array
+            } else {
+                startDayArray = NSMutableArray()
+                output[startDay] = startDayArray
+            }
+            if splitIntervalsSpanningMultipleDays, startDay != endDay {
+                let startInterval = DateInterval(start: interval.start, end: calendar.startOfDay(for: interval.end))
+                let endInterval = DateInterval(start: calendar.startOfDay(for: interval.end), end: interval.end)
+                startDayArray.add(startInterval)
+                if let array = output[endDay] as? NSMutableArray {
+                    array.add(endInterval)
+                } else {
+                    let array = NSMutableArray()
+                    array.add(endInterval)
+                    output[endDay] = array
+                }
+            } else {
+                startDayArray.add(interval)
+            }
+        }
+        return output as! [DateDay: [DateInterval]]
+    }
 }
 
 public extension DateFormatter {
@@ -269,8 +322,8 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
         self.day = day
     }
     
-    public init(date: Date) {
-        let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
+    public init(date: Date, calendar: Calendar = .current) {
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
         self.year = dateComponents.year!
         self.month = dateComponents.month!
         self.day = dateComponents.day!
@@ -367,6 +420,11 @@ public struct UTCOffset: Codable, Sendable {
         self.seconds = seconds
     }
     
+    public init(secondsFromGMT: Int) {
+        self.hours = secondsFromGMT / (60 * 60)
+        self.minutes = UInt((abs(secondsFromGMT) % (60 * 60)) / 60)
+        self.seconds = UInt((abs(secondsFromGMT) % (60 * 60)) % 60)
+    }
     
     public var string: String {
         let absHours = (abs(hours) < 10) ? "0\(abs(hours))" : "\(abs(hours))"
@@ -376,7 +434,7 @@ public struct UTCOffset: Codable, Sendable {
         return "\(hoursComp):\(minutesComp):\(secondsComp)"
     }
     
-    public var secondsFromGMT: TimeInterval {
-        return Double(hours * (60 * 60)) + Double(minutes * 60) + Double(seconds)
+    public var secondsFromGMT: Int {
+        return (hours * (60 * 60)) + Int(minutes * 60) + Int(seconds)
     }
 }

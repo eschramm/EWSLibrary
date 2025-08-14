@@ -17,7 +17,7 @@ public final class TimeProfiler: Sendable {
     }
     
     struct TimeStamp: Sendable {
-        let timeStamp: TimeInterval
+        let timeStamp: ContinuousClock.Instant
         let tag: String
     }
     
@@ -37,7 +37,7 @@ public final class TimeProfiler: Sendable {
     }
     
     nonisolated public func stamp(tag: String, trial: Int = 0) {
-        let timeStamp = ProcessInfo.processInfo.systemUptime
+        let timeStamp = ContinuousClock.now
         Task { @MainActor in
             var trialTimeStamps = timeStamps[trial] ?? [TimeStamp]()
             trialTimeStamps.append(TimeStamp(timeStamp: timeStamp, tag: tag))
@@ -68,24 +68,25 @@ public final class TimeProfiler: Sendable {
                 }
             } else {
                 // summarize
-                var dataDict = [String : [TimeInterval]]()
+                var dataDict = [String : [Duration]]()
                 for (_, timeStamps) in timeStamps {
                     for idx in 1..<timeStamps.count {
-                        let interval = timeStamps[idx].timeStamp - timeStamps[idx - 1].timeStamp
+                        let duration = timeStamps[idx].timeStamp - timeStamps[idx - 1].timeStamp
                         let key = "[\(idx)]: \(timeStamps[idx - 1].tag) - \(timeStamps[idx].tag)"
-                        var intervals = dataDict[key] ?? [TimeInterval]()
-                        intervals.append(interval)
-                        dataDict[key] = intervals
+                        var durations = dataDict[key] ?? [Duration]()
+                        durations.append(duration)
+                        dataDict[key] = durations
                     }
                     // full run
                     let key = "[FULL RUN]"
-                    var intervals = dataDict[key] ?? [TimeInterval]()
-                    intervals.append(timeStamps[timeStamps.count - 1].timeStamp - timeStamps[0].timeStamp)
-                    dataDict[key] = intervals
+                    var durations = dataDict[key] ?? [Duration]()
+                    durations.append(timeStamps[timeStamps.count - 1].timeStamp - timeStamps[0].timeStamp)
+                    dataDict[key] = durations
                 }
                 let sortedKeys = dataDict.keys.sorted()
                 lines = sortedKeys.map({ (key) -> String in
-                    let intervals = dataDict[key]!
+                    let durations = dataDict[key]!
+                    let intervals = durations.map { $0.timeInterval }
                     let stats = intervals.stats()
                     return """
                            \(key)
@@ -117,7 +118,7 @@ public final class TimeProfiler: Sendable {
         guard let lastTimeStamp = lastTimeStamp else {
             return (String(repeating: "-", count: timeLength + 7 - 1) + " " + timeStamp.tag).trunc(length: lineLength - (timeLength + 7))
         }
-        let secondDifference = timeStamp.timeStamp - lastTimeStamp.timeStamp
+        let secondDifference = (timeStamp.timeStamp - lastTimeStamp.timeStamp).timeInterval
         let unit: NSCalendar.Unit
         switch granularity {
         case .automatic:
@@ -163,6 +164,12 @@ public final class TimeProfiler: Sendable {
     
 }
 
+public extension Duration {
+    var timeInterval: TimeInterval {
+        return Double(components.0) + Double(components.attoseconds / 1_000_000_000_000_000_000)
+    }
+}
+
 extension String {
     func trunc(length: Int, trailing: String = "…") -> String {
       return (self.count > length) ? self.prefix(length) + trailing : self
@@ -173,7 +180,7 @@ extension String {
 public final class ProgressTimeProfiler: Sendable {
 
     struct ProgressTimeStamp: Sendable {
-        let timeStamp: TimeInterval
+        let timeStamp: ContinuousClock.Instant
         let workComplete: Int
         let fractionComplete: Double
     }
@@ -207,16 +214,16 @@ public final class ProgressTimeProfiler: Sendable {
     }
     
     nonisolated public func stamp(withWorkUnitsComplete workUnitsComplete: Int) {
-        let timeStamp = ProcessInfo.processInfo.systemUptime
+        let timeStamp = ContinuousClock.now
         Task { @MainActor in
             timeStamps.append(ProgressTimeStamp(timeStamp: timeStamp, workComplete: workUnitsComplete, fractionComplete: Double(workUnitsComplete) / Double(totalWork)))
         }
     }
     
     public func progress(showRawUnits: Bool, showEstTotalTime: Bool) -> String {
-        var timeSum: TimeInterval = 0
+        var timeSum: Duration = .seconds(0)
         var countSum = 0
-        var lastInstant: TimeInterval?
+        var lastInstant: ContinuousClock.Instant?
         var lastCount: Int?
         var firstFractionComplete: Double?
         for timeStamp in timeStamps {
@@ -234,13 +241,13 @@ public final class ProgressTimeProfiler: Sendable {
         // assumes called at symmetric intervals, e.g. every 10,000, etc.
         var secondsRemaining: Double?
         var secondsSoFar: Double?
-        if timeSum > 0, timeStamps.count > 1, let firstFractionComplete, let lastTimeStamp = timeStamps.last, lastTimeStamp.fractionComplete - firstFractionComplete > 0 {
-            secondsSoFar = Double(timeSum) / (lastTimeStamp.fractionComplete - firstFractionComplete) * lastTimeStamp.fractionComplete
+        if timeSum > .seconds(0), timeStamps.count > 1, let firstFractionComplete, let lastTimeStamp = timeStamps.last, lastTimeStamp.fractionComplete - firstFractionComplete > 0 {
+            secondsSoFar = Double(timeSum.timeInterval) / (lastTimeStamp.fractionComplete - firstFractionComplete) * lastTimeStamp.fractionComplete
             let totalRate = lastTimeStamp.fractionComplete / secondsSoFar!
             let secondToLastTimeStamp = timeStamps[timeStamps.count - 2]
             let lastFractionCompleteDiff = lastTimeStamp.fractionComplete - secondToLastTimeStamp.fractionComplete
             let lastInterval = lastTimeStamp.timeStamp - secondToLastTimeStamp.timeStamp
-            let lastRate = lastFractionCompleteDiff / Double(lastInterval)
+            let lastRate = lastFractionCompleteDiff / Double(lastInterval.timeInterval)
             let weightedRate: Double
             if let lastResultWeight = lastResultWeight {
                 weightedRate = (totalRate * (1 - lastResultWeight)) + (lastRate * lastResultWeight)
@@ -345,3 +352,4 @@ public struct AppInfo {
         }
     }
 }
+

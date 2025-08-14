@@ -309,3 +309,14 @@ extension View {
     }
 }
 #endif
+
+// https://mastodon.social/@chockenberry/114870691808745710
+public extension Bundle {
+    static var isXCodePreview: Bool {
+#if targetEnvironment(simulator)
+        return (Self.main.executableURL?.lastPathComponent == "XCPreviewAgent")
+#else
+        return false
+#endif
+    }
+}
