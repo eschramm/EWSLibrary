@@ -170,6 +170,14 @@ public extension Duration {
     }
 }
 
+@available(macOS 15.0, *)
+@available(iOS 18.0, *)
+public extension TimeInterval {
+    var duration: Duration {
+        return .init(attoseconds:Int128(self * 1_000_000_000_000_000_000))
+    }
+}
+
 extension String {
     func trunc(length: Int, trailing: String = "…") -> String {
       return (self.count > length) ? self.prefix(length) + trailing : self
