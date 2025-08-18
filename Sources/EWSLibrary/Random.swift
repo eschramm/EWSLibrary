@@ -40,7 +40,65 @@ public func randomBool(withTrueProbability trueProbability: Double) -> Bool {
     return Double(random) < Double(precision) * trueProbability
 }
 
-public struct EWSStats<T:FloatingPoint> {
+public enum Stat {
+    case sum
+    case min
+    case max
+    case mean
+    case median
+    case stDev
+    case relDev
+}
+
+public struct EWSStatsInt<T : BinaryInteger> {
+    public let sum: T
+    public let min: T?
+    public let max: T?
+    public let mean: Double?
+    public let median: Double?
+    public let standardDeviation: Double?
+    public let relativeDeviation: Double?
+    
+    public func string(stat: Stat, numberFormatter: NumberFormatter, naString: String = "--") -> String {
+        switch stat {
+        case .sum:
+            return numberFormatter.string(for: sum)!
+        case .min:
+            return numberFormatter.string(for: min) ?? naString
+        case .max:
+            return numberFormatter.string(for: max) ?? naString
+        case .mean:
+            return numberFormatter.string(for: mean) ?? naString
+        case .median:
+            return numberFormatter.string(for: median) ?? naString
+        case .stDev:
+            return numberFormatter.string(for: standardDeviation) ?? naString
+        case .relDev:
+            if let relDev = relativeDeviation {
+                return "\(numberFormatter.string(for: relDev * 100)!) %"
+            } else {
+                return naString
+            }
+        }
+    }
+    
+    public func printAllStats(count: Int, numberFormatter: NumberFormatter?) -> String {
+        let numberFormatter = numberFormatter ?? {
+            let nf = NumberFormatter()
+            nf.numberStyle = .decimal
+            return nf
+        }()
+        var output = "Count  : \(count)"
+        output +=  "\nSum    : \(string(stat: .sum, numberFormatter: numberFormatter))"
+        output +=  "\nRange  : \(string(stat: .min, numberFormatter: numberFormatter)) - \(string(stat: .max, numberFormatter: numberFormatter))"
+        output +=  "\nMean   : \(string(stat: .mean, numberFormatter: numberFormatter))"
+        output +=  "\nMedian : \(string(stat: .median, numberFormatter: numberFormatter))"
+        output +=  "\nStDev  : \(string(stat: .stDev, numberFormatter: numberFormatter)) (\(string(stat: .relDev, numberFormatter: numberFormatter)))"
+        return output
+    }
+}
+
+public struct EWSStatsFloat<T : FloatingPoint> {
     public let sum: T
     public let min: T?
     public let max: T?
@@ -48,16 +106,6 @@ public struct EWSStats<T:FloatingPoint> {
     public let median: T?
     public let standardDeviation: T?
     public let relativeDeviation: T?
-    
-    public enum Stat {
-        case sum
-        case min
-        case max
-        case mean
-        case median
-        case stDev
-        case relDev
-    }
     
     public func string(stat: Stat, numberFormatter: NumberFormatter, naString: String = "--") -> String {
         switch stat {
@@ -102,7 +150,7 @@ public struct EWSStats<T:FloatingPoint> {
 
 public extension Collection where Element: FloatingPoint {
     
-    func stats() -> EWSStats<Element> {
+    func stats() -> EWSStatsFloat<Element> {
         let sortedSelf = sorted()
         let sum = self.sum()
         let mean = self.mean(sum: sum)
@@ -111,7 +159,15 @@ public extension Collection where Element: FloatingPoint {
         let max = self.max(sorted: sortedSelf)
         let stDev = self.standardDeviation(mean: mean)
         let relDev = self.relativeDeviation(stDev: stDev, mean: mean)
-        return EWSStats(sum: sum, min: min, max: max, mean: mean, median: median, standardDeviation: stDev, relativeDeviation: relDev)
+        return .init(
+            sum: sum,
+            min: min,
+            max: max,
+            mean: mean,
+            median: median,
+            standardDeviation: stDev,
+            relativeDeviation: relDev
+        )
     }
     
     func sum() -> Element {
@@ -158,6 +214,77 @@ public extension Collection where Element: FloatingPoint {
     }
 }
 
+public extension Collection where Element: BinaryInteger {
+    
+    func statsAsDouble() -> EWSStatsInt<Element> {
+        let sortedDouble = sortedDouble()
+        let sum = self.sum()
+        let mean = self.mean(sum: sum)
+        let median = self.median(sorted: sortedDouble)
+        let sortedSelf = self.sorted()
+        let min = self.min(sorted: sortedSelf)
+        let max = self.max(sorted: sortedSelf)
+        let stDev = self.standardDeviation(mean: mean)
+        let relDev = self.relativeDeviation(stDev: stDev, mean: mean)
+        return .init(
+            sum: sum,
+            min: min,
+            max: max,
+            mean: mean,
+            median: median,
+            standardDeviation: stDev,
+            relativeDeviation: relDev
+        )
+    }
+    
+    func sortedDouble() -> [Double] {
+        return self.sorted().map({ Double($0) })
+    }
+    
+    func sum() -> Element {
+        return self.reduce(0, +)
+    }
+    
+    func mean(sum: Element? = nil) -> Double? {
+        guard count > 0 else { return nil }
+        let sum = sum ?? self.sum()
+        return Double(sum) / Double(count)
+    }
+    
+    func min(sorted: [Element]? = nil) -> Element? {
+        let sorted = sorted ?? self.sorted()
+        return sorted.first
+    }
+    
+    func max(sorted: [Element]? = nil) -> Element? {
+        let sorted = sorted ?? self.sorted()
+        return sorted.last
+    }
+    
+    func median(sorted: [Double]? = nil) -> Double? {
+        guard count > 0 else { return nil }
+        let sorted = sorted ?? self.sortedDouble()
+        if sorted.count % 2 == 0 {
+            return (sorted[sorted.count / 2] + sorted[sorted.count / 2 - 1]) / 2
+        } else {
+            return sorted[(sorted.count - 1) / 2]
+        }
+    }
+    
+    func standardDeviation(mean: Double? = nil) -> Double? {
+        guard count > 1 else { return nil }
+        let mean = mean ?? self.mean()!
+        let variance = self.reduce(0, { $0 + (Double($1) - mean) * (Double($1) - mean) })
+        return sqrt(variance / (Double(count) - 1))
+    }
+    
+    func relativeDeviation(stDev: Double? = nil, mean: Double? = nil) -> Double? {
+        guard let stDev = stDev ?? standardDeviation() else { return nil }
+        let mean = mean ?? self.mean()!
+        return stDev / mean
+    }
+}
+
 public struct AnyHashableAndSendable: @unchecked Sendable, Hashable {
     private let wrapped: AnyHashable
     
@@ -165,3 +292,4 @@ public struct AnyHashableAndSendable: @unchecked Sendable, Hashable {
         self.wrapped = .init(wrapped)
     }
 }
+
