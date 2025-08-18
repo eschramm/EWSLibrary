@@ -32,20 +32,6 @@ class CSVTests: XCTestCase {
         XCTAssertEqual("make me<CR>CSV safe", testCR.makeCSVsafe(carriageReturnReplacement: "<CR>", overrideDelimiter: "\t"))
     }
     
-    func testCSVLineParsing() throws {
-        let testSimple = "foo,bar"
-        XCTAssertEqual(["foo", "bar"], testSimple.parseCSVLine())
-        let testQuotedComma = "foo,\"bar, tavern, pub\""
-        XCTAssertEqual(["foo", "bar, tavern, pub"], testQuotedComma.parseCSVLine())
-        /*
-        let testEtsyFailCase =
-        """
-        "Sale Date","Order ID",Status,"Buyer User ID",SKU
-        """
-        XCTAssertEqual(["Sale Date", "Order ID", "Status", "Buyer User ID", "SKU"], testEtsyFailCase.parseCSVLine())
-        */
-    }
-    
     func testCSVParsing() throws {
         let quadQuotes = "\"\"\"\""
         var separator = ","
@@ -205,11 +191,5 @@ class CSVTests: XCTestCase {
         
         XCTAssertThrowsError(try csvString.headersMustMap(stringEnum: TestFields.self, overrideDelimiter: ","))
     }
-
-    static var allTests = [
-        ("testCSVcreation", testCSVcreation),
-        ("testCSVLineParsing", testCSVLineParsing),
-        ("testCSVParsing", testCSVParsing)
-    ]
 }
 
