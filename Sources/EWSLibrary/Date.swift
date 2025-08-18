@@ -173,7 +173,7 @@ public extension DateInterval {
         }
         let dateFormatter: DateFormatter
         if let overrideTimeZone {
-            var df = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
+            let df = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
             df.timeZone = overrideTimeZone
             dateFormatter = df
         } else {
@@ -181,7 +181,7 @@ public extension DateInterval {
         }
         let timeFormatter: DateFormatter
         if let overrideTimeZone {
-            var df = Self.timeFormatter
+            let df = Self.timeFormatter
             df.timeZone = overrideTimeZone
             timeFormatter = df
         } else {

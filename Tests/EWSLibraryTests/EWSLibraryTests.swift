@@ -44,11 +44,18 @@ final class EWSLibraryTests: XCTestCase {
         let start = ContinuousClock.now
         let interval: Duration = .seconds(1)
         let allowedErrorInterval: TimeInterval = 0.5
+        
         var firings = [ContinuousClock.Instant]()
+        
         print("Testing AsyncTimer - expected delay")
         let timer = AsyncTimer(interval: interval.timeInterval) { _ in
-            print("Timer fired")
-            firings.append(ContinuousClock.now)
+            let now = ContinuousClock.now
+            Task {
+                await MainActor.run {
+                    firings.append(now)
+                }
+                print("Timer fired")
+            }
         }
         await timer.start(fireNow: false)
         try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 8)
@@ -74,7 +81,9 @@ final class EWSLibraryTests: XCTestCase {
     func testASyncAtomicOperationWithOperation() async throws {
         let atomicQueue = AsyncAtomicOperationQueue()
         let allStart = ContinuousClock.now
+        
         var operatingIntervals = [(Duration, Duration)]()
+        
         let scaling = 3_000_000
         print("enqueuing 1 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "1") {
@@ -84,8 +93,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...scaling {
                 p += n
             }
-            print("Done Performing 1 : \(scaling) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 1 : \(scaling) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         print("enqueuing 2 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "2") {
@@ -95,8 +107,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...Int(Double(scaling) * 0.25) {
                 p += n
             }
-            print("Done Performing 2 : \(Double(scaling) * 0.25) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 2 : \(Double(scaling) * 0.25) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         print("enqueuing 3 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "3") {
@@ -106,8 +121,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...Int(Double(scaling) * 0.4) {
                 p += n
             }
-            print("Done Performing 3 : \(Double(scaling) * 0.4) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 3 : \(Double(scaling) * 0.4) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         print("enqueuing 4 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "4") {
@@ -117,8 +135,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...Int(Double(scaling) * 0.1) {
                 p += n
             }
-            print("Done Performing 4 : \(Double(scaling) * 0.1) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 4 : \(Double(scaling) * 0.1) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         print("enqueuing 5 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "5") {
@@ -128,8 +149,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...Int(Double(scaling) * 0.05) {
                 p += n
             }
-            print("Done Performing 5 : \(Double(scaling) * 0.05) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 5 : \(Double(scaling) * 0.05) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         print("enqueuing 6 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "6") {
@@ -139,8 +163,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...Int(Double(scaling) * 0.3) {
                 p += n
             }
-            print("Done Performing 6 : \(Double(scaling) * 0.3) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 6 : \(Double(scaling) * 0.3) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         print("enqueuing 7 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "7") {
@@ -150,8 +177,11 @@ final class EWSLibraryTests: XCTestCase {
             for n in 0...Int(Double(scaling) * 0.05) {
                 p += n
             }
-            print("Done Performing 7 : \(Double(scaling) * 0.05) - \(ContinuousClock.now - allStart)")
-            operatingIntervals.append((start - allStart, ContinuousClock.now - allStart))
+            let now = ContinuousClock.now
+            print("Done Performing 7 : \(Double(scaling) * 0.05) - \(now - allStart)")
+            Task { @MainActor in
+                operatingIntervals.append((start - allStart, now - allStart))
+            }
         }
         try await Task.sleep(nanoseconds: 5.0.nanoSeconds)
         for interval in operatingIntervals {
@@ -297,19 +327,4 @@ final class EWSLibraryTests: XCTestCase {
         }
         XCTAssertEqual(operatingIntervals.count, 7, "all 7 operations should have finished, if older hardware, may need to adjust scaling")
     }
-
-    #if os(macOS)
-    static var allTests = [
-        ("testShell", testShell),
-        ("testAlwaysRandomization", testAlwaysRandomization),
-        ("testNeverRandomization", testNeverRandomization),
-        ("testSometimeRandomization", testSometimesRandomization)
-    ]
-    #elseif os(iOS)
-    static var allTests = [
-        ("testAlwaysRandomization", testAlwaysRandomization),
-        ("testNeverRandomization", testNeverRandomization),
-        ("testSometimeRandomization", testSometimesRandomization)
-    ]
-    #endif
 }

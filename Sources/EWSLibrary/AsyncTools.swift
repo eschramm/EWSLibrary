@@ -16,12 +16,12 @@ public extension TimeInterval {
 public actor AsyncTimer {
     
     let interval: TimeInterval
-    let fireClosure: (AsyncTimer) -> ()
+    let fireClosure: @Sendable (AsyncTimer) -> ()
     var fireTask: Task<Void, Never>?
     
     var isRunning = false
     
-    public init(interval: TimeInterval, fireClosure: @escaping (AsyncTimer) -> ()) {
+    public init(interval: TimeInterval, fireClosure: @escaping @Sendable (AsyncTimer) -> ()) {
         self.interval = interval
         self.fireClosure = fireClosure
     }
@@ -87,7 +87,7 @@ public actor AsyncAtomicOperationQueue {
         self.randomSleepRange = randomSleepRange
     }
     
-    public func enqueueOperation(identifier: String = "", operation: @escaping () -> ()) {
+    public func enqueueOperation(identifier: String = "", operation: @Sendable @escaping () -> ()) {
         //print("START: \(ProcessInfo.processInfo.systemUptime)")
         Task {
             await takeLock(identifier: identifier)

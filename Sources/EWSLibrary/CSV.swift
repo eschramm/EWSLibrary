@@ -199,56 +199,6 @@ public extension String {
         }
     }
 
-    @available(*, deprecated, message: "Don't parse CSV by line, use parseCSV() on file string")
-    func parseCSVLine() -> [String] {
-        var lineFields = [String]()
-
-        let characterSet = CharacterSet([",", "\""])
-
-        let scanner = Scanner(string: self)
-        scanner.charactersToBeSkipped = nil
-
-        var insideParens = false
-        var line = ""
-        var lastCharWasQuote = false
-
-        while !scanner.isAtEnd {
-            let text = scanner.scanUpToCharacters(from: characterSet)
-            let separator = scanner.scanCharacter()
-
-            if separator == "," {
-                line += text ?? ""
-                if insideParens {
-                    line += ","
-                } else {
-                    lineFields.append(line.scrubFieldForOuterQuotes())
-                    line = ""
-                }
-                lastCharWasQuote = false
-            } else if separator == "\"" {
-                if lastCharWasQuote {  // escaped
-                    line += (text ?? "")
-                    lastCharWasQuote = false
-                } else {
-                    line += "\(text ?? "")\""
-                    lastCharWasQuote = true
-                }
-                insideParens.toggle()
-            } else if separator == nil {
-                // end of string
-                line += text ?? ""
-                lineFields.append(line.scrubFieldForOuterQuotes())
-                lastCharWasQuote = false
-            } else {
-                assert(true, "Should never reach this if Scanner is working as expected")
-            }
-        }
-        if !line.isEmpty, lastCharWasQuote {
-            lineFields.append(line.scrubFieldForOuterQuotes())
-        }
-        return lineFields
-    }
-
     func scrubFieldForOuterQuotes() -> String {
         if hasPrefix("\""), hasSuffix("\"") {
             let start = index(startIndex, offsetBy: 1)
