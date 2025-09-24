@@ -113,15 +113,17 @@ public struct AsyncText: View {
     
     /// used to ensure ASyncText is reconstructed if linked item changes
     public let uniqueKey: String
+    public let errorHandling: ErrorHandling?
     @State private var string: String? = nil
     
-    public let loadingClosure: () async -> String
+    public let loadingThrowingClosure: () async throws -> String
     
-    public init(loadingStyle: LoadingStyle, string: String? = nil, uniqueKey: String, loadingClosure: @escaping () async -> String) {
+    public init(loadingStyle: LoadingStyle, string: String? = nil, uniqueKey: String, errorHandling: ErrorHandling? = nil, loadingThrowingClosure: @escaping () async throws -> String) {
         self.loadingStyle = loadingStyle
         self.string = string
         self.uniqueKey = uniqueKey
-        self.loadingClosure = loadingClosure
+        self.errorHandling = errorHandling
+        self.loadingThrowingClosure = loadingThrowingClosure
     }
     
     public var body: some View {
@@ -138,7 +140,15 @@ public struct AsyncText: View {
             }
         }
         .task(id: uniqueKey) {
-            string = await loadingClosure()
+            do {
+                string = try await loadingThrowingClosure()
+            } catch {
+                if let errorHandling {
+                    errorHandling.handle(error: error, title: "Problem rendering AsyncText", prefix: nil)
+                } else {
+                    print("Error caught in AsyncText: \(error)")
+                }
+            }
         }
     }
 }
