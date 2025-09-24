@@ -324,7 +324,11 @@ extension View {
 public extension Bundle {
     static var isXCodePreview: Bool {
 #if targetEnvironment(simulator)
-        return (Self.main.executableURL?.lastPathComponent == "XCPreviewAgent")
+        /// as of 2025-09-16 Xcode 26.0 - file:///Users/ericschramm/Library/Developer/Xcode/UserData/Previews/Simulator%20Devices/BB59FF3B-B7AE-4FF9-8F01-CD1F0DCA3A07/data/Containers/Bundle/Application/49D68762-8357-4368-B08B-C809EC361C13/StattyCaddy2.app/StattyCaddy2
+        guard let url = Self.main.executableURL else {
+            return false
+        }
+        return ((url.lastPathComponent == "XCPreviewAgent") || url.path.contains("/UserData/Previews/Simulator"))
 #else
         return false
 #endif
