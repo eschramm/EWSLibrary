@@ -166,7 +166,7 @@ public final class TimeProfiler: Sendable {
 
 public extension Duration {
     var timeInterval: TimeInterval {
-        return Double(components.0) + Double(components.attoseconds / 1_000_000_000_000_000_000)
+        return Double(components.0) + Double(components.attoseconds) / 1_000_000_000_000_000_000
     }
 }
 
