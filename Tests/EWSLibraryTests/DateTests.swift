@@ -302,5 +302,83 @@ struct DateTests2 {
         #expect(indexDate.addingTimeInterval(-10).previousIndex(for: dates) == nil, "before any date in array")
         #expect(indexDate.addingTimeInterval(500).previousIndex(for: dates) == 4, "after all dates in array")
     }
+    
+    @Test func rangeSelection() {
+        let dict: [Double : String] = [
+            10.0 : "Less than 10",
+            20.0 : "Between 10 and 20",
+            30.0 : "Between 20 and 30",
+            40.0 : "Between 30 and 40",
+            50.0 : "Between 40 and 50",
+            60.0 : "Between 50 and 60",
+            70.0 : "Between 60 and 70",
+            9999999.0 : "Greater than 70"
+        ]
+        
+        #expect(5.itemForValueInRange(dict: dict) == "Less than 10")
+        #expect(0.itemForValueInRange(dict: dict) == "Less than 10")
+        #expect((-10.0).itemForValueInRange(dict: dict) == "Less than 10")
+        #expect(33.333.itemForValueInRange(dict: dict) == "Between 30 and 40")
+        #expect(85.itemForValueInRange(dict: dict) == "Greater than 70")
+        #expect(99999999.itemForValueInRange(dict: dict) == "Greater than 70")
+        #expect(10.itemForValueInRange(dict: dict) == "Between 10 and 20")
+    }
+    
+    @Test func formattedEWS() {
+        // Table-driven test cases for TimeInterval.formattedEWS
+        // Adjust expected strings if your formatter output differs in spacing/casing.
+        let cases: [(TimeInterval, String)] = [
+            // Milliseconds
+            (0.00345, "3.45 ms"),
+            (0.0974, "97.4 ms"),
+            // Seconds
+            (0, "0 sec"),
+            (1, "1 sec"),
+            (25.345, "25.345 sec"),
+            (59, "59 sec"),
+            (60, "60 sec"),
+            (61, "61 sec"),
+            (119, "119 sec"),
+            // Minutes
+            (120, "2m"),
+            (3599, "59m"),
+            // Hours
+            (3600, "1h"),
+            (3601, "1h"),
+            (7199, "1h 59m"),
+            (7200, "2h"),
+            (86399, "23h 59m"),
+            // Days
+            (86400, "1d"),
+            (86400 * 2 - 1, "1d 23h 59m"),
+            (86400 * 2, "2d"),
+            (86400 * 6 + 86399, "6d 23h 59m"),
+            // Weeks
+            (86400 * 7, "7d"),
+            (86400 * 13 + 86399, "13d"),
+            (86400 * 14, "14d"),
+            (86400 * 27 + 86399, "27d"),
+            // Months (approximate 30d buckets)
+            (86400 * 30, "30d"),
+            (86400 * 59 + 86399, "2mo"),
+            (86400 * 60, "2mo 1d"),
+            (86400 * 89 + 86399, "2mo 30d"),
+            // Years (approximate 365d buckets)
+            (86400 * 365, "1y"),
+            (86400 * 364 + 86399, "11mo 30d"),
+            (86400 * 366, "1y 1d"),
+            (86400 * 730, "2y")
+        ]
+        
+        for (interval, expected) in cases {
+            let actual = interval.formattedEWS()
+            #expect(actual == expected, "formattedEWS for \(interval) expected \(expected) but got \(actual)")
+        }
+        
+        // Sanity check: negative intervals should likely clamp to 0 or produce "0s"; adjust if your implementation differs.
+        let negativeSample: TimeInterval = -5
+        let negativeFormatted = negativeSample.formattedEWS()
+        #expect(negativeFormatted == "-5 sec", "Define behavior for negatives; got: \(negativeFormatted)")
+    }
 }
 
