@@ -41,7 +41,7 @@ public struct SimpleProgressWindow {
 @MainActor
 public class ObservableProgress : ObservableObject, Identifiable, @preconcurrency Equatable, @preconcurrency Hashable {
     
-    public enum ProgressBarTitleStyle {
+    public enum ProgressBarTitleStyle: Sendable {
         case automatic(showRawUnits: Bool, showEstTotalTime: Bool)
         case custom(String)
     }
@@ -93,18 +93,20 @@ public class ObservableProgress : ObservableObject, Identifiable, @preconcurrenc
         self.init(current: 0, total: Self.parentResolution, title: asParentWithTitle, progressBarTitleStyle: progressBarTitleStyle, createdAsParent: true)
     }
     
-    public func update(current: Int, total: Int? = nil, title: String? = nil, progressBarTitleStyle: ProgressBarTitleStyle? = nil) {
-        let superTotal = nextUpdate?.total ?? self.total
-        if let parent {
-            let superCurrent = nextUpdate?.current ?? self.current
-            let lastFraction = (superTotal > 0) ? Double(superCurrent) / Double(superTotal) : 0
-            let currentFraction = Double(current) / Double(total ?? superTotal)
-            parent.updateWithChildFraction(fractionDiff: currentFraction - lastFraction)
-        }
-        
-        self.nextUpdate = Update(current: current, total: total ?? superTotal, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
+    public nonisolated func update(current: Int, total: Int? = nil, title: String? = nil, progressBarTitleStyle: ProgressBarTitleStyle? = nil) {
         Task { @MainActor in
+            let superTotal = nextUpdate?.total ?? self.total
+            if let parent {
+                let superCurrent = nextUpdate?.current ?? self.current
+                let lastFraction = (superTotal > 0) ? Double(superCurrent) / Double(superTotal) : 0
+                let currentFraction = Double(current) / Double(total ?? superTotal)
+                parent.updateWithChildFraction(fractionDiff: currentFraction - lastFraction)
+            }
+            
+            self.nextUpdate = Update(current: current, total: total ?? superTotal, title: title ?? self.nextUpdate?.title ?? self.title, progressBarTitleStyle: progressBarTitleStyle ?? self.nextUpdate?.progressBarTitleStyle ?? self.progressBarTitleStyle)
+            
             await self.limiter.submit(operation: { await self.applyUpdate() })
+            
         }
     }
     

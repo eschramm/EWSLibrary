@@ -201,7 +201,7 @@ public actor RemoteDiskManager {
         
         try await mount(presentingVC: presentingViewController)
         if let totalFileSize = try? Self.fileSize(at: fromURL) {
-            await progress.update(current: 0, total: totalFileSize)
+            progress.update(current: 0, total: totalFileSize)
             let spv: NSViewController?
             if let pvc = presentingViewController {
                 spv = await SimpleProgressWindow.present(presentingVC: pvc, presentationStyle: .modalSheet, progress: progress)
@@ -211,9 +211,7 @@ public actor RemoteDiskManager {
             let timer = AsyncTimer(interval: 0.75) { thisTimer in
                 if let copiedFileSize = try? Self.fileSize(at: toURL) {
                     // don't call on DispatchQueue.main - will not update - maybe because it does it internally, too?
-                    Task {
-                        await progress.update(current: copiedFileSize)
-                    }
+                    progress.update(current: copiedFileSize)
                 }
             }
             await timer.start(fireNow: true)
