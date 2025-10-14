@@ -37,6 +37,8 @@ public class ErrorHandling: ObservableObject {
         public let prefix: String?
     }
     
+    public init() { }
+    
     @Published var currentAlert: ErrorAlert?
     
     /// can use this to prevent an error doom loop where using onChange of appearsActive to trigger an event that is erroring out
