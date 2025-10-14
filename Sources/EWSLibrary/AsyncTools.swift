@@ -111,3 +111,76 @@ public actor AsyncAtomicOperationQueue {
         sharedOperationInProgress = false
     }
 }
+
+/// **AsyncSemaphore**
+/// Allows for controlled concurrency - like a concurrent queue with a cap of concurrent operations
+/// Example:
+/*
+ let pool = AsyncSemaphore(limit: 3)
+ return try await withThrowingTaskGroup(of: ScanChunk.self) { group in
+     // Seed the root directory/file
+     group.addTask {
+         await pool.acquire()
+         do {
+             let chunk = try await doWork()
+             await pool.release()
+             return chunk
+         } catch {
+             await pool.release()
+             throw error
+         }
+     }
+
+     var totalWorkStuffs = 0
+
+     for try await chunk in group {
+         // Aggregate immediate stats
+         totalWorkStuffs += chunk.workCount
+         
+         // Even allows adding subchunks while queue is working (like recursion)
+         for subdir in chunk.subdirs {
+             group.addTask {
+                 await pool.acquire()
+                 do {
+                     let subChunk = try await doWork()
+                     await pool.release()
+                     return subChunk
+                 } catch {
+                     await pool.release()
+                     throw error
+                 }
+             }
+         }
+     }
+
+     return totalWorkStuffs
+ */
+
+public actor AsyncSemaphore {
+    private let limit: Int
+    private var current = 0
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+    
+    /// Allows for controlled concurrency - like a concurrent queue with a cap of concurrent operations
+    /// - Parameter limit: number of concurrent operations allowed
+    public init(limit: Int) { self.limit = limit }
+    
+    public func acquire() async {
+        if current < limit {
+            current += 1
+            return
+        }
+        await withCheckedContinuation { cont in
+            waiters.append(cont)
+        }
+    }
+    
+    public func release() {
+        if !waiters.isEmpty {
+            let cont = waiters.removeFirst()
+            cont.resume()
+        } else {
+            current = max(0, current - 1)
+        }
+    }
+}
