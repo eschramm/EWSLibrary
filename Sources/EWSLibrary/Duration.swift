@@ -50,7 +50,7 @@ public extension TimeInterval {
         guard absSelf > 0.1 else {
             return "\(negative)\((self * 1000).formatted()) ms"
         }
-        guard self >= 120 else {
+        guard absSelf >= 120 else {
             return "\(self.formatted()) sec"
         }
         let floorsDict: [Double   : DateComponentsFormatter] = [
@@ -59,7 +59,7 @@ public extension TimeInterval {
             (60 * 60 * 24 * 365)  : Self.lastModFormatterLessThanYear,
             (60 * 60 * 24 * 1000) : Self.lastModFormatterMoreThanYear
         ]
-        let text = itemForValueInRange(dict: floorsDict).string(from: self)
+        let text = absSelf.itemForValueInRange(dict: floorsDict).string(from: absSelf)
         return (text == nil) ? "<error>" : "\(negative)\(text!)"
     }
 }

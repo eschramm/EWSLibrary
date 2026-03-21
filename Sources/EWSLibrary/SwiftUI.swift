@@ -54,9 +54,7 @@ public class ErrorHandling: ObservableObject {
             message = "\(error)"
         }
         Self.externalErrorLoggerHandler?(.init(error: error, title: title, prefix: prefix))
-        DispatchQueue.main.async {
-            self.currentAlert = ErrorAlert(title: title ?? "Error", message: message)
-        }
+        self.currentAlert = ErrorAlert(title: title ?? "Error", message: message)
         if let title {
             print("Error: \(title) - \(message)")
         } else {
@@ -65,9 +63,7 @@ public class ErrorHandling: ObservableObject {
     }
     
     public func handleMessage(title: String, message: String) {
-        DispatchQueue.main.async {
-            self.currentAlert = ErrorAlert(title: title, message: message)
-        }
+        self.currentAlert = ErrorAlert(title: title, message: message)
     }
 }
 

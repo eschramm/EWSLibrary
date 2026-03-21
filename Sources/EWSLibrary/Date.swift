@@ -173,7 +173,13 @@ public extension DateInterval {
         }
         let dateFormatter: DateFormatter
         if let overrideTimeZone {
-            let df = hideTimes ? Self.dateOnlyFormatter : Self.dateFormatter
+            let df = DateFormatter()
+            if hideTimes {
+                df.dateStyle = .short
+            } else {
+                df.dateStyle = .short
+                df.timeStyle = .long
+            }
             df.timeZone = overrideTimeZone
             dateFormatter = df
         } else {
@@ -181,7 +187,8 @@ public extension DateInterval {
         }
         let timeFormatter: DateFormatter
         if let overrideTimeZone {
-            let df = Self.timeFormatter
+            let df = DateFormatter()
+            df.timeStyle = .long
             df.timeZone = overrideTimeZone
             timeFormatter = df
         } else {
@@ -349,6 +356,11 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
     
     public var date: Date {
         let dateComponents = DateComponents(calendar: .current, year: year, month: month, day: day, hour: 12)
+        return Calendar.current.date(from: dateComponents)!
+    }
+    
+    public func dateInCalendar(_ calendar: Calendar) -> Date {
+        let dateComponents = DateComponents(calendar: calendar, year: year, month: month, day: day, hour: 12)
         return Calendar.current.date(from: dateComponents)!
     }
     

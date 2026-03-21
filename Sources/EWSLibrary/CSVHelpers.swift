@@ -36,13 +36,15 @@ public actor AsyncArray<T : Sendable> {
         self.items = []
     }
     
+    /// Fire-and-forget convenience; does NOT guarantee ordering or completion before caller continues.
+    @available(*, deprecated, message: "Use 'await addItem(item:)' directly for guaranteed ordering")
     public nonisolated func addItem(_ item: T) {
         Task {
             await self.addItem(item: item)
         }
     }
     
-    private func addItem(item: T) {
+    public func addItem(item: T) {
         items.append(item)
     }
 }

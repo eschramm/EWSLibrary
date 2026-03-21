@@ -113,7 +113,7 @@ public extension String {
                     fields.append(currentField)
                     currentField = ""
                 } else {
-                    currentField += "\(text),"
+                    currentField += "\(text)\(delimiter)"
                 }
                 if scanner.isAtEnd {
                     fields.append("")

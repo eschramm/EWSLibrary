@@ -121,8 +121,8 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(line2fields[0], "this line starts with a quote")
         
         print(line1fields)
-        XCTAssertEqual(line1fields[1], "safely escaped , comma")
-        XCTAssertEqual(line2fields[1], "safely escaped , comma")
+        XCTAssertEqual(line1fields[1], "safely escaped \t comma")
+        XCTAssertEqual(line2fields[1], "safely escaped \t comma")
         
         XCTAssertEqual(line1fields[2], "plain")
         XCTAssertEqual(line2fields[2], "plain")
