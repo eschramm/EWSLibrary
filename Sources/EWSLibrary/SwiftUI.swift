@@ -46,7 +46,7 @@ public class ErrorHandling: ObservableObject {
 
     public static var externalErrorLoggerHandler: ((ErrorLoggerModel) -> ())? = nil
     
-    public func handle(error: Error, title: String?, prefix: String?) {
+    public func handle(error: Error, title: String?, prefix: String? = nil) {
         let message: String
         if let prefix {
             message = "\(prefix) - \(error)"
