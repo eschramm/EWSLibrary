@@ -87,12 +87,12 @@ public actor AsyncAtomicOperationQueue {
         self.randomSleepRange = randomSleepRange
     }
     
-    public func enqueueOperation(identifier: String = "", operation: @Sendable @escaping () -> ()) {
+    public func enqueueOperation(identifier: String = "", operation: @Sendable @escaping () async -> ()) {
         //print("START: \(ProcessInfo.processInfo.systemUptime)")
         Task {
             await takeLock(identifier: identifier)
             await Task.yield()
-            operation()
+            await operation()
             releaseLock()
         }
         //print("END  : \(ProcessInfo.processInfo.systemUptime)")

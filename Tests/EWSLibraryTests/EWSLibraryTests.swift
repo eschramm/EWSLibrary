@@ -45,24 +45,40 @@ final class EWSLibraryTests: XCTestCase {
         let interval: Duration = .seconds(1)
         let allowedErrorInterval: TimeInterval = 0.5
         
-        var firings = [ContinuousClock.Instant]()
+        actor FiringsTracker {
+            private var firings: [ContinuousClock.Instant] = []
+            
+            func append(_ instant: ContinuousClock.Instant) {
+                firings.append(instant)
+            }
+            
+            func count() -> Int {
+                return firings.count
+            }
+            
+            func all() -> [ContinuousClock.Instant] {
+                return firings
+            }
+        }
+        
+        let firingsTracker = FiringsTracker()
         
         print("Testing AsyncTimer - expected delay")
         let timer = AsyncTimer(interval: interval.timeInterval) { _ in
             let now = ContinuousClock.now
             Task {
-                await MainActor.run {
-                    firings.append(now)
-                }
+                await firingsTracker.append(now)
                 print("Timer fired")
             }
         }
         await timer.start(fireNow: false)
         try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 8)
         await timer.stop()
-        let firingsAfterStop = firings.count
-        XCTAssertGreaterThan(firings.count, 6)
-        XCTAssertLessThan(firings.count, 10)
+        let firingsAfterStop = await firingsTracker.count()
+        XCTAssertGreaterThan(firingsAfterStop, 6)
+        XCTAssertLessThan(firingsAfterStop, 10)
+        
+        let firings = await firingsTracker.all()
         var intervals = [TimeInterval]()
         intervals.append((firings[0] - start).timeInterval - interval.timeInterval)
         for n in 1..<firings.count {
@@ -71,18 +87,19 @@ final class EWSLibraryTests: XCTestCase {
         let stats = intervals.stats()
         _ = stats.printAllStats(count: intervals.count, numberFormatter: nil)
         try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 2)
-        XCTAssertEqual(firings.count, firingsAfterStop, "AsyncTimer fired additional times after being stopped")
+        let finalCount = await firingsTracker.count()
+        XCTAssertEqual(finalCount, firingsAfterStop, "AsyncTimer fired additional times after being stopped")
         XCTAssertEqual(intervals.filter({ abs($0) > allowedErrorInterval }).count, 0, "At least one of the intervals for the AsyncTimer exceeds expected error of \(allowedErrorInterval)")
         await timer.start(fireNow: true)
         try await Task.sleep(nanoseconds: interval.timeInterval.nanoSeconds * 3)
-        XCTAssertGreaterThan(firings.count, firingsAfterStop + 2, "Async timer failed to make the initial and at least one firing after a restart")
+        let restartCount = await firingsTracker.count()
+        XCTAssertGreaterThan(restartCount, firingsAfterStop + 2, "Async timer failed to make the initial and at least one firing after a restart")
     }
     
     func testASyncAtomicOperationWithOperation() async throws {
         let atomicQueue = AsyncAtomicOperationQueue()
         let allStart = ContinuousClock.now
-        
-        var operatingIntervals = [(Duration, Duration)]()
+        let intervals = OperatingIntervals()
         
         let scaling = 3_000_000
         print("enqueuing 1 - \(ContinuousClock.now - allStart)")
@@ -95,9 +112,7 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 1 : \(scaling) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         print("enqueuing 2 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "2") {
@@ -109,9 +124,7 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 2 : \(Double(scaling) * 0.25) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         print("enqueuing 3 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "3") {
@@ -123,9 +136,7 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 3 : \(Double(scaling) * 0.4) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         print("enqueuing 4 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "4") {
@@ -137,9 +148,7 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 4 : \(Double(scaling) * 0.1) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         print("enqueuing 5 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "5") {
@@ -151,9 +160,7 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 5 : \(Double(scaling) * 0.05) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         print("enqueuing 6 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "6") {
@@ -165,9 +172,7 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 6 : \(Double(scaling) * 0.3) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         print("enqueuing 7 - \(ContinuousClock.now - allStart)")
         await atomicQueue.enqueueOperation(identifier: "7") {
@@ -179,11 +184,10 @@ final class EWSLibraryTests: XCTestCase {
             }
             let now = ContinuousClock.now
             print("Done Performing 7 : \(Double(scaling) * 0.05) - \(now - allStart)")
-            Task { @MainActor in
-                operatingIntervals.append((start - allStart, now - allStart))
-            }
+            await intervals.append((start - allStart, now - allStart))
         }
         try await Task.sleep(nanoseconds: 5.0.nanoSeconds)
+        let operatingIntervals = await intervals.allIntervals()
         for interval in operatingIntervals {
             print("\(interval.0) - \(interval.1)")
         }
