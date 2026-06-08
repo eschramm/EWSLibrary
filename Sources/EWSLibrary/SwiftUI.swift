@@ -118,7 +118,7 @@ public struct AsyncText: View {
     
     public init(loadingStyle: LoadingStyle, string: String? = nil, uniqueKey: String, errorHandling: ErrorHandling? = nil, loadingThrowingClosure: @escaping () async throws -> String) {
         self.loadingStyle = loadingStyle
-        self.string = string
+        _string = .init(initialValue: string)
         self.uniqueKey = uniqueKey
         self.errorHandling = errorHandling
         self.loadingThrowingClosure = loadingThrowingClosure

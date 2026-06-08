@@ -58,9 +58,9 @@ public class SettingsRatingCell : UITableViewCell, SettingsCell {
         
         let appInfo = CellAppInfo(with: appStoreID)
         appInfo.getData { (dataDict : [AnyHashableAndSendable : Sendable]) in
-            DispatchQueue.main.async { [weak self] in
+            DispatchQueue.main.async { [weak weakSelf = self] in
                 NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewBeginUpdates))
-                label.text = self?.updateTitleHandler(dataDict)
+                label.text = weakSelf?.updateTitleHandler(dataDict)
                 NotificationCenter.default.post(Notification(name: .SettingsTVCTableviewEndUpdates))
             }
         }
