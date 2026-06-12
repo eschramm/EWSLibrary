@@ -21,8 +21,8 @@ public class Shell
     
     public init() {}
     
-    public func outputOf(commandName: String, arguments: [String] = [], runFromPath: String = "") -> (output: String?, returnValue: Int32) {
-        return bash(commandName: commandName, arguments:arguments, runFromPath: runFromPath)
+    public func outputOf(commandName: String, arguments: [String] = [], runFromPath: String = "", environment: [String: String]? = nil) -> (output: String?, returnValue: Int32) {
+        return bash(commandName: commandName, arguments:arguments, runFromPath: runFromPath, environment: environment)
     }
     
     public func streaming(commandName: String, arguments: [String] = [], runFromPath: String = "", handler: @escaping @Sendable (StreamingOutput) -> ()) {
@@ -36,15 +36,15 @@ public class Shell
     
     // MARK: private
     
-    private func bash(commandName: String, arguments: [String], runFromPath: String) -> (output: String?, returnValue: Int32) {
-        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "").output else {
+    private func bash(commandName: String, arguments: [String], runFromPath: String, environment: [String: String]? = nil) -> (output: String?, returnValue: Int32) {
+        guard var whichPathForCommand = executeShell(command: "/bin/bash" , arguments:[ "-l", "-c", "which \(commandName)" ], runFromPath: "", environment: environment).output else {
             return ("\(commandName) not found", -1)
         }
         whichPathForCommand = whichPathForCommand.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
-        return executeShell(command: whichPathForCommand, arguments: arguments, runFromPath: runFromPath)
+        return executeShell(command: whichPathForCommand, arguments: arguments, runFromPath: runFromPath, environment: environment)
     }
     
-    private func executeShell(command: String, arguments: [String] = [], runFromPath: String) -> (output: String?, returnValue: Int32) {
+    private func executeShell(command: String, arguments: [String] = [], runFromPath: String, environment: [String: String]? = nil) -> (output: String?, returnValue: Int32) {
         let task = Process()
         task.launchPath = command
         task.arguments = arguments
@@ -54,6 +54,10 @@ public class Shell
         
         if !runFromPath.isEmpty {
             task.currentDirectoryPath = runFromPath
+        }
+        
+        if let environment = environment {
+            task.environment = environment
         }
         
         task.launch()
