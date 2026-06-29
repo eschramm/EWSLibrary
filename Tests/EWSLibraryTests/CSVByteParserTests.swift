@@ -66,4 +66,25 @@ final class CSVByteParserTests: XCTestCase {
         XCTAssertNil(Date.fromExportExplorerUTC(""))
         XCTAssertNil(Date.fromExportExplorerUTC("2025-13-22 14:56:45.000"))  // bad month
     }
+
+    // MARK: - Civil components (offset-based bucketing)
+
+    func testCivilComponentsMatchCalendarRandomized() {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: -7 * 3600)!
+        var rng = SystemRandomNumberGenerator()
+        for _ in 0..<2000 {
+            let date = Date(timeIntervalSince1970: Double(Int.random(in: 0...1_900_000_000, using: &rng)))
+            let c = date.civilComponents(offsetSeconds: -7 * 3600)
+            let comps = cal.dateComponents([.year, .month, .day, .hour], from: date)
+            XCTAssertEqual([c.year, c.month, c.day, c.hour], [comps.year!, comps.month!, comps.day!, comps.hour!])
+        }
+    }
+
+    func testCivilComponentsDayRollover() {
+        let base = DateFormatter.exportExplorer.date(from: "2026-01-05 03:30:45.000")!  // UTC
+        let c = base.civilComponents(offsetSeconds: -6 * 3600)
+        XCTAssertEqual(c.dayString, "2026-01-04")
+        XCTAssertEqual(c.hour, 21)
+    }
 }

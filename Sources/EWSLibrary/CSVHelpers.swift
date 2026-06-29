@@ -62,6 +62,44 @@ public extension Date {
     }
 }
 
+public struct CivilDateTime: Sendable, Equatable {
+    public let year: Int
+    public let month: Int
+    public let day: Int
+    public let hour: Int
+    public let minute: Int
+    public let second: Int
+
+    /// `yyyy-MM-dd`
+    public var dayString: String {
+        String(format: "%04d-%02d-%02d", year, month, day)
+    }
+}
+
+public extension Date {
+    /// Fast proleptic-Gregorian breakdown of this instant shifted by `offsetSeconds`, with no
+    /// `Calendar`/`TimeZone` and no locks. Pass a fixed UTC offset (e.g. `-6 * 3600`) to bucket an
+    /// instant into "local" day/hour. Uses Howard Hinnant's `civil_from_days`.
+    func civilComponents(offsetSeconds: Int = 0) -> CivilDateTime {
+        let total = Int(self.timeIntervalSince1970.rounded(.down)) + offsetSeconds
+        let days = Int((Double(total) / 86400).rounded(.down))
+        let secOfDay = total - days * 86400            // always 0..<86400 (days is floored)
+
+        let z = days + 719468
+        let era = (z >= 0 ? z : z - 146096) / 146097
+        let doe = z - era * 146097                     // [0, 146096]
+        let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365  // [0, 399]
+        let y = yoe + era * 400
+        let doy = doe - (365 * yoe + yoe / 4 - yoe / 100)   // [0, 365]
+        let mp = (5 * doy + 2) / 153                        // [0, 11]
+        let day = doy - (153 * mp + 2) / 5 + 1              // [1, 31]
+        let month = mp < 10 ? mp + 3 : mp - 9              // [1, 12]
+        let year = (month <= 2 ? y + 1 : y)
+        return CivilDateTime(year: year, month: month, day: day,
+                             hour: secOfDay / 3600, minute: (secOfDay % 3600) / 60, second: secOfDay % 60)
+    }
+}
+
 public protocol StringConvertableEnum : RawRepresentable {
     init?(string: String)
 }
