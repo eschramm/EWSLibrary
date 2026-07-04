@@ -17,10 +17,12 @@ public class AppReleaseNotesVC : UIViewController {
     let completionHandler: () -> ()
     let releaseNotesTitle: String
     let releaseNotesText: String
-    
-    public init(completion: @escaping () -> ()) {
+    let popupCornerRadius: CGFloat
+
+    public init(completion: @escaping () -> (), popupCornerRadius: CGFloat = 15) {
         self.completionHandler = completion
-        
+        self.popupCornerRadius = popupCornerRadius
+
         let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?.?.?"
         self.releaseNotesTitle = "What's new in version \(currentAppVersion)"
         
@@ -50,7 +52,7 @@ public class AppReleaseNotesVC : UIViewController {
         let popupView = UIView()
         popupView.translatesAutoresizingMaskIntoConstraints = false
         popupView.backgroundColor = .systemBackground
-        popupView.layer.cornerRadius = 15
+        popupView.layer.cornerRadius = popupCornerRadius
         popupView.layer.shadowOffset = CGSize(width: 7, height: 7)
         popupView.layer.shadowColor = UIColor.black.cgColor
         popupView.layer.shadowRadius = 5
