@@ -117,14 +117,41 @@ public class CellAppInfo : NSObject {  // class from NSObject only for Obj-C com
             }
             
             guard let data = data else { return }
-            
-            if let possibleDict = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [AnyHashableAndSendable : Sendable]) as [AnyHashableAndSendable : Sendable]??), let dict = possibleDict {
-                completion(dict)
-                //print(possibleDict)
-            }
-            
+
+            // JSONSerialization bridges JSON objects to [String : Any] (via NSDictionary),
+            // never directly to [AnyHashableAndSendable : Sendable] — a direct cast to that
+            // type always fails at runtime. Cast to [String : Any] first, then convert.
+            guard let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+                  let jsonDict = jsonObject as? [String : Any] else { return }
+            completion(Self.sendableDict(from: jsonDict))
+
         }
         task.resume()
+    }
+
+    private static func sendableDict(from dict: [String : Any]) -> [AnyHashableAndSendable : Sendable] {
+        var result = [AnyHashableAndSendable : Sendable]()
+        for (key, value) in dict {
+            if let converted = sendableValue(from: value) {
+                result[AnyHashableAndSendable(wrapped: key)] = converted
+            }
+        }
+        return result
+    }
+
+    private static func sendableValue(from value: Any) -> Sendable? {
+        switch value {
+        case let dict as [String : Any]:
+            return sendableDict(from: dict)
+        case let array as [Any]:
+            return array.compactMap { sendableValue(from: $0) }
+        case let string as String:
+            return string
+        case let number as NSNumber:
+            return number
+        default:
+            return nil   // e.g. NSNull
+        }
     }
 }
 #endif
