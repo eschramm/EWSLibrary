@@ -13,10 +13,23 @@
 #if os(iOS)
 import SwiftUI
 
+/// One version's worth of release notes. Host apps build a newest-first array
+/// of these to give `ReleaseNotesView` browsable history.
+public struct AppRelease: Identifiable, Sendable {
+    public let version: String
+    public let notes: [LocalizedStringResource]
+
+    public var id: String { version }
+
+    public init(version: String, notes: [LocalizedStringResource]) {
+        self.version = version
+        self.notes = notes
+    }
+}
+
 public struct ReleaseNotesView: View {
 
-    private let version: String
-    private let notes: [LocalizedStringResource]
+    private let releases: [AppRelease]
     private let onClose: () -> Void
 
     /// - Parameters:
@@ -28,43 +41,105 @@ public struct ReleaseNotesView: View {
     public init(version: String,
                 notes: [LocalizedStringResource],
                 onClose: @escaping () -> Void) {
-        self.version = version
-        self.notes = notes
+        self.init(releases: [AppRelease(version: version, notes: notes)], onClose: onClose)
+    }
+
+    /// - Parameters:
+    ///   - releases: Newest-first release history. The first entry lands as the
+    ///     visible screen; when more than one entry is given, a "Release History"
+    ///     link lets the user drill into older versions.
+    ///   - onClose: Invoked when the user taps Close (e.g. flip the sheet's binding).
+    public init(releases: [AppRelease],
+                onClose: @escaping () -> Void) {
+        self.releases = releases
         self.onClose = onClose
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
-            // Interpolating `version` yields the catalog format "What's new in version %@".
-            Text("What's new in version \(version)", bundle: #bundle,
-                 comment: "Release-notes popup title; the placeholder is the app version number.")
-                .font(.headline)
-                .multilineTextAlignment(.center)
+        NavigationStack {
+            if let newest = releases.first {
+                VStack(spacing: 16) {
+                    // Interpolating `version` yields the catalog format "What's new in version %@".
+                    Text("What's new in version \(newest.version)", bundle: #bundle,
+                         comment: "Release-notes popup title; the placeholder is the app version number.")
+                        .font(.headline)
+                        .multilineTextAlignment(.center)
 
-            Divider()
+                    Divider()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            Text(verbatim: "•")
-                            Text(note)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                    ReleaseNotesBulletList(notes: newest.notes)
+
+                    if releases.count > 1 {
+                        NavigationLink {
+                            ReleaseHistoryList(releases: Array(releases.dropFirst()))
+                        } label: {
+                            Text("Release History", bundle: #bundle,
+                                 comment: "Link that opens a list of previous app versions' release notes.")
                         }
+                    }
+
+                    Divider()
+
+                    Button {
+                        onClose()
+                    } label: {
+                        Text("Close", bundle: #bundle,
+                             comment: "Button that dismisses the what's-new release notes.")
+                    }
+                }
+                .padding(20)
+            }
+        }
+    }
+}
+
+/// Shared bullet rendering for the current release and each history detail screen.
+private struct ReleaseNotesBulletList: View {
+    let notes: [LocalizedStringResource]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(verbatim: "•")
+                        Text(note)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
+        }
+    }
+}
 
-            Divider()
+/// List of older releases (newest of the "older" set first); tap a row to see its bullets.
+private struct ReleaseHistoryList: View {
+    let releases: [AppRelease]
 
-            Button {
-                onClose()
+    var body: some View {
+        List(releases) { release in
+            NavigationLink {
+                ReleaseVersionDetail(release: release)
             } label: {
-                Text("Close", bundle: #bundle,
-                     comment: "Button that dismisses the what's-new release notes.")
+                Text("Version \(release.version)", bundle: #bundle,
+                     comment: "Row label in the release-notes history list; the placeholder is a version number.")
             }
         }
-        .padding(20)
+        .navigationTitle(Text("Release History", bundle: #bundle,
+                               comment: "Navigation title for the list of previous app versions' release notes."))
+    }
+}
+
+/// Detail screen for a single historical release, pushed from `ReleaseHistoryList`.
+private struct ReleaseVersionDetail: View {
+    let release: AppRelease
+
+    var body: some View {
+        ReleaseNotesBulletList(notes: release.notes)
+            .padding(20)
+            .navigationTitle(Text("Version \(release.version)", bundle: #bundle,
+                                   comment: "Navigation title for a single historical release's notes; the placeholder is a version number."))
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
 
