@@ -70,13 +70,19 @@ public actor FileCounter {
     public init() { }
 
     public nonisolated func scanDirectoryParallel(at url: URL, excludeLastModifiedForSpeed: Bool, maxConcurrentTasks: Int = 8) async throws -> DirectoryStats {
+        // Resolve a symlinked root (e.g. a repo directory that is itself a symlink, like a
+        // config folder linked in from elsewhere) so its contents actually get counted.
+        // scanOne() below still skips symlinks it *encounters while walking* - that guard stays
+        // in place to avoid double-counting and symlink cycles further down the tree; only the
+        // root gets this one-time resolution.
+        let resolvedURL = url.resolvingSymlinksInPath()
         let pool = AsyncSemaphore(limit: maxConcurrentTasks)
         return try await withThrowingTaskGroup(of: ScanChunk.self) { group in
             // Seed the root directory/file
             group.addTask {
                 await pool.acquire()
                 do {
-                    let chunk = try await self.scanOne(URLItem(url: url, isHidden: false), excludeLastModifiedForSpeed: excludeLastModifiedForSpeed)
+                    let chunk = try await self.scanOne(URLItem(url: resolvedURL, isHidden: false), excludeLastModifiedForSpeed: excludeLastModifiedForSpeed)
                     await pool.release()
                     return chunk
                 } catch {
