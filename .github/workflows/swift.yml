@@ -9,8 +9,9 @@ on:
 jobs:
   test:
     # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-    # runs-on: macos-latest
-    runs-on: macos-26
+    # xcode-27 is a public-preview image pinned to Xcode's major version (arm64 only), not a
+    # macOS-version label like macos-26 - https://github.blog/changelog/2026-07-16-xcode-27-runner-image-now-in-public-preview/
+    runs-on: xcode-27
     timeout-minutes: 15
     steps:
       - name: Cancel previous jobs
