@@ -172,6 +172,7 @@ public extension Duration {
 
 @available(macOS 15.0, *)
 @available(iOS 18.0, *)
+@available(watchOS 11.0, *)
 public extension TimeInterval {
     var duration: Duration {
         return .init(attoseconds: Int128(self * 1_000_000_000_000_000_000))

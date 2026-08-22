@@ -156,6 +156,10 @@ public struct AsyncText: View {
  Order of subSet is stable to the sort order of superSet.
  */
 
+// Table/TableColumn don't exist on watchOS at any OS version (not an availability gate - the
+// APIs are absent there), and a two-pane table picker isn't a sensible watch UI to begin with,
+// so this type is excluded from watchOS builds entirely rather than annotated.
+#if !os(watchOS)
 @available(iOS 17.0, *)
 @available(macOS 14.0, *)
 public struct SubsetPickerView<T : Identifiable>: View {
@@ -244,6 +248,7 @@ public struct SubsetPickerView<T : Identifiable>: View {
         }
     }
 }
+#endif
 
 extension View {
     /// Applies the given transform if the given condition evaluates to `true`.

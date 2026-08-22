@@ -143,6 +143,9 @@
         }
       }
     },
+    "Password" : {
+
+    },
     "Release History" : {
       "comment" : "Link that opens a list of previous app versions' release notes.\nNavigation title for the list of previous app versions' release notes.",
       "localizations" : {
