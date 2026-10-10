@@ -225,14 +225,14 @@ public extension Array where Element == String {
         return stringValue.data(using: .utf8)!
     }
     func iBool<E: RawRepresentable>(mapping: [E : Int], field: E) -> Bool where E.RawValue == String {
-        let stringValue = self[mapping[field]!].lowercased() as NSString
+        let stringValue = NSString(string: self[mapping[field]!].lowercased())
         return stringValue.boolValue
     }
     func iBoolOpt<E: RawRepresentable>(mapping: [E : Int], field: E, nilIfNotMapped: Bool = false) -> Bool? where E.RawValue == String {
         if nilIfNotMapped, !mapping.keys.contains(field) {
             return nil
         } else {
-            let stringValue = self[mapping[field]!].lowercased() as NSString
+            let stringValue = NSString(string: self[mapping[field]!].lowercased())
             return stringValue.boolValue
         }
     }

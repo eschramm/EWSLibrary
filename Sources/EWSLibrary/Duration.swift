@@ -9,32 +9,32 @@ import Foundation
 
 public extension TimeInterval {
     
-    internal static let lastModFormatterLessThan5Minutes: DateComponentsFormatter = {
-        let f = DateComponentsFormatter()
+    internal static let lastModFormatterLessThan5Minutes: IntervalComponentsFormatter = {
+        let f = IntervalComponentsFormatter()
         f.unitsStyle = .abbreviated
         f.allowedUnits = [.minute, .second]
         f.zeroFormattingBehavior = .dropAll
         return f
     }()
     
-    internal static let lastModFormatterLessThanWeek: DateComponentsFormatter = {
-        let f = DateComponentsFormatter()
+    internal static let lastModFormatterLessThanWeek: IntervalComponentsFormatter = {
+        let f = IntervalComponentsFormatter()
         f.unitsStyle = .abbreviated
         f.allowedUnits = [.day, .hour, .minute]
         f.zeroFormattingBehavior = .dropAll
         return f
     }()
     
-    internal static let lastModFormatterLessThanYear: DateComponentsFormatter = {
-        let f = DateComponentsFormatter()
+    internal static let lastModFormatterLessThanYear: IntervalComponentsFormatter = {
+        let f = IntervalComponentsFormatter()
         f.unitsStyle = .abbreviated
         f.allowedUnits = [.month, .day]
         f.zeroFormattingBehavior = .dropAll
         return f
     }()
     
-    internal static let lastModFormatterMoreThanYear: DateComponentsFormatter = {
-        let f = DateComponentsFormatter()
+    internal static let lastModFormatterMoreThanYear: IntervalComponentsFormatter = {
+        let f = IntervalComponentsFormatter()
         f.unitsStyle = .abbreviated
         f.allowedUnits = [.year, .month, .day]
         f.zeroFormattingBehavior = .dropAll
@@ -53,7 +53,7 @@ public extension TimeInterval {
         guard absSelf >= 120 else {
             return "\(self.formatted()) sec"
         }
-        let floorsDict: [Double   : DateComponentsFormatter] = [
+        let floorsDict: [Double   : IntervalComponentsFormatter] = [
             (60 * 5)              : Self.lastModFormatterLessThan5Minutes,
             (60 * 60 * 24 * 7)    : Self.lastModFormatterLessThanWeek,
             (60 * 60 * 24 * 365)  : Self.lastModFormatterLessThanYear,

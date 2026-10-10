@@ -5,6 +5,7 @@
 //  Created by Eric Schramm on 5/14/26.
 //
 
+#if canImport(SwiftUI)
 import Foundation
 import SwiftUI
 
@@ -95,3 +96,4 @@ public final class TokenContext: ObservableObject {
         return values
     }
 }
+#endif

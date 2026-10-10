@@ -196,8 +196,8 @@ public final class ProgressTimeProfiler: Sendable {
     
     var timeStamps = [ProgressTimeStamp]()
     public var totalWork: Int
-    let timeFormatter: DateComponentsFormatter = {
-        let dcf = DateComponentsFormatter()
+    let timeFormatter: IntervalComponentsFormatter = {
+        let dcf = IntervalComponentsFormatter()
         dcf.allowedUnits = [.day, .hour, .minute, .second]
         dcf.unitsStyle = .abbreviated
         //dcf.maximumUnitCount = 1
@@ -296,6 +296,8 @@ func timeStampDiff(start: TimeInterval, end: TimeInterval) -> String {
     return "\(diffInSeconds) seconds"
 }
 
+// Timer's target/selector API needs the Objective-C runtime.
+#if canImport(ObjectiveC)
 public class Debouncer: NSObject {
     let callback: (() -> ())
     let delay: Double
@@ -334,7 +336,10 @@ public class Debouncer: NSObject {
     }
 }
 
+#endif
+
 public struct AppInfo {
+    #if canImport(Darwin)
     public static func currentMemory() -> Int {
         let TASK_VM_INFO_COUNT = MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<natural_t>.size
 
@@ -359,6 +364,14 @@ public struct AppInfo {
             print("Error with task_info(): %s", errorString)
             return 0
         }
+    }    #else
+    /// Resident set size, read from `/proc/self/statm` (second field, in pages).
+    public static func currentMemory() -> Int {
+        guard let statm = try? String(contentsOfFile: "/proc/self/statm", encoding: .utf8) else { return 0 }
+        let fields = statm.split(separator: " ")
+        guard fields.count > 1, let residentPages = Int(fields[1]) else { return 0 }
+        return residentPages * Int(sysconf(Int32(_SC_PAGESIZE)))
     }
+    #endif
 }
 

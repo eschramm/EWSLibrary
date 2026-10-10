@@ -5,6 +5,8 @@
 //  Created by Eric Schramm on 5/14/26.
 //
 
+// TokenContext is an ObservableObject, so it only exists where SwiftUI does.
+#if canImport(SwiftUI)
 import XCTest
 @testable import EWSLibrary
 
@@ -406,3 +408,4 @@ final class TokenContextTests: XCTestCase {
         }
     }
 }
+#endif

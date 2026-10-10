@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if canImport(SwiftUI)
 import SwiftUI
 
 public enum LoadingResult<T> {
@@ -337,3 +338,4 @@ public extension Bundle {
 #endif
     }
 }
+#endif

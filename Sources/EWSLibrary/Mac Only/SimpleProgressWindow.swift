@@ -5,6 +5,7 @@
 //  Created by Eric Schramm on 7/14/21.
 //
 
+#if canImport(SwiftUI)
 import SwiftUI
 
 @available(macOS 12, *)
@@ -300,4 +301,5 @@ struct TestProgressView: View {
 #Preview {
     TestProgressView()
 }
+#endif
 #endif

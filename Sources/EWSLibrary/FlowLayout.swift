@@ -7,6 +7,7 @@
 //  width. Shared across apps (e.g. iQIF, StattyCaddy2) for tag clouds.
 //
 
+#if canImport(SwiftUI)
 import SwiftUI
 
 public struct FlowLayout: Layout {
@@ -57,3 +58,4 @@ public struct FlowLayout: Layout {
         }
     }
 }
+#endif

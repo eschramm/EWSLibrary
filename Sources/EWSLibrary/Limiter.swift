@@ -111,5 +111,5 @@ private extension Limiter {
 // MARK: - TimeInterval
 
 extension TimeInterval {
-    static let nanosecondsPerSecond = TimeInterval(NSEC_PER_SEC)
+    static let nanosecondsPerSecond = TimeInterval(1_000_000_000)
 }
