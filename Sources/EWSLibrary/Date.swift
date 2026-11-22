@@ -311,7 +311,6 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
     public let month: Int
     public let day: Int
     
-    static let epoch = Date(timeIntervalSince1970: 0)  // January 1, 1970
     
     /// Create a simple DateDay from a string
     /// - Parameter string: e.g., 2024-08-07
@@ -336,10 +335,10 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
         self.day = dateComponents.day!
     }
     
+    /// The day `dayNumber` days after 1970-01-01 (negative before it). Integer math, no Calendar.
     public init(dayNumber: Int) {
-        let components = DateComponents(day: dayNumber, hour: 12)
-        let date = Calendar.current.date(byAdding: components, to: Self.epoch)!
-        self.init(date: date)
+        let (year, month, day) = Self.civil(fromDayNumber: dayNumber)
+        self.init(year: year, month: month, day: day)
     }
     
     public init(year: Int, month: Int, day: Int) {
@@ -368,8 +367,12 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
         return "\(year)|\(month)|\(day)"
     }
     
+    /// Days since 1970-01-01, negative before it. An out-of-range month or day rolls over as
+    /// Calendar does (2026-02-30 is 2026-03-02, month 13 is January of the next year).
     public var dayNumber: Int {
-        return Calendar.current.dateComponents([.day], from: Self.epoch, to: date).day!
+        let months = year * 12 + (month - 1)
+        let (normalizedYear, normalizedMonth) = (Self.floorDivide(months, 12), months - Self.floorDivide(months, 12) * 12 + 1)
+        return Self.dayNumber(year: normalizedYear, month: normalizedMonth, day: 1) + (day - 1)
     }
     
     public static var today: DateDay {
@@ -403,13 +406,54 @@ public struct DateDay: Codable, Hashable, Comparable, Sendable, Identifiable {
     }
     
     public var lastDateDayOfMonth: DateDay {
-        let date = self.date
-        let range = Calendar.current.range(of: .day, in: .month, for: date)!
-        return .init(date: Calendar.current.date(bySetting: .day, value: range.count, of: date)!)
+        let normalized = offsetByDays(0)
+        return .init(year: normalized.year, month: normalized.month, day: Self.daysInMonth(year: normalized.year, month: normalized.month))
     }
     
+    /// 1 is Sunday through 7, Saturday, as Calendar's Gregorian `.weekday`.
     public var weekday: Int {
-        return Calendar.current.component(.weekday, from: date)
+        let sinceThursday = (dayNumber % 7 + 7) % 7   // 1970-01-01 was a Thursday
+        return (sinceThursday + 4) % 7 + 1
+    }
+    
+    // Day arithmetic in plain integers (Howard Hinnant's days_from_civil and civil_from_days,
+    // https://howardhinnant.github.io/date_algorithms.html): the proleptic Gregorian calendar,
+    // exact for any year, with no Calendar, no time zone and no lock, so it costs nothing when
+    // many threads do it at once. Calendar.current is shared and serializes its callers; the
+    // arithmetic used to go through it four times for each `+ n`. (Foundation's Gregorian
+    // calendar is Julian before 1582-10-15; these are Gregorian throughout.)
+    
+    static func floorDivide(_ a: Int, _ b: Int) -> Int {
+        a >= 0 ? a / b : -((-a + b - 1) / b)
+    }
+    
+    static func dayNumber(year: Int, month: Int, day: Int) -> Int {
+        let y = month <= 2 ? year - 1 : year
+        let era = floorDivide(y, 400)
+        let yearOfEra = y - era * 400
+        let dayOfYear = (153 * (month > 2 ? month - 3 : month + 9) + 2) / 5 + day - 1
+        let dayOfEra = yearOfEra * 365 + yearOfEra / 4 - yearOfEra / 100 + dayOfYear
+        return era * 146_097 + dayOfEra - 719_468
+    }
+    
+    static func civil(fromDayNumber dayNumber: Int) -> (year: Int, month: Int, day: Int) {
+        let z = dayNumber + 719_468
+        let era = floorDivide(z, 146_097)
+        let dayOfEra = z - era * 146_097
+        let yearOfEra = (dayOfEra - dayOfEra / 1460 + dayOfEra / 36_524 - dayOfEra / 146_096) / 365
+        let dayOfYear = dayOfEra - (365 * yearOfEra + yearOfEra / 4 - yearOfEra / 100)
+        let shiftedMonth = (5 * dayOfYear + 2) / 153
+        let day = dayOfYear - (153 * shiftedMonth + 2) / 5 + 1
+        let month = shiftedMonth < 10 ? shiftedMonth + 3 : shiftedMonth - 9
+        return (yearOfEra + era * 400 + (month <= 2 ? 1 : 0), month, day)
+    }
+    
+    static func daysInMonth(year: Int, month: Int) -> Int {
+        switch month {
+        case 2: return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0 ? 29 : 28
+        case 4, 6, 9, 11: return 30
+        default: return 31
+        }
     }
 }
 
